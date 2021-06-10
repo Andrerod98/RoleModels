@@ -1,0 +1,289 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import { Tab, Row, Col, Nav, Table } from "react-bootstrap";
+import SyntaxHighlighter from "react-syntax-highlighter";
+import { docco } from "react-syntax-highlighter/dist/esm/styles/hljs";
+
+<Meta
+  title='Welcome'
+  parameters={{
+    previewTabs: {
+      canvas: { hidden: true },
+      "fluid/sourcecode-addon/panel": { hidden: true },
+    },
+  }}
+/>
+
+# Welcome to the RoleModels Prototyping Tool Playground
+
+The Fluid Framework is a real-time collaboration technology that can be used to sync state between multiple users.
+The playground provides a way to interact with the prototyping tool demos running side by side in the browser.
+
+In the demos I focused on the cross-device interactions therefore I did not include a mechanism to change or add roles.
+There are two pre-defined roles (capturer and viewer) but the tool is supports any other roles.
+When viewing a demo you can perform the following actions:
+
+- View a demo on its own by clicking the **Canvas tab**.
+- Get details about a demo by clicking the **Docs tab**.
+
+**To get started** select a demo from the left sidebar!
+
+# Additional Info
+
+The roles are automatically distributed when devices connect. By clicking the header buttons you can change the role of the current device.
+
+Each combined view includes a button "E" that can be used to see the UI and edit it.
+
+The available components are:
+
+<Tab.Container id='left-tabs-example' defaultActiveKey='first'>
+  <Row>
+    <Col sm={3}>
+      <Nav variant='pills' className='flex-column'>
+        <Nav.Item>
+          <Nav.Link eventKey='first'>UIComponent (base) </Nav.Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Nav.Link eventKey='second'>Input</Nav.Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Nav.Link eventKey='three'>Link</Nav.Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Nav.Link eventKey='four'>List</Nav.Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Nav.Link eventKey='five'>Map</Nav.Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Nav.Link eventKey='six'>Radio</Nav.Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Nav.Link eventKey='seven'>Image</Nav.Link>
+        </Nav.Item>
+      </Nav>
+    </Col>
+    <Col sm={9}>
+      <Tab.Content>
+        <Tab.Pane eventKey='first'>
+        <Table striped bordered hover>
+  <thead>
+    <tr>
+      <th>Properties</th>
+      <th>Example</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><SyntaxHighlighter language="typescript" style={docco}>
+      {`id:string`}
+    </SyntaxHighlighter></td>
+      <td rowSpan="9"><SyntaxHighlighter language="json" style={docco}>{`{
+        id: "next",
+        name: "button",
+        x: 190,
+        y: 250,
+        width: 100,
+        height: 30,
+        type: "text",
+        value: "Random",
+      },`}</SyntaxHighlighter></td>
+    </tr>
+    <tr>
+      <td><SyntaxHighlighter language="typescript" style={docco}>{`name: string`}</SyntaxHighlighter></td>
+    </tr>
+    <tr>
+      <td><SyntaxHighlighter language="typescript" style={docco}>{`width: number`}</SyntaxHighlighter></td>
+    </tr>
+     <tr>
+      <td><SyntaxHighlighter language="typescript" style={docco}>{`height: number`}</SyntaxHighlighter></td>
+    </tr>
+     <tr>
+      <td><SyntaxHighlighter language="typescript" style={docco}>{`x: number`}</SyntaxHighlighter></td>
+    </tr>
+     <tr>
+      <td><SyntaxHighlighter language="typescript" style={docco}>{`y:number`}</SyntaxHighlighter></td>
+    </tr>
+     <tr>
+      <td><SyntaxHighlighter language="typescript" style={docco}>{`type:string`}</SyntaxHighlighter></td>
+    </tr>
+     <tr>
+      <td><SyntaxHighlighter language="typescript" style={docco}>{`value:string`}</SyntaxHighlighter></td>
+    </tr>
+     <tr>
+      <td><SyntaxHighlighter language="typescript" style={docco}>{`style?: React.CSSProperties`}</SyntaxHighlighter></td>
+    </tr>
+  </tbody>
+</Table>
+</Tab.Pane>
+<Tab.Pane eventKey='second'><Table striped bordered hover>
+  <thead>
+    <tr>
+      <th>Additional Properties</th>
+      <th>Example</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><SyntaxHighlighter language="typescript" style={docco}>{`label: string`}</SyntaxHighlighter></td>
+      <td rowSpan="1"><SyntaxHighlighter language="json" style={docco}>{`{
+        id: "border_controller",
+        name: "input",
+        x: 235,
+        y: 180,
+        width: 100,
+        height: 40,
+        type: "range",
+        label: "Border Width",
+        value: "Distribute",
+      }`}</SyntaxHighlighter></td>
+    </tr>
+  </tbody>
+</Table></Tab.Pane>
+<Tab.Pane eventKey='three'><Table striped bordered hover>
+  <thead>
+    <tr>
+      <th>Additional Properties</th>
+      <th>Example</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><SyntaxHighlighter language="typescript" style={docco}>{`href:string`}</SyntaxHighlighter></td>
+      <td rowSpan="1"><SyntaxHighlighter language="json" style={docco}>{`{
+        id: "border_controller",
+        name: "a",
+        x: 235,
+        y: 180,
+        width: 100,
+        height: 40,
+        type: "range",
+        value: "Google",
+        href: "http://google.com"
+      }`}</SyntaxHighlighter></td>
+    </tr>
+  </tbody>
+</Table></Tab.Pane>
+<Tab.Pane eventKey='four'><Table striped bordered hover>
+  <thead>
+    <tr>
+      <th>Additional Properties</th>
+      <th>Example</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><SyntaxHighlighter language="typescript" style={docco}>{`items:string[]`}</SyntaxHighlighter></td>
+      <td rowSpan="1"><SyntaxHighlighter language="json" style={docco}>{`{
+        id: "list_id",
+        name: "list",
+        x: 10,
+        y: 60,
+        width: 460,
+        height: 300,
+        type: "text",
+        value: "Link",
+        items: ["Pterodactyl", 
+        "Lirainosaurus", 
+        "Iguanodon",
+        "Allosaurus",
+        "Brontosaurus",
+        "Gallimimus",
+        "Isanosaurus",
+        "Mosasaurus",
+        "Diplodocus",
+        "Tyrannosaurus Rex"
+        ],
+      }`}</SyntaxHighlighter></td>
+    </tr>
+  </tbody>
+</Table></Tab.Pane>
+<Tab.Pane eventKey='five'><Table striped bordered hover>
+  <thead>
+    <tr>
+      <th>Additional Properties</th>
+      <th>Example</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><SyntaxHighlighter language="typescript" style={docco}>{`center: {
+    lat: number;
+    lng: number;
+  };`}</SyntaxHighlighter></td>
+      <td rowSpan="2"><SyntaxHighlighter language="json" style={docco}>{`{
+        id: "map",
+        name: "map",
+        x: 490,
+        y: 50,
+        width: 460,
+        height: 300,
+        type: "satelite",
+        value: "",
+        style: {},
+        center: { lat: 59.95, lng: 30.33 },
+        zoom: 11,
+      }`}</SyntaxHighlighter></td>
+    </tr>
+    <tr>
+      <td><SyntaxHighlighter language="typescript" style={docco}>{`zoom: number`}</SyntaxHighlighter></td>
+  </tr>
+  </tbody>
+</Table></Tab.Pane>
+<Tab.Pane eventKey='six'><Table striped bordered hover>
+  <thead>
+    <tr>
+      <th>Additional Properties</th>
+      <th>Example</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><SyntaxHighlighter language="typescript" style={docco}>{`label: string`}</SyntaxHighlighter></td>
+      <td rowSpan="2"><SyntaxHighlighter language="json" style={docco}>{`{
+        id: "gender_controller",
+        name: "radio",
+        x: 20,
+        y: 130,
+        width: 100,
+        height: 40,
+        type: "radio",
+        label: "Mr.",
+        value: "Mr.",
+        values:["Mr.", "Mrs."]
+      }`}</SyntaxHighlighter></td>
+    </tr>
+    <tr>
+      <td><SyntaxHighlighter language="typescript" style={docco}>{`values:string[]`}</SyntaxHighlighter></td>
+  </tr>
+  </tbody>
+</Table></Tab.Pane>
+<Tab.Pane eventKey='seven'><Table striped bordered hover>
+  <thead>
+    <tr>
+      <th>Additional Properties</th>
+      <th>Example</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><SyntaxHighlighter language="typescript" style={docco}>{`src: string`}</SyntaxHighlighter></td>
+      <td rowSpan="1"><SyntaxHighlighter language="json" style={docco}>{`{
+        id: "image",
+        name: "img",
+        x: 80,
+        y: 40,
+        width: 300,
+        height: 200,
+        type: "text",
+        src: "lisbon.jpeg",
+        value: "Distribute",
+      }`}</SyntaxHighlighter></td>
+    </tr>
+   
+  </tbody>
+</Table></Tab.Pane>
+</Tab.Content>
+</Col>
+
+  </Row>
+</Tab.Container>
