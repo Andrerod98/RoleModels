@@ -1,13 +1,9 @@
 /* eslint-disable no-undef */
 import React from "react";
 import { GridUI, GridView as GridView } from ".";
-import { UIComponentController } from "../UIComponent/UIComponentController";
+import { GenericController } from "../UIComponent";
 
-export class GridController extends UIComponentController {
-  constructor(protected model: GridUI) {
-    super(model);
-  }
-
+export class GridController extends GenericController<GridUI> {
   generateWidget(): JSX.Element {
     return <GridView controller={this} />;
   }

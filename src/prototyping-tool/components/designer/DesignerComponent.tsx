@@ -1,0 +1,45 @@
+/* eslint-disable prettier/prettier */
+/* eslint-disable no-unreachable */
+/* eslint-disable react/prop-types */
+/* eslint-disable react/jsx-key */
+/* !
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License.
+ */
+
+import React, { FC } from "react";
+import { DesignTool } from "../../../design-tool/App";
+import { Project } from "../../../design-tool/Project";
+import { CrossDeviceApplication } from "../../Application";
+import { Header } from "../header/Header";
+
+interface ManagerComponentProps {
+  readonly app: CrossDeviceApplication;
+  readonly project: Project;
+}
+
+export const DesignerComponent: FC<ManagerComponentProps> = (props) => {
+  const model = props.app.getSharedObject();
+  return (
+    <div>
+      <div>
+        <Header
+          app={props.app}
+          myRole={model.getDeviceRole()}
+          roles={model.getRoles().map((role) => role.getName())}
+          onManagerClick={() => {
+            model.promoteToManager();
+          }}
+          onRoleClick={(role: string) => {
+            model.promoteToRole(role);
+            // setUI(props.model.getCombinedUI());
+          }}
+          onDesignClick={() => {
+            model.promoteToDesigner();
+          }}
+        />
+        <DesignTool app={props.app} />
+      </div>
+    </div>
+  );
+};

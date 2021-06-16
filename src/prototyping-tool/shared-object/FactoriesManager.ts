@@ -3,21 +3,8 @@ import { IUIComponent, UIComponentFactory } from "./components/UIComponent";
 export class FactoriesManager {
   private factories: Map<string, UIComponentFactory>;
 
-  private static _instance: FactoriesManager = new FactoriesManager();
-
   constructor() {
-    if (FactoriesManager._instance) {
-      throw new Error(
-        "Error: Instantiation failed: Use SingletonClass.getInstance() instead of new."
-      );
-    }
-
     this.factories = new Map<string, UIComponentFactory>();
-    FactoriesManager._instance = this;
-  }
-
-  public static getInstance(): FactoriesManager {
-    return FactoriesManager._instance;
   }
 
   public registerFactory(factory: UIComponentFactory) {
@@ -30,6 +17,9 @@ export class FactoriesManager {
       factory = this.factories.get("uicomponent");
     }
 
+    console.log("GETTING UI COMPONENT");
+    console.log(component);
+    console.log(factory);
     return factory.generateComponent(component);
 
     /*

@@ -1,4 +1,4 @@
-import { EditIcon, Icon } from "@chakra-ui/icons";
+import { Icon } from "@chakra-ui/icons";
 import {
   Box,
   Center,
@@ -42,8 +42,11 @@ export const ViewComponent: FC<ViewComponentProps> = (
     <Box
       // ref={drop}
       // key={props.view.g}
+      w={"100%"}
+      h={"100%"}
       boxShadow={"xl"}
       bg={"white"}
+      position={"relative"}
 
       // top={y + "px"}
       // left={x + "px"}
@@ -63,8 +66,8 @@ export const ViewComponent: FC<ViewComponentProps> = (
         <Popover>
           <PopoverTrigger>
             <IconButton
-              w={"40px"}
               mx={"5px"}
+              size={"sm"}
               aria-label={"QRCode"}
               icon={<Icon as={ImQrcode} />}
             />
@@ -82,12 +85,6 @@ export const ViewComponent: FC<ViewComponentProps> = (
             </PopoverContent>
           </Portal>
         </Popover>
-        <IconButton
-          w={"40px"}
-          aria-label={"Edit Combined View"}
-          // onClick={() => props.onEdit(props.cvm, ui.components)}
-          icon={<EditIcon />}
-        />
       </Box>
     </Box>
   );

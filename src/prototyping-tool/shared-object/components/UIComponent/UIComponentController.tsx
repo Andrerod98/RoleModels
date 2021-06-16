@@ -9,7 +9,11 @@ export class UIComponentController {
   parent: UIComponentController;
   children: UIComponentController[];
 
-  constructor(protected model: IUIComponent, parent?: UIComponentController) {
+  constructor(
+    protected model: IUIComponent,
+    readonly factoriesManager: FactoriesManager,
+    parent?: UIComponentController
+  ) {
     this.listeners = {};
     this.parent = parent;
     this.children = [];
@@ -20,7 +24,7 @@ export class UIComponentController {
   createController(model: IUIComponent) {
     console.log("Adding child,");
     console.log(model);
-    const controller = FactoriesManager.getInstance().getUIComponent(model);
+    const controller = this.factoriesManager.getUIComponent(model);
     // .new UIComponentController(model, this);
     return controller;
   }
@@ -46,7 +50,7 @@ export class UIComponentController {
   }
 
   addChild(model: IUIComponent) {
-    const controller = FactoriesManager.getInstance().getUIComponent(model);
+    const controller = this.factoriesManager.getUIComponent(model);
     this.children.push(controller);
   }
 
@@ -114,5 +118,13 @@ export class UIComponentController {
 
   generateWidget(): JSX.Element {
     return <UIComponentView controller={this} />;
+  }
+}
+
+export class GenericController<
+  M extends IUIComponent
+> extends UIComponentController {
+  constructor(protected model: M, readonly factoriesManager: FactoriesManager) {
+    super(model, factoriesManager);
   }
 }

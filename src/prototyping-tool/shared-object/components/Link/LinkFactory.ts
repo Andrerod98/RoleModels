@@ -3,6 +3,6 @@ import { UIComponentFactory } from "../UIComponent";
 
 export class LinkFactory extends UIComponentFactory {
   public generateComponent(component: LinkUI): LinkController {
-    return new LinkController(component);
+    return new LinkController(component, this.factoriesManager);
   }
 }

@@ -22,6 +22,7 @@ import {
   useTab,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
+import { CrossDeviceApplication } from "../../../prototyping-tool/Application";
 import { BoxUI } from "../../../prototyping-tool/shared-object/components/Box";
 import { CenterUI } from "../../../prototyping-tool/shared-object/components/Center";
 import { CheckboxUI } from "../../../prototyping-tool/shared-object/components/CheckBox";
@@ -40,39 +41,38 @@ import { IUIComponent } from "../../../prototyping-tool/shared-object/components
 import { IView } from "../../../prototyping-tool/shared-object/views/IView";
 import { View } from "../../../prototyping-tool/shared-object/views/View";
 
-import { ITemplate, Project } from "../../Project";
 import { Utils } from "../../Utils";
 import { SingleTabCatalogBar } from "./CatalogBar";
 import { CodeEditor } from "./CodeEditor";
 import { Previewer } from "./Previewer/Previewer";
 interface SingleTabProps {
-  project: Project;
-  template: ITemplate;
+  app: CrossDeviceApplication;
   onChange: (value: string) => void;
 }
 
 export const SingleTab = (props: SingleTabProps) => {
-  const [curTab, setCurTab] = useState("individual");
+  const [curTab, setCurTab] = useState("default");
+
+  const views = props.app.getRole(curTab).getViews();
   const [value, setValue] = useState(
-    props.project.viewsToString(
-      props.project
-        .getLayoutManager(curTab)
-        .getViews()
-        .map((v) => v.toView())
-    )
+    Utils.jsonToString(views.map((v) => v.toView()))
   );
 
   const [cursorPosition, setCursorPosition] = useState({ row: 0, column: 0 });
   const [alert, setAlert] = useState(false);
-  const tabs = Array.from(props.project.getRoles());
-  const views = props.project.getLayoutManager(curTab).getViews();
-
+  const tabs = Array.from(props.app.getSharedObject().getRoles());
+  const curIndex = tabs.findIndex((tab) => tab.getName() === curTab);
   const preview = (newValue?: string) => {
     console.log("Preview");
     //props.project.stringToViews(value)
-    props.project
-      .getLayoutManager(curTab)
-      .setViews(Utils.stringToJson(newValue === undefined ? value : newValue));
+
+    props.app
+      .getRole(curTab)
+      .updateViews(
+        Utils.stringToJson(newValue === undefined ? value : newValue).map(
+          (iview) => View.from(iview, props.app.getSharedObject().getFactoriesManager())
+        )
+      );
   };
 
   const addUIComponent = (name: string) => {
@@ -197,11 +197,11 @@ export const SingleTab = (props: SingleTabProps) => {
 
   const handleChangeView = (newView: View) => {
     console.log("view change");
-    props.project.getLayoutManager(curTab).changeView(newView);
+    props.app.getRole(curTab).updateView(newView);
     setValue(
       Utils.jsonToString(
-        props.project
-          .getLayoutManager(curTab)
+        props.app
+          .getRole(curTab)
           .getViews()
           .map((v) => v.toView())
       )
@@ -210,13 +210,13 @@ export const SingleTab = (props: SingleTabProps) => {
 
   const handleChangeViews = (newViews: View[]) => {
     console.log("change views");
-    props.project
-      .getLayoutManager(curTab)
-      .setViews(newViews.map((v) => v.toView()));
+
+    props.app.getRole(curTab).updateViews(newViews);
+
     setValue(
       Utils.jsonToString(
-        props.project
-          .getLayoutManager(curTab)
+        props.app
+          .getRole(curTab)
           .getViews()
           .map((v) => v.toView())
       )
@@ -238,19 +238,19 @@ export const SingleTab = (props: SingleTabProps) => {
     console.log("role " + role + " loading");
     setCurTab(role);
 
-    const layoutManager = props.project.getLayoutManager(role);
+    const r = props.app.getRole(curTab);
 
-    if (layoutManager === undefined) {
+    if (r === undefined) {
       console.warn("The layout manager of " + role + " was not found.");
-      console.table(Array.from(props.project.getRoles()));
+      console.table(Array.from(props.app.getSharedObject().getRoles()));
       return;
     }
 
     //Load role
     setValue(
       Utils.jsonToString(
-        props.project
-          .getLayoutManager(role)
+        props.app
+          .getRole(curTab)
           .getViews()
           .map((v) => v.toView())
       )
@@ -266,8 +266,8 @@ export const SingleTab = (props: SingleTabProps) => {
 
   const handleTabClose = (role: string) => {
     console.log("Tab close");
-    props.project.removeRole(role);
-    loadRole("individual");
+    props.app.getSharedObject().getRolesManager().removeRole(role);
+    loadRole("default");
   };
 
   const handleTabSubmit = (role: string, e: any) => {
@@ -277,11 +277,10 @@ export const SingleTab = (props: SingleTabProps) => {
       return;
     }
 
-    props.project.renameRole(role, nextValue);
+    props.app.getSharedObject().getRolesManager().renameRole(role, nextValue);
     loadRole(nextValue);
   };
 
-  const curIndex = tabs.indexOf(curTab);
   return (
     <Box h={"100%"} overflow={"hidden"}>
       <SingleTabCatalogBar onClick={(element) => addUIComponent(element)} />
@@ -298,15 +297,15 @@ export const SingleTab = (props: SingleTabProps) => {
             {tabs.map((tab, index) => (
               <CustomTab
                 key={"tab-" + index}
-                title={tab}
+                title={tab.getName()}
                 onClick={() => {
-                  handleTabClick(tab);
+                  handleTabClick(tab.getName());
                 }}
                 onClose={() => {
-                  handleTabClose(tab);
+                  handleTabClose(tab.getName());
                 }}
                 onSubmit={(e) => {
-                  handleTabSubmit(tab, e);
+                  handleTabSubmit(tab.getName(), e);
                 }}
               />
             ))}
@@ -314,7 +313,7 @@ export const SingleTab = (props: SingleTabProps) => {
             <Tab
               bg={"blackAlpha.100"}
               onClick={() => {
-                props.project.addRole("new");
+                props.app.addRole("new");
               }}
             >
               Add...
@@ -359,7 +358,6 @@ export const SingleTab = (props: SingleTabProps) => {
                       onChangeViews={handleChangeViews}
                       views={views}
                       handleClick={() => preview()}
-                      project={props.project}
                     />
                     {}
                   </Center>

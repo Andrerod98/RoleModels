@@ -81,6 +81,8 @@ export class PrototypingToolDataObject
   private qrMap: SharedMap;
   private qrManager: QRManager;
 
+  private factoriesManager: FactoriesManager;
+
   /* Ink */
   private ink: IInk;
 
@@ -111,6 +113,43 @@ export class PrototypingToolDataObject
     const ink = Ink.create(this.runtime);
 
     const sharedPing = SharedCounter.create(this.runtime);
+
+    const managerRole = SharedCell.create(this.runtime);
+
+    managerRole.set({
+      name: "manager",
+      views: [],
+      combinedViewsIds: [],
+      qrIds: [],
+    } as IRole);
+
+    const designerRole = SharedCell.create(this.runtime);
+
+    designerRole.set({
+      name: "designer",
+      views: [],
+      combinedViewsIds: [],
+      qrIds: [],
+    } as IRole);
+
+    const defaultRole = SharedCell.create(this.runtime);
+
+    defaultRole.set({
+      name: "default",
+      views: [],
+      combinedViewsIds: [],
+      qrIds: [],
+    } as IRole);
+
+    /* Creating shared Cells...*/
+    /* for (let i = 0; i < 5; i++) {
+      const sharedCell = SharedCell.create(this.runtime);
+      rolesMap.set("role-" + i, sharedCell.handle);
+    }*/
+
+    rolesMap.set("manager", managerRole.handle);
+    rolesMap.set("designer", designerRole.handle);
+    rolesMap.set("default", defaultRole.handle);
 
     /* Setting shared Cells in combined views Map...*/
     this.root.set("devices", devicesMap.handle);
@@ -178,19 +217,16 @@ export class PrototypingToolDataObject
   private loadManagers() {
     /* Creating devices manager...*/
     this.devicesManager = new DevicesManager(this.devicesMap, this.runtime);
-
+    this.factoriesManager = new FactoriesManager();
     /* Creating factories manager...*/
 
     /* Creating Roles manager...*/
-    this.rolesManager = new RolesManager(
-      this.rolesMap,
-      FactoriesManager.getInstance()
-    );
+    this.rolesManager = new RolesManager(this.rolesMap, this.factoriesManager);
 
     /* Creating combined views Manager...*/
     this.combinedViewsManager = new CombinedViewsManager(
       this.combinedViewsMap,
-      FactoriesManager.getInstance(),
+      this.factoriesManager,
       () => {
         this.emit("change", "CVM");
       }
@@ -226,32 +262,59 @@ export class PrototypingToolDataObject
   }
 
   private registerDefaultFactories() {
-    FactoriesManager.getInstance().registerFactory(
-      new UIComponentFactory("uicomponent")
+    this.factoriesManager.registerFactory(
+      new UIComponentFactory("uicomponent", this.factoriesManager)
     );
-    FactoriesManager.getInstance().registerFactory(new RadioFactory("radio"));
-    FactoriesManager.getInstance().registerFactory(new MapFactory("map"));
-    FactoriesManager.getInstance().registerFactory(new ListFactory("list"));
-    FactoriesManager.getInstance().registerFactory(new LinkFactory("link"));
-    FactoriesManager.getInstance().registerFactory(new InputFactory("input"));
-    FactoriesManager.getInstance().registerFactory(new ImageFactory("image"));
-    FactoriesManager.getInstance().registerFactory(new FlexFactory("flex"));
-    FactoriesManager.getInstance().registerFactory(new CenterFactory("column"));
-    FactoriesManager.getInstance().registerFactory(new SpacerFactory("spacer"));
-    FactoriesManager.getInstance().registerFactory(new BoxFactory("box"));
-    FactoriesManager.getInstance().registerFactory(new CenterFactory("center"));
-    FactoriesManager.getInstance().registerFactory(new StackFactory("stack"));
-    FactoriesManager.getInstance().registerFactory(new GridFactory("grid"));
-    FactoriesManager.getInstance().registerFactory(
-      new CheckboxFactory("checkbox")
+    this.factoriesManager.registerFactory(
+      new RadioFactory("radio", this.factoriesManager)
     );
-    FactoriesManager.getInstance().registerFactory(
-      new EditableFactory("editable")
+    this.factoriesManager.registerFactory(
+      new MapFactory("map", this.factoriesManager)
     );
-    FactoriesManager.getInstance().registerFactory(new SliderFactory("slider"));
-
-    FactoriesManager.getInstance().registerFactory(
-      new InkCanvasFactory("ink", this.ink)
+    this.factoriesManager.registerFactory(
+      new ListFactory("list", this.factoriesManager)
+    );
+    this.factoriesManager.registerFactory(
+      new LinkFactory("link", this.factoriesManager)
+    );
+    this.factoriesManager.registerFactory(
+      new InputFactory("input", this.factoriesManager)
+    );
+    this.factoriesManager.registerFactory(
+      new ImageFactory("image", this.factoriesManager)
+    );
+    this.factoriesManager.registerFactory(
+      new FlexFactory("flex", this.factoriesManager)
+    );
+    this.factoriesManager.registerFactory(
+      new CenterFactory("column", this.factoriesManager)
+    );
+    this.factoriesManager.registerFactory(
+      new SpacerFactory("spacer", this.factoriesManager)
+    );
+    this.factoriesManager.registerFactory(
+      new BoxFactory("box", this.factoriesManager)
+    );
+    this.factoriesManager.registerFactory(
+      new CenterFactory("center", this.factoriesManager)
+    );
+    this.factoriesManager.registerFactory(
+      new StackFactory("stack", this.factoriesManager)
+    );
+    this.factoriesManager.registerFactory(
+      new GridFactory("grid", this.factoriesManager)
+    );
+    this.factoriesManager.registerFactory(
+      new CheckboxFactory("checkbox", this.factoriesManager)
+    );
+    this.factoriesManager.registerFactory(
+      new EditableFactory("editable", this.factoriesManager)
+    );
+    this.factoriesManager.registerFactory(
+      new SliderFactory("slider", this.factoriesManager)
+    );
+    this.factoriesManager.registerFactory(
+      new InkCanvasFactory("ink", this.ink, this.factoriesManager)
     );
   }
 
@@ -349,6 +412,7 @@ export class PrototypingToolDataObject
     this.loadManagers();
 
     /* Registering factories...*/
+
     this.registerDefaultFactories();
 
     this.createAllEventListeners();
@@ -357,38 +421,9 @@ export class PrototypingToolDataObject
     //this.devicesManager.addDevice("manager");
     //this.devicesManager.addMyDevice();
 
-    const managerRole = SharedCell.create(this.runtime);
-
-    managerRole.set({
-      name: "manager",
-      views: [],
-      combinedViewsIds: [],
-      qrIds: [],
-    } as IRole);
-
-    const designerRole = SharedCell.create(this.runtime);
-
-    designerRole.set({
-      name: "designer",
-      views: [],
-      combinedViewsIds: [],
-      qrIds: [],
-    } as IRole);
-
-    /* Creating shared Cells...*/
-    /* for (let i = 0; i < 5; i++) {
-      const sharedCell = SharedCell.create(this.runtime);
-      rolesMap.set("role-" + i, sharedCell.handle);
-    }*/
-
-    this.rolesManager.addRole(managerRole);
-    this.rolesManager.addRole(designerRole);
-
     /* Loading combined views...*/
     await this.rolesManager.loadRoles();
-    await this.combinedViewsManager.loadCombinedViews(
-      FactoriesManager.getInstance()
-    );
+    await this.combinedViewsManager.loadCombinedViews(this.factoriesManager);
     await this.qrManager.loadQRCodes();
 
     this.runtime.once("connected", () => {
@@ -742,8 +777,8 @@ export class PrototypingToolDataObject
   public combineViews = (view1: View, view2: View): MultiCombinedView => {
     const id = view1.getId() + "-" + view2.getId();
     const roles = [];
-    const view1New = View.from(view1.toView());
-    const view2New = View.from(view2.toView());
+    const view1New = View.from(view1.toView(), this.factoriesManager);
+    const view2New = View.from(view2.toView(), this.factoriesManager);
     view1New.setCombinedViewID(id);
     view2New.setCombinedViewID(id);
 
@@ -783,7 +818,7 @@ export class PrototypingToolDataObject
   };
 
   public registerFactory(factory: UIComponentFactory) {
-    FactoriesManager.getInstance().registerFactory(factory);
+    this.factoriesManager.registerFactory(factory);
   }
 
   /**
@@ -794,8 +829,7 @@ export class PrototypingToolDataObject
   /**
    * Get the manager device
    */
-  public getFactoriesManager = (): FactoriesManager =>
-    FactoriesManager.getInstance();
+  public getFactoriesManager = (): FactoriesManager => this.factoriesManager;
 
   /**
    * Get a connected device with a role
@@ -808,11 +842,17 @@ export class PrototypingToolDataObject
    */
   public isManager = (): boolean => this.devicesManager.isManager();
 
+  public isDesigner = (): boolean => this.devicesManager.isDesigner();
+
   /**
    * Promotes the current device to the manager
    */
   public promoteToManager = (): void => {
     this.devicesManager.promoteToManager();
+  };
+
+  public promoteToDesigner = (): void => {
+    this.devicesManager.promoteToDesigner();
   };
 
   /**

@@ -3,6 +3,6 @@ import { UIComponentFactory } from "../UIComponent";
 
 export class ImageFactory extends UIComponentFactory {
   public generateComponent(component: ImageUI): ImageController {
-    return new ImageController(component);
+    return new ImageController(component, this.factoriesManager);
   }
 }

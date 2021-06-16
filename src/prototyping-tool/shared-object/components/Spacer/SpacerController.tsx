@@ -1,13 +1,9 @@
 /* eslint-disable no-undef */
 import React from "react";
 import { SpacerUI, SpacerView } from ".";
-import { UIComponentController } from "../UIComponent/UIComponentController";
+import { GenericController } from "../UIComponent/UIComponentController";
 
-export class SpacerController extends UIComponentController {
-  constructor(protected model: SpacerUI) {
-    super(model);
-  }
-
+export class SpacerController extends GenericController<SpacerUI> {
   generateWidget(): JSX.Element {
     return <SpacerView controller={this} />;
   }

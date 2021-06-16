@@ -18,7 +18,6 @@ import {
 } from "@chakra-ui/react";
 import React, { FC } from "react";
 import { CrossDeviceApplication } from "../../Application";
-import { FocusButton } from "./FocusButton";
 import { RiMusicLine } from "react-icons/ri";
 import { TestInteractionModal } from "../../InteractionModal";
 import { FaPencilRuler } from "react-icons/fa";
@@ -53,13 +52,6 @@ export const Header: FC<HeaderProps> = (props: HeaderProps) => {
         <DrawerContent>
           <Box bg={"#272B35"} h={"60px"} py={"10px"} px={"20px"}>
             <Flex>
-              <Button
-                display={{ base: "none", md: "block" }}
-                leftIcon={<FaPencilRuler />}
-                onClick={props.onDesignClick}
-              >
-                Design
-              </Button>
               <Box key={"header-box"}>
                 <Box display={{ base: "block", md: "none" }}>
                   <Menu>
@@ -79,6 +71,15 @@ export const Header: FC<HeaderProps> = (props: HeaderProps) => {
                               manager
                             </MenuItem>
                           );
+                        } else if (role === "designer") {
+                          <MenuItem
+                            key={"header-button-" + index}
+                            mx={"5px"}
+                            variant={"solid"}
+                            onClick={() => props.onDesignClick()}
+                          >
+                            designer
+                          </MenuItem>;
                         }
                         return (
                           <MenuItem
@@ -106,6 +107,15 @@ export const Header: FC<HeaderProps> = (props: HeaderProps) => {
                           onClick={() => props.onManagerClick()}
                         >
                           manager
+                        </Button>
+                      );
+                    } else if (role === "designer") {
+                      return (
+                        <Button
+                          leftIcon={<FaPencilRuler />}
+                          onClick={props.onDesignClick}
+                        >
+                          Designer
                         </Button>
                       );
                     }
@@ -143,7 +153,6 @@ export const Header: FC<HeaderProps> = (props: HeaderProps) => {
                   }}
                 />
                 <TestInteractionModal app={props.app} />
-                <FocusButton app={props.app} />
               </Box>
             </Flex>
           </Box>

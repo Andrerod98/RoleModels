@@ -108,7 +108,7 @@ export const ManagerComponent: FC<ManagerComponentProps> = (props) => {
             // setUI(props.model.getCombinedUI());
           }}
           onDesignClick={() => {
-            props.app.redirectToDesign();
+            model.promoteToDesigner();
           }}
         />
         <Stack
@@ -124,7 +124,7 @@ export const ManagerComponent: FC<ManagerComponentProps> = (props) => {
             value={
               "https://" +
               props.app.getServerUrl() +
-              ":8080#documentId=" +
+              ":8080#project=" +
               model.getId()
             }
           />
@@ -134,7 +134,7 @@ export const ManagerComponent: FC<ManagerComponentProps> = (props) => {
             href={
               "https://" +
               props.app.getServerUrl() +
-              ":8080#documentId=" +
+              ":8080#project=" +
               model.getId()
             }
             rel='noreferrer'

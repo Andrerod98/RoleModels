@@ -4,6 +4,8 @@ import { getDefaultObjectFromContainer } from "@fluidframework/aqueduct";
 import React from "react";
 import ReactDOM from "react-dom";
 import { MainComponent } from ".";
+import { Project } from "../design-tool/Project";
+import { Utils } from "../design-tool/Utils";
 import { CombinedView } from "./shared-object/combined-views/combined-view";
 import { PositionMap } from "./shared-object/combined-views/stitching-combined-view/IStitchingCombinedView";
 import { UIComponentFactory } from "./shared-object/components/UIComponent";
@@ -12,6 +14,7 @@ import { PrototypingToolDataObject } from "./shared-object/PrototypingToolDataOb
 import { IQRCode } from "./shared-object/qrcode/IQRCode";
 import { QRCodeController } from "./shared-object/qrcode/QRCodeController";
 import { Role } from "./shared-object/roles/Role";
+import { IView } from "./shared-object/views/IView";
 import { View } from "./shared-object/views/View";
 import { TinyliciousServiceWithUrl } from "./utils/tinyliciousService";
 
@@ -46,6 +49,14 @@ export class CrossDeviceApplication {
   public getSharedObject(): PrototypingToolDataObject {
     return this.sharedObject;
   }
+  
+  public viewsToString = (views: IView[]) => {
+    let fullStr = "";
+    views.forEach((view) => {
+      fullStr = fullStr + Utils.jsonToString(view);
+    });
+    return fullStr;
+  };
 
   /*private isNewDocument(): boolean {
     return window.location.hash.length === 0;
@@ -110,14 +121,11 @@ export class CrossDeviceApplication {
     window["fluidStarted"] = true;
   }
 
-  public render(div: HTMLElement) {
+  public render(div: HTMLElement, project: Project) {
     ReactDOM.render(
-      // ,
-      // React.createElement("button", { className: "sidebar" }, [
       <ChakraProvider>
-        <MainComponent key={"object"} app={this} />
+        <MainComponent key={"object"} app={this} project={project} />
       </ChakraProvider>,
-      // ]),
       div
     );
 

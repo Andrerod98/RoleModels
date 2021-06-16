@@ -4,7 +4,6 @@ import { Box, Spacer, IconButton, Flex, useColorMode } from "@chakra-ui/react";
 import { v4 as uuidv4 } from "uuid";
 import { arrayMove } from "@dnd-kit/sortable";
 import { useEffect, useState } from "react";
-import { Project } from "../../../Project";
 
 import { IoRefresh } from "react-icons/io5";
 import { FullScreenWrapper } from "./FullScreenWrapper";
@@ -12,7 +11,6 @@ import { Preview } from "./Preview";
 import React from "react";
 import { View } from "../../../../prototyping-tool/shared-object/views/View";
 interface PreviewerProps {
-  project: Project;
   views: View[];
   handleClick: () => void;
   onChangeView: (newView: View) => void;

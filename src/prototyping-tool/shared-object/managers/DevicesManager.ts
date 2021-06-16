@@ -282,8 +282,16 @@ export class DevicesManager implements IDeviceManager {
     this.promoteToRole("manager");
   }
 
+  public promoteToDesigner(): void{
+    this.promoteToRole("designer");
+  }
+
   public isManager(): boolean {
     return this.getDevice().role === "manager";
+  }
+
+  public isDesigner(): boolean {
+    return this.getDevice().role === "designer";
   }
 
   public getManager(): IDevice {

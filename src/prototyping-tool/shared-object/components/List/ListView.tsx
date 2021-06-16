@@ -18,7 +18,6 @@ export class ListView extends UIComponentView {
               className: "remove-all-styles",
               id: component.id + "_" + index,
               key: index,
-              ...controller.getItemListeners(),
             },
 
             uiComponent

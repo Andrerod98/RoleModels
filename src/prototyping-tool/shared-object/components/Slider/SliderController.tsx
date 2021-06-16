@@ -1,13 +1,9 @@
 /* eslint-disable no-undef */
 import React from "react";
 import { SliderUI, SliderView as SliderView } from ".";
-import { UIComponentController } from "../UIComponent/UIComponentController";
+import { GenericController } from "../UIComponent";
 
-export class SliderController extends UIComponentController {
-  constructor(protected model: SliderUI) {
-    super(model);
-  }
-
+export class SliderController extends GenericController<SliderUI> {
   generateWidget(): JSX.Element {
     return <SliderView controller={this} />;
   }

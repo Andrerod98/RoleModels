@@ -36,7 +36,7 @@ export class LayoutManager extends EventEmitter {
 
   public setViews(views: IView[]) {
     if (views === undefined) return;
-    this.views = views.map((v) => View.from(v));
+    //this.views = views.map((v) => View.from(v, this.facto));
     this.emit("change");
   }
 }

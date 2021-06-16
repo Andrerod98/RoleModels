@@ -1,14 +1,10 @@
 /* eslint-disable no-undef */
 import React from "react";
 import { CheckboxView as CheckboxView } from ".";
-import { IUIComponent } from "../UIComponent";
-import { UIComponentController } from "../UIComponent/UIComponentController";
+import { GenericController } from "../UIComponent";
+import { CheckboxUI } from "./CheckboxModel";
 
-export class CheckboxController extends UIComponentController {
-  constructor(protected model: IUIComponent) {
-    super(model);
-  }
-
+export class CheckboxController extends GenericController<CheckboxUI> {
   generateWidget(): JSX.Element {
     return <CheckboxView controller={this} />;
   }

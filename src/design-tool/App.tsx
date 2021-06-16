@@ -2,37 +2,21 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import "./styles/App.css";
 
-import {
-  Box,
-  ChakraProvider,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  useDisclosure,
-} from "@chakra-ui/react";
-import { CombinedTab } from "./components/combined-tab/CombinedTab";
-import { ContextMenu } from "./components/ContextMenu";
-import { Header } from "./components/Header";
+import { Box, ChakraProvider, useDisclosure } from "@chakra-ui/react";
 import { SingleTab } from "./components/single-tab/SingleTab";
-import React, { useEffect, useState } from "react";
-import { ITemplate, Project } from "./Project";
+import React, { useState } from "react";
 import { TemplateEditor } from "./components/TemplateEditor";
 import { LoggingWindow } from "./components/LoggingWindow";
-import { View } from "../prototyping-tool/shared-object/views/View";
-interface AppState {
-  template: ITemplate;
-  views: View[];
-}
+import { CrossDeviceApplication } from "../prototyping-tool/Application";
 
 interface DesignToolProps {
-  project: Project;
+  app: CrossDeviceApplication;
 }
 export const DesignTool = (props: DesignToolProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const generateState = () => {
+  /*const generateState = () => {
     return {
-      template: props.project.getTemplate(),
       views: [],
     };
   };
@@ -49,9 +33,8 @@ export const DesignTool = (props: DesignToolProps) => {
     return () => {
       props.project.off("change", onChange);
     };
-  }, []);
+  }, []);*/
 
-  const [value, setValue] = useState("");
   const [loggingOpen, setLoggingOpen] = useState(false);
 
   const handleLoggingClose = () => {
@@ -61,10 +44,10 @@ export const DesignTool = (props: DesignToolProps) => {
   return (
     <ChakraProvider resetCSS={true}>
       <Box maxH={"100vh"}>
-        <ContextMenu project={props.project}></ContextMenu>
+        {/* <ContextMenu project={props.app}></ContextMenu> */}
 
-        <Tabs isManual variant={"soft-rounded"}>
-          <Header
+        {/*<Tabs isManual variant={"soft-rounded"}>
+         <Header
             onSaveProject={() => {
               props.project.loadTemplate(value);
               props.project.saveProject();
@@ -96,7 +79,8 @@ export const DesignTool = (props: DesignToolProps) => {
               />
             </TabPanel>
           </TabPanels>
-        </Tabs>
+        </Tabs>*/}
+        <SingleTab app={props.app} onChange={(value) => {}} />
         <TemplateEditor
           isOpen={isOpen}
           onOpen={onOpen}

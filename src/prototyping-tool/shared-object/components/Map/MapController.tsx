@@ -1,14 +1,10 @@
 /* eslint-disable no-undef */
 import React from "react";
-import { UIComponentController } from "../UIComponent/UIComponentController";
+import { GenericController } from "../UIComponent/UIComponentController";
 import { MapUI } from "./MapModel";
 import { MapView } from "./MapView";
 
-export class MapController extends UIComponentController {
-  constructor(protected model: MapUI) {
-    super(model);
-  }
-
+export class MapController extends GenericController<MapUI> {
   generateWidget(): JSX.Element {
     return <MapView controller={this} />;
   }

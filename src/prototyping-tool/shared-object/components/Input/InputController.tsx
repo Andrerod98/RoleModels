@@ -1,14 +1,10 @@
 /* eslint-disable no-undef */
 import React from "react";
-import { UIComponentController } from "../UIComponent/UIComponentController";
+import { GenericController } from "../UIComponent";
 import { InputUI } from "./InputModel";
 import { InputView } from "./InputView";
 
-export class InputController extends UIComponentController {
-  constructor(protected model: InputUI) {
-    super(model);
-  }
-
+export class InputController extends GenericController<InputUI> {
   generateWidget(): JSX.Element {
     return <InputView controller={this} />;
   }

@@ -49,7 +49,7 @@ export class MultiCombinedView
 
   private loadObject() {
     Object.keys(this.combinedView.get().roleMap).forEach((role) =>
-      this.roleMap.set(role, View.from(this.combinedView.get().roleMap[role]))
+      this.roleMap.set(role, View.from(this.combinedView.get().roleMap[role], this.factoriesManager))
     );
   }
   /* Loads all the objects in the shared Cell */

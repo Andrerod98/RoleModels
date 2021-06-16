@@ -29,7 +29,7 @@ export class Role {
     role.views.forEach((v) => {
       const viewId = this.views.findIndex((v2) => v2.getId() === v.id);
       if (viewId === -1) {
-        tempArray.push(View.from(v));
+        tempArray.push(View.from(v, this.factoriesManager));
       } else {
         this.views[viewId].update(v);
         tempArray.push(this.views[viewId]);
@@ -75,6 +75,8 @@ export class Role {
   }
 
   public updateViews(newViews: View[]) {
+    console.log("UPDATING VIEWS");
+    console.log(newViews);
     this.sharedRole.set({
       ...this.getObject(),
       views: newViews.map((v) => v.toView()),

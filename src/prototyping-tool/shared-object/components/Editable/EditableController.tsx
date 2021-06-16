@@ -1,13 +1,9 @@
 /* eslint-disable no-undef */
 import React from "react";
 import { EditableUI, EditableView as EditableView } from ".";
-import { UIComponentController } from "../UIComponent/UIComponentController";
+import { GenericController } from "../UIComponent/UIComponentController";
 
-export class EditableController extends UIComponentController {
-  constructor(protected model: EditableUI) {
-    super(model);
-  }
-
+export class EditableController extends GenericController<EditableUI> {
   generateWidget(): JSX.Element {
     return <EditableView controller={this} />;
   }

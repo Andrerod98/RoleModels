@@ -1,10 +1,8 @@
 /* eslint-disable no-undef */
 import * as SRD from "@projectstorm/react-diagrams";
-import { View } from "../../prototyping-tool/shared-object/views/View";
 import { QRNodeFactory } from "./nodes/qr-node/QRNodeFactory";
 import { RoleNodeFactory } from "./nodes/role-node/RoleNodeFactory";
 import { RoleNodeModel } from "./nodes/role-node/RoleNodeModel";
-import { ViewNodeFactory } from "./nodes/view-node/ViewNodeFactory";
 export class Diagram {
   protected activeModel!: SRD.DiagramModel;
   protected diagramEngine: SRD.DiagramEngine;
@@ -18,7 +16,7 @@ export class Diagram {
   public initializeDiagram() {
     this.activeModel = new SRD.DiagramModel();
 
-    this.diagramEngine
+    /* this.diagramEngine
       .getNodeFactories()
       .registerFactory(
         new ViewNodeFactory(
@@ -26,7 +24,7 @@ export class Diagram {
           "untitled",
           new View("id", 0, 0, "", { id: "", name: "", children: [] })
         )
-      );
+      );*/
 
     this.diagramEngine
       .getNodeFactories()

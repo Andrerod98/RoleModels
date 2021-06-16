@@ -9,15 +9,8 @@ import { DefaultLinkModel } from "@projectstorm/react-diagrams";
 import { LayoutManager } from "./components/single-tab/LayoutManager";
 
 import { CrossDeviceApplication } from "../prototyping-tool/Application";
-import { IUIComponent } from "../prototyping-tool/shared-object/components/UIComponent";
 import { IRole } from "../prototyping-tool/shared-object/roles/IRole";
 import { IView } from "../prototyping-tool/shared-object/views/IView";
-import { View } from "../prototyping-tool/shared-object/views/View";
-import { FactoriesManager } from "../prototyping-tool/shared-object/FactoriesManager";
-import ReactDOM from "react-dom";
-import React from "react";
-import { ChakraProvider } from "@chakra-ui/react";
-import { MainComponent } from "../prototyping-tool";
 /* eslint-disable @typescript-eslint/no-empty-function */
 export class Project extends EventEmitter {
   private template: ITemplate;
@@ -74,7 +67,7 @@ export class Project extends EventEmitter {
     let node = null;
     console.log(data);
 
-    node = new ViewNodeModel(data.type, "teste", View.from(data.view));
+    // node = new ViewNodeModel(data.type, "teste", View.from(data.view));
 
     const point = this.diagram.getDiagramEngine().getRelativeMousePoint(event);
     node.setPosition(point);
@@ -121,12 +114,6 @@ export class Project extends EventEmitter {
       if (fileList != null) this.loadFile(fileList[0]);
     });
     return fileSelector;
-  }
-
-  public generateComponent(component: IUIComponent) {
-    return FactoriesManager.getInstance()
-      .getUIComponent(component)
-      .generateWidget();
   }
 
   public async loadFile(file: File): Promise<void> {
@@ -253,13 +240,13 @@ export class Project extends EventEmitter {
       console.log(
         this.application.getSharedObject().getDevicesManager().getDevice()
       );
-      ReactDOM.render(
+      /*ReactDOM.render(
         <ChakraProvider>
           <MainComponent key={"object"} app={this.application} />
         </ChakraProvider>,
 
         document.getElementById("content")
-      );
+      );*/
     }, 5000);
 
     /*const redirect = () => {

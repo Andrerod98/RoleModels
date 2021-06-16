@@ -31,7 +31,8 @@ export interface ISingleCombinedViewManager {
 
 export class SingleCombinedView
   extends CombinedView
-  implements ISingleCombinedViewManager {
+  implements ISingleCombinedViewManager
+{
   view: View;
   public constructor(
     protected readonly combinedView: SharedCell,
@@ -52,7 +53,7 @@ export class SingleCombinedView
   }
 
   private loadObject() {
-    this.view = View.from(this.getCombinedView().view);
+    this.view = View.from(this.getCombinedView().view, this.factoriesManager);
   }
 
   private setEventListener() {

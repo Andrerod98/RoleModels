@@ -8,8 +8,12 @@ import { InkCanvas } from "./inkCanvas";
 export class InkCanvasController extends UIComponentController {
   private inkCanvas: InkCanvas;
 
-  constructor(protected model: InkCanvasUI, private readonly ink: IInk) {
-    super(model);
+  constructor(
+    protected model: InkCanvasUI,
+    private readonly ink: IInk,
+    readonly factoriesManager
+  ) {
+    super(model, factoriesManager);
   }
 
   getInk(): IInk {

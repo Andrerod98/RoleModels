@@ -4,10 +4,8 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import React from "react";
 import ReactDOM from "react-dom";
-import { DesignTool } from "./design-tool/App";
-import { TemplateSelector } from "./design-tool/components/TemplateSelector";
+import { LandingPage } from "./design-tool/components/LandingPage";
 import { Project } from "./design-tool/Project";
-import { MainComponent } from "./prototyping-tool";
 import { CrossDeviceApplication } from "./prototyping-tool/Application";
 // const _ = require("lodash");
 
@@ -20,14 +18,14 @@ const result = hash.split("&").reduce(function (res, item) {
 }, {});
 
 const projectName = result["project"];
-const mode = result["mode"];
 
 console.log(projectName);
 
 if (projectName === undefined) {
   ReactDOM.render(
     <ChakraProvider>
-      <TemplateSelector
+      <LandingPage
+        ip={"192.168.1.72"}
         onCreate={(name: string) => {
           const application = new CrossDeviceApplication(
             "192.168.1.72",
@@ -44,8 +42,8 @@ if (projectName === undefined) {
               );
             })
             .then(() => {
-              window.location.href = application.getFullHost();
-              window.location.reload();
+              //window.location.href = application.getFullHost();
+              //window.location.reload();
             });
         }}
       />
@@ -71,24 +69,16 @@ if (projectName === undefined) {
     })
     .then(async () => {
       application.getSharedObject().once("connected", () => {
-        if (mode === "design") {
-          const project = new Project(projectName, application);
+        const project = new Project(projectName, application);
 
-          ReactDOM.render(
-            <ChakraProvider>
-              <DesignTool project={project} />
-            </ChakraProvider>,
-            document.getElementById("content")
-          );
-        } else if (mode === undefined) {
-          ReactDOM.render(
-            <ChakraProvider>
-              <MainComponent key={"object"} app={application} />
-            </ChakraProvider>,
+        application.render(document.getElementById("content"), project);
+        /*ReactDOM.render(
+          <ChakraProvider>
+            <MainComponent key={"object"} app={application} project={project} />
+          </ChakraProvider>,
 
-            document.getElementById("content")
-          );
-        }
+          document.getElementById("content")
+        );*/
       });
     });
 }

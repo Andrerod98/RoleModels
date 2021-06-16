@@ -10,10 +10,11 @@ export class View {
     protected rows: number,
     protected columns: number,
     protected combinedViewID: string = "",
+    private readonly factoriesManager: FactoriesManager,
     root: IUIComponent
   ) {
     this.combinedViewID = combinedViewID;
-    this.root = FactoriesManager.getInstance().getUIComponent(root);
+    this.setRoot(root);
   }
 
   public getId() {
@@ -41,7 +42,7 @@ export class View {
   }
 
   public setRoot(root: IUIComponent) {
-    this.root = new UIComponentController(root);
+    this.root = this.factoriesManager.getUIComponent(root);
   }
 
   public getRoot() {
@@ -137,13 +138,14 @@ export class View {
     if (this.updateEvent !== undefined) this.updateEvent();
   }
 
-  static from(object: IView) {
+  static from(object: IView, factoriesManager: FactoriesManager) {
     console.log(object);
     const view = new View(
       object.id,
       object.rows,
       object.cols,
       object.combinedViewID,
+      factoriesManager,
       object.root
     );
 

@@ -45,8 +45,6 @@ export class RolesManager implements IRolesManager {
     this.rolesMap.on("valueChanged", async (e: any, ...args) => {
       const roleName = e.key;
       if (e.previousValue === undefined) {
-
-        
         // added
         const sharedCell = await this.rolesMap
           .get<IFluidHandle<SharedCell>>(roleName)
@@ -73,6 +71,12 @@ export class RolesManager implements IRolesManager {
         }
       }
     });
+  }
+
+  public renameRole(role: string, nextValue: string) {
+    if (role === nextValue) return;
+    this.roles.set(nextValue, this.roles.get(role));
+    this.roles.delete(role);
   }
 
   public getRole(roleName: string): Role {
@@ -124,6 +128,7 @@ export class RolesManager implements IRolesManager {
     const role = sharedRole.get();
 
     const r = new Role(sharedRole, this.factoriesManager);
+    this.rolesMap.set(role.name, sharedRole);
     this.roles.set(role.name, r);
 
     return r;

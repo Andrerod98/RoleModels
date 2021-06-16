@@ -1,13 +1,9 @@
 /* eslint-disable no-undef */
 import React from "react";
 import { CenterUI, CenterView as CenterView } from ".";
-import { UIComponentController } from "../UIComponent/UIComponentController";
+import { GenericController } from "../UIComponent";
 
-export class CenterController extends UIComponentController {
-  constructor(protected model: CenterUI) {
-    super(model);
-  }
-
+export class CenterController extends GenericController<CenterUI> {
   generateWidget(): JSX.Element {
     return <CenterView controller={this} />;
   }
