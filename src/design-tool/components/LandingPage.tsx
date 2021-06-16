@@ -29,11 +29,11 @@ export interface TemplateSelectorProps {
   ip: string;
 }
 
-var context = require.context(
+/*var context = require.context(
   "/var/tmp/tinylicious/tinylicious/.git/refs/heads",
-  true
+  false
 );
-var filesnames = context.keys().map((k) => k.substr(2));
+var filesnames = context.keys().map((k) => k.substr(2));*/
 
 export const LandingPage: React.FC<TemplateSelectorProps> = (
   props: TemplateSelectorProps
@@ -60,9 +60,9 @@ export const LandingPage: React.FC<TemplateSelectorProps> = (
         <VStack spacing={4} align={"stretch"} flex={1}>
           <Heading>Projects</Heading>
           <UnorderedList>
-            {filesnames.map((f) => {
+            {[].map((f, index) => {
               return (
-                <ListItem>
+                <ListItem key={"filename-" + index}>
                   <Link
                     onClick={() => {
                       window.location.href =

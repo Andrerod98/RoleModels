@@ -14,6 +14,7 @@ import { Position } from "./ViewItemOverlay";
 
 export const ViewItem = forwardRef(({ id, ...props }: any, ref: any) => {
   const [isOver, setOver] = useState(false);
+  console.log((props.item.view as View).getRoot());
   return (
     <GridItem
       rowSpan={props.item.view.getColumns()}

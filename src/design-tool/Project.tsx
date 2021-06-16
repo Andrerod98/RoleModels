@@ -230,24 +230,7 @@ export class Project extends EventEmitter {
     const sharedObj = this.application.getSharedObject();
     sharedObj.clearAll();
 
-    setTimeout(() => {
-      /*window.location.href =
-        "https://" +
-        this.application.serverUrl +
-        ":8080/#project=" +
-        this.application.projectName;
-      window.location.reload();*/
-      console.log(
-        this.application.getSharedObject().getDevicesManager().getDevice()
-      );
-      /*ReactDOM.render(
-        <ChakraProvider>
-          <MainComponent key={"object"} app={this.application} />
-        </ChakraProvider>,
-
-        document.getElementById("content")
-      );*/
-    }, 5000);
+    
 
     /*const redirect = () => {
       setTimeout(() => {

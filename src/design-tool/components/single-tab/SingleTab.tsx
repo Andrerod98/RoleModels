@@ -54,6 +54,7 @@ export const SingleTab = (props: SingleTabProps) => {
   const [curTab, setCurTab] = useState("default");
 
   const views = props.app.getRole(curTab).getViews();
+  console.log(views);
   const [value, setValue] = useState(
     Utils.jsonToString(views.map((v) => v.toView()))
   );
@@ -70,7 +71,8 @@ export const SingleTab = (props: SingleTabProps) => {
       .getRole(curTab)
       .updateViews(
         Utils.stringToJson(newValue === undefined ? value : newValue).map(
-          (iview) => View.from(iview, props.app.getSharedObject().getFactoriesManager())
+          (iview) =>
+            View.from(iview, props.app.getSharedObject().getFactoriesManager())
         )
       );
   };

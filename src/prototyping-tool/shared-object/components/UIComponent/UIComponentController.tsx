@@ -18,7 +18,9 @@ export class UIComponentController {
     this.parent = parent;
     this.children = [];
 
-    model.children.forEach((child) => this.addChild(child));
+    if (model.children !== undefined) {
+      model.children.forEach((child) => this.addChild(child));
+    }
   }
 
   createController(model: IUIComponent) {

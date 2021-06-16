@@ -45,7 +45,7 @@ export class View {
     this.root = this.factoriesManager.getUIComponent(root);
   }
 
-  public getRoot() {
+  public getRoot(): UIComponentController {
     return this.root;
   }
 
@@ -133,7 +133,8 @@ export class View {
     this.combinedViewID = object.combinedViewID;
     console.log("updated");
     console.log(object);
-    this.root.update(object.root);
+    this.setRoot(object.root);
+    //this.root.update(object.root);
 
     if (this.updateEvent !== undefined) this.updateEvent();
   }
