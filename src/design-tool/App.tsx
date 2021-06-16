@@ -10,12 +10,10 @@ import {
   Tabs,
   useDisclosure,
 } from "@chakra-ui/react";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { CombinedTab } from "./components/combined-tab/CombinedTab";
 import { ContextMenu } from "./components/ContextMenu";
 import { Header } from "./components/Header";
 import { SingleTab } from "./components/single-tab/SingleTab";
-import { TemplateSelector } from "./components/TemplateSelector";
 import React, { useEffect, useState } from "react";
 import { ITemplate, Project } from "./Project";
 import { TemplateEditor } from "./components/TemplateEditor";
@@ -25,14 +23,16 @@ interface AppState {
   template: ITemplate;
   views: View[];
 }
-const project = new Project("untitled");
-export const DesignTool = () => {
+
+interface DesignToolProps {
+  project: Project;
+}
+export const DesignTool = (props: DesignToolProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const generateState = () => {
-    console.log(project.getTemplate());
     return {
-      template: project.getTemplate(),
+      template: props.project.getTemplate(),
       views: [],
     };
   };
@@ -43,11 +43,11 @@ export const DesignTool = () => {
       console.log("The state has changed...");
       setState(generateState());
     };
-    project.on("change", onChange);
+    props.project.on("change", onChange);
 
     onChange();
     return () => {
-      project.off("change", onChange);
+      props.project.off("change", onChange);
     };
   }, []);
 
@@ -60,63 +60,56 @@ export const DesignTool = () => {
   };
   return (
     <ChakraProvider resetCSS={true}>
-      <Router>
-        <Switch>
-          <Route path={"/project"}>
-            <Box maxH={"100vh"}>
-              <ContextMenu project={project}></ContextMenu>
+      <Box maxH={"100vh"}>
+        <ContextMenu project={props.project}></ContextMenu>
 
-              <Tabs isManual variant={"soft-rounded"}>
-                <Header
-                  onSaveProject={() => {
-                    project.loadTemplate(value);
-                    project.saveProject();
-                  }}
-                  onOpenProject={() => {
-                    project.openProject();
-                    setValue(value);
-                  }}
-                  onChangeTemplate={onOpen}
-                  onPrototype={() => {
-                    project.prototype();
-                  }}
-                  onLoggingOpen={() => {
-                    setLoggingOpen(!loggingOpen);
-                  }}
-                />
-                <TabPanels h={"100%"}>
-                  <TabPanel p={0} h={"100%"}>
-                    <SingleTab
-                      project={project}
-                      template={state.template}
-                      onChange={(value) => setValue(value)}
-                    />
-                  </TabPanel>
-                  <TabPanel height={"calc(100% - 15px)"} p={0}>
-                    <CombinedTab app={project.getDiagram()} project={project} />
-                  </TabPanel>
-                </TabPanels>
-              </Tabs>
-              <TemplateEditor
-                isOpen={isOpen}
-                onOpen={onOpen}
-                onClose={onClose}
-                onCreate={() => {
-                  console.log();
-                }}
+        <Tabs isManual variant={"soft-rounded"}>
+          <Header
+            onSaveProject={() => {
+              props.project.loadTemplate(value);
+              props.project.saveProject();
+            }}
+            onOpenProject={() => {
+              props.project.openProject();
+              setValue(value);
+            }}
+            onChangeTemplate={onOpen}
+            onPrototype={() => {
+              props.project.prototype();
+            }}
+            onLoggingOpen={() => {
+              setLoggingOpen(!loggingOpen);
+            }}
+          />
+          <TabPanels h={"100%"}>
+            <TabPanel p={0} h={"100%"}>
+              <SingleTab
+                project={props.project}
+                template={state.template}
+                onChange={(value) => setValue(value)}
               />
-              <LoggingWindow
-                isOpen={loggingOpen}
-                onClose={handleLoggingClose}
-              ></LoggingWindow>
-            </Box>
-          </Route>
-
-          <Route path={"/"}>
-            <TemplateSelector project={project} />
-          </Route>
-        </Switch>
-      </Router>
+            </TabPanel>
+            <TabPanel height={"calc(100% - 15px)"} p={0}>
+              <CombinedTab
+                app={props.project.getDiagram()}
+                project={props.project}
+              />
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
+        <TemplateEditor
+          isOpen={isOpen}
+          onOpen={onOpen}
+          onClose={onClose}
+          onCreate={() => {
+            console.log();
+          }}
+        />
+        <LoggingWindow
+          isOpen={loggingOpen}
+          onClose={handleLoggingClose}
+        ></LoggingWindow>
+      </Box>
     </ChakraProvider>
   );
 };

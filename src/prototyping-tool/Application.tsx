@@ -19,12 +19,14 @@ export class CrossDeviceApplication {
   protected sharedObject: PrototypingToolDataObject;
   private viewId: string;
   private combinedViewId: string;
-  private isFirst: boolean;
 
   private setInteractions: () => void = () => {};
 
-  constructor(public readonly serverUrl: string, public readonly projectName) {
-    this.isFirst = false;
+  constructor(
+    public readonly serverUrl: string,
+    public readonly projectName,
+    readonly isFirst
+  ) {
     this.viewId = "";
     this.combinedViewId = "";
   }
@@ -45,12 +47,22 @@ export class CrossDeviceApplication {
     return this.sharedObject;
   }
 
-  private isNewDocument(): boolean {
+  /*private isNewDocument(): boolean {
     return window.location.hash.length === 0;
-  }
+  }*/
 
   public reRender() {
     this.sharedObject.emit("change");
+  }
+
+  public redirectToDesign() {
+    window.location.href =
+      "https://" +
+      this.serverUrl +
+      ":8080/#project=" +
+      this.projectName +
+      "&mode=design";
+    window.location.reload();
   }
 
   public getViewId(): string {
@@ -70,11 +82,10 @@ export class CrossDeviceApplication {
   }
 
   public async start() {
-    if (this.isNewDocument()) {
-      this.isFirst = true;
-      window.location.hash = "projectName=" + this.projectName;
+    /*if (this.isNewDocument()) {
+      window.location.hash = "documentId=" + this.projectName;
     }
-
+*/
     const serviceTiny = new TinyliciousServiceWithUrl(this.serverUrl, 7070);
     /* const serviceRouter = new RouterliciousService({
       orderer: "http://localhost:3003",
@@ -119,7 +130,11 @@ export class CrossDeviceApplication {
 
   public getFullHost() {
     return (
-      "http://" + this.serverUrl + ":8080/#projectName=" + this.projectName
+      "https://" +
+      this.serverUrl +
+      ":8080/#project=" +
+      this.projectName +
+      "&mode=design"
     );
   }
 
@@ -127,8 +142,8 @@ export class CrossDeviceApplication {
     this.sharedObject.grabView(view);
   }
 
-  public addRole(role: string): Role {
-    return this.sharedObject.addRole(role);
+  public async addRole(role: string): Promise<Role> {
+    return await this.sharedObject.addRole(role);
   }
 
   public addQRCode(id: string, qrcode: IQRCode, ...roles): QRCodeController {

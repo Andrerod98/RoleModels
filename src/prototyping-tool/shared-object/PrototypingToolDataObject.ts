@@ -64,7 +64,8 @@ export interface IPrototypingToolInitialState {
 
 export class PrototypingToolDataObject
   extends DataObject<{}, IPrototypingToolInitialState>
-  implements IPrototypingToolDataModel {
+  implements IPrototypingToolDataModel
+{
   /* The Map with the connected devices */
   private devicesMap: SharedMap; // <device Id, IDevice>
   private devicesManager: DevicesManager;
@@ -94,6 +95,7 @@ export class PrototypingToolDataObject
   protected async initializingFirstTime(
     initialState?: IPrototypingToolInitialState
   ) {
+    console.log("INITIALIZING FIRST TIME");
     /* Creating device Shared Map...*/
     const devicesMap = SharedMap.create(this.runtime);
 
@@ -143,6 +145,10 @@ export class PrototypingToolDataObject
     });
   }*/
 
+  public getRolesMap() {
+    return this.rolesMap;
+  }
+
   private async loadSharedObjects() {
     /* Getting devices shared map...*/
     this.devicesMap = await this.root
@@ -186,12 +192,37 @@ export class PrototypingToolDataObject
       this.combinedViewsMap,
       FactoriesManager.getInstance(),
       () => {
-        this.emit("change");
+        this.emit("change", "CVM");
       }
     );
 
     /* Creating combined views Manager...*/
     this.qrManager = new QRManager(this.qrMap);
+  }
+
+  public getRoot() {
+    return this.root;
+  }
+
+  public clearAll(): void {
+    //this.devicesMap.clear();
+    this.combinedViewsMap.clear();
+    this.rolesMap.clear();
+    this.qrMap.clear();
+    this.ink.clear();
+
+    this.emit("cleared", "Clear all");
+  }
+
+  public getDevicesMap() {
+    return this.devicesMap;
+  }
+  public getCombinedViewsMap() {
+    return this.combinedViewsMap;
+  }
+
+  public getQRMap() {
+    return this.qrMap;
   }
 
   private registerDefaultFactories() {
@@ -224,25 +255,45 @@ export class PrototypingToolDataObject
     );
   }
 
+  public changeState = () => {
+    this.emit("change");
+  };
+
+  public playSound() {
+    this.audio.pause();
+    this.audio.currentTime = 0;
+    this.audio.play();
+  }
+
+  public deleteAllEventListeners() {
+    console.warn("DELETING ALL EVENT LISTENERS");
+    this.devicesMap.removeAllListeners();
+    this.combinedViewsMap.removeAllListeners();
+    this.rolesMap.removeAllListeners();
+    this.qrMap.removeAllListeners();
+
+    this.deleteMapEventListeners("Combined View", this.combinedViewsMap);
+    this.deleteMapEventListeners("roles", this.rolesMap);
+    this.deleteMapEventListeners("qrs", this.qrMap);
+    this.pingCounter.removeAllListeners();
+    this.removeAllListeners();
+  }
+
   public createAllEventListeners() {
     this.devicesMap.on("valueChanged", () => {
-      // console.log("Devices map changed so changing state.");
-      this.emit("change");
+      this.emit("change", "Devices map changed");
     });
-
     this.combinedViewsMap.on("valueChanged", () => {
-      // console.log("Combined views map changed so changing state.");
-      this.emit("change");
+      this.emit("change", "Combined views map changed");
     });
-
     this.rolesMap.on("valueChanged", () => {
-      // console.log("Role map changed so changing state.");
-      this.emit("change");
+      this.emit("change", "Roles map changed");
     });
-
+    this.rolesMap.on("changeState", () => {
+      this.emit("change", "Roles map adeed");
+    });
     this.qrMap.on("valueChanged", () => {
-      // console.log("Role map changed so changing state.");
-      this.emit("change");
+      this.emit("change", "QR map changed");
     });
 
     /* Creating shared cell event listeners*/
@@ -253,11 +304,8 @@ export class PrototypingToolDataObject
 
     this.createMapEventListeners("qrs", this.qrMap);
 
-    this.pingCounter.on("incremented", () => {
-      this.audio.pause();
-      this.audio.currentTime = 0;
-      this.audio.play();
-    });
+    this.pingCounter.on("incremented", this.playSound);
+
     /*
     const quorum = this.context.getQuorum();
 
@@ -272,32 +320,19 @@ export class PrototypingToolDataObject
     });*/
   }
 
+  private async deleteMapEventListeners(name: string, map: SharedMap) {
+    for (const value of map.values()) {
+      const cell = await value.get();
+      cell.removeAllListeners();
+    }
+  }
   private async createMapEventListeners(name: string, map: SharedMap) {
     for (const value of map.values()) {
       const cell = await value.get();
-      console.log(cell);
-      cell.on("valueChanged", (e) => {
-        // console.log(e);
-        console.log(name + " cell changed so changing state.");
-        this.emit("change");
+      cell.on("valueChanged", () => {
+        this.emit("change", "Cell of " + name + " changed.");
       });
     }
-    /* const tempArray = [];
-    map.forEach((combinedView: SharedCell) => {
-      tempArray.push(combinedView);
-    });
-
-    const cells = await Promise.all(
-      tempArray.map(async (cell: SharedCell) => await cell.get())
-    );
-
-    cells.forEach((cell) => {
-      cell.on("valueChanged", (e) => {
-        console.log(e);
-        console.log(name + " cell changed so changing state.");
-        this.emit("change");
-      });
-    });*/
   }
 
   public pingAll() {
@@ -305,6 +340,7 @@ export class PrototypingToolDataObject
   }
 
   protected async hasInitialized() {
+    console.log("HAS INITIALIZED");
     /* Has initialized...*/
 
     /* Loading shared objects...*/
@@ -318,12 +354,22 @@ export class PrototypingToolDataObject
     this.createAllEventListeners();
 
     /* Adding current device...*/
-    this.devicesManager.addDevice("manager");
+    //this.devicesManager.addDevice("manager");
+    //this.devicesManager.addMyDevice();
 
     const managerRole = SharedCell.create(this.runtime);
 
     managerRole.set({
       name: "manager",
+      views: [],
+      combinedViewsIds: [],
+      qrIds: [],
+    } as IRole);
+
+    const designerRole = SharedCell.create(this.runtime);
+
+    designerRole.set({
+      name: "designer",
       views: [],
       combinedViewsIds: [],
       qrIds: [],
@@ -336,6 +382,7 @@ export class PrototypingToolDataObject
     }*/
 
     this.rolesManager.addRole(managerRole);
+    this.rolesManager.addRole(designerRole);
 
     /* Loading combined views...*/
     await this.rolesManager.loadRoles();
@@ -343,6 +390,10 @@ export class PrototypingToolDataObject
       FactoriesManager.getInstance()
     );
     await this.qrManager.loadQRCodes();
+
+    this.runtime.once("connected", () => {
+      this.emit("connected");
+    });
   }
 
   /* Device Management Functions*/
@@ -477,12 +528,16 @@ export class PrototypingToolDataObject
 
   public getDeviceRole = (): string => this.devicesManager.getDevice().role;
 
-  public addRole = (role: string): Role => {
+  public addRole = async (role: string): Promise<Role> => {
     if (this.rolesMap.has(role)) {
+      console.log("ROLE ALREADY EXISTS");
       return this.rolesManager.getRole(role);
     }
 
     const sharedRole = SharedCell.create(this.runtime);
+    sharedRole.on("valueChanged", () => {
+      this.emit("change");
+    });
     sharedRole.set({
       name: role,
       views: [],
@@ -490,11 +545,10 @@ export class PrototypingToolDataObject
       qrIds: [],
     } as IRole);
 
-    sharedRole.on("valueChanged", () => {
-      this.emit("change");
-    });
+    this.rolesMap.set(role, sharedRole.handle);
 
-    return this.rolesManager.addRole(sharedRole);
+    await this.rolesMap.wait<IFluidHandle<SharedCell>>(role);
+    return this.rolesManager.getRole(role);
   };
   /**
    * Get the available roles.
@@ -531,12 +585,11 @@ export class PrototypingToolDataObject
 
     // Creates a shared cell and adds it to the shared map
     const sharedCell = SharedCell.create(this.runtime);
-    sharedCell.set(combinedView);
-    this.combinedViewsMap.set(id, sharedCell.handle);
-
     sharedCell.on("valueChanged", () => {
       this.emit("change");
     });
+    sharedCell.set(combinedView);
+    this.combinedViewsMap.set(id, sharedCell.handle);
 
     // Adds the combined view to the manager
     const cvm = this.combinedViewsManager.addCombinedView(sharedCell);

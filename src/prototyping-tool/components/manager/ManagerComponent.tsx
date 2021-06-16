@@ -107,6 +107,9 @@ export const ManagerComponent: FC<ManagerComponentProps> = (props) => {
             model.promoteToRole(role);
             // setUI(props.model.getCombinedUI());
           }}
+          onDesignClick={() => {
+            props.app.redirectToDesign();
+          }}
         />
         <Stack
           m='40px'

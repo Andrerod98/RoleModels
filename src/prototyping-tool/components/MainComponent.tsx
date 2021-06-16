@@ -53,7 +53,10 @@ export const MainComponent: FC<MainComponentProps> = (
       console.log("The state has changed...");
       setState(generateState());
     };
-    model.on("change", onChange);
+    model.on("change", (type) => {
+      console.log(type);
+      onChange();
+    });
 
     // useEffect runs after the first render so we will update the view again incase there
     // were changes that came into the model in between generating initialState and setting
@@ -64,7 +67,7 @@ export const MainComponent: FC<MainComponentProps> = (
       // When the view dismounts remove the listener to avoid memory leaks
       window.removeEventListener("beforeunload", handleWindowBeforeUnload);
       model.off("change", onChange);
-      model.removeAllListeners();
+      model.deleteAllEventListeners();
     };
   }, []);
 

@@ -1,27 +1,99 @@
 /* eslint-disable no-invalid-this */
 /* eslint-disable no-unused-vars */
 
+import { ChakraProvider } from "@chakra-ui/react";
 import React from "react";
 import ReactDOM from "react-dom";
 import { DesignTool } from "./design-tool/App";
+import { TemplateSelector } from "./design-tool/components/TemplateSelector";
+import { Project } from "./design-tool/Project";
+import { MainComponent } from "./prototyping-tool";
 import { CrossDeviceApplication } from "./prototyping-tool/Application";
-import { BoxUI } from "./prototyping-tool/shared-object/components/Box";
-import { IUIComponent } from "./prototyping-tool/shared-object/components/UIComponent";
-import { View } from "./prototyping-tool/shared-object/views/View";
 // const _ = require("lodash");
-const application = new CrossDeviceApplication("127.0.0.1", "untitled");
 
-application
-  .start()
-  .catch((e) => {
-    console.error(e);
-    console.log(
-      "%cEnsure you are running the Tinylicious Fluid Server\nUse:`npm run start:server`",
-      "font-size:30px"
-    );
-  })
-  .then(async () => {
-    if (application.isFirstClient()) {
+const hash = window.location.hash.substring(1);
+
+const result = hash.split("&").reduce(function (res, item) {
+  const parts = item.split("=");
+  res[parts[0]] = parts[1];
+  return res;
+}, {});
+
+const projectName = result["project"];
+const mode = result["mode"];
+
+console.log(projectName);
+
+if (projectName === undefined) {
+  ReactDOM.render(
+    <ChakraProvider>
+      <TemplateSelector
+        onCreate={(name: string) => {
+          const application = new CrossDeviceApplication(
+            "192.168.1.72",
+            name,
+            true
+          );
+          application
+            .start()
+            .catch((e) => {
+              console.error(e);
+              console.log(
+                "%cEnsure you are running the Tinylicious Fluid Server\nUse:`npm run start:server`",
+                "font-size:30px"
+              );
+            })
+            .then(() => {
+              window.location.href = application.getFullHost();
+              window.location.reload();
+            });
+        }}
+      />
+    </ChakraProvider>,
+
+    document.getElementById("content")
+  );
+} else {
+  const application = new CrossDeviceApplication(
+    "192.168.1.72",
+    projectName,
+    false
+  );
+
+  application
+    .start()
+    .catch((e) => {
+      console.error(e);
+      console.log(
+        "%cEnsure you are running the Tinylicious Fluid Server\nUse:`npm run start:server`",
+        "font-size:30px"
+      );
+    })
+    .then(async () => {
+      application.getSharedObject().once("connected", () => {
+        if (mode === "design") {
+          const project = new Project(projectName, application);
+
+          ReactDOM.render(
+            <ChakraProvider>
+              <DesignTool project={project} />
+            </ChakraProvider>,
+            document.getElementById("content")
+          );
+        } else if (mode === undefined) {
+          ReactDOM.render(
+            <ChakraProvider>
+              <MainComponent key={"object"} app={application} />
+            </ChakraProvider>,
+
+            document.getElementById("content")
+          );
+        }
+      });
+    });
+}
+
+/*if (application.isFirstClient()) {
       const presenter = application.addRole("presenter");
       application.addRole("assistant");
       // const remote = application.addRole("remote");
@@ -60,9 +132,9 @@ application
       onClick: () => {
         alert("LETS GO");
       },
-    });
+    });*/
 
-    /* const interactions = () => {
+/* const interactions = () => {
       // const assistant = application.getRole("assistant");
 
       const view = application.getViewOrCombinedView(
@@ -113,17 +185,29 @@ application
     };
 
     application.defineInteractions(interactions);
-    interactions();*/
+    interactions();
 
-    ReactDOM.render(
-      <DesignTool></DesignTool>,
-      // ,
-      // React.createElement("button", { className: "sidebar" }, [
-      /* <ChakraProvider>
+
+    if (documentId === undefined) {
+      const project = new Project("untitled", application);
+      ReactDOM.render(
+        <DesignTool project={project}></DesignTool>,
+        // ,
+        // React.createElement("button", { className: "sidebar" }, [
+        /* <ChakraProvider>
         <MainComponent key={"object"} app={application} />
-      </ChakraProvider>,*/
+      </ChakraProvider>,
 
-      // ]),
-      document.getElementById("content")
-    );
-  });
+        // ]),
+        document.getElementById("content")
+      );
+    } else {
+      ReactDOM.render(
+        <ChakraProvider>
+          <MainComponent key={"object"} app={application} />
+        </ChakraProvider>,
+
+        document.getElementById("content")
+      );
+    }
+  });*/

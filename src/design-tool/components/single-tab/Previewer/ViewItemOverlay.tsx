@@ -1,7 +1,7 @@
 import React from "react";
 import { DragHandleIcon } from "@chakra-ui/icons";
 import { GridItem, IconButton } from "@chakra-ui/react";
-import { UIComponentController } from "../../../../prototyping-tool/shared-object/components/UIComponent";
+import { View } from "../../../../prototyping-tool/shared-object/views/View";
 export enum Position {
   Before = -1,
   After = 1,
@@ -34,9 +34,7 @@ export function ViewItemOverlay({ id, items, ...props }: any) {
         zIndex={2}
         icon={<DragHandleIcon />}
       />
-      {item.view.getComponents().map((component: UIComponentController) => {
-        return component.generateWidget();
-      })}
+      {(props.item.view as View).getRoot().generateWidget()}
     </GridItem>
   );
 }

@@ -61,7 +61,7 @@ export const LoggingWindow = (props: LogginWindowProps) => {
         top={"3"}
         size={"xs"}
         aria-label={"Search database"}
-        icon={<CloseButton size={"sm"} />}
+        icon={<CloseButton />}
         onClick={() => {
           props.onClose();
         }}

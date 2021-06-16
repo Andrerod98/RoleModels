@@ -24,7 +24,7 @@ export class Diagram {
         new ViewNodeFactory(
           "button",
           "untitled",
-          new View("id", 0, 0, "", { id: "", name: "" })
+          new View("id", 0, 0, "", { id: "", name: "", children: [] })
         )
       );
 

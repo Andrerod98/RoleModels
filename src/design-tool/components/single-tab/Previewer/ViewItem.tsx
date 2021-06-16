@@ -9,7 +9,7 @@ import {
 import { Box, GridItem, IconButton } from "@chakra-ui/react";
 import React, { forwardRef, useState } from "react";
 import { IoTrashOutline } from "react-icons/io5";
-import { UIComponentController } from "../../../../prototyping-tool/shared-object/components/UIComponent";
+import { View } from "../../../../prototyping-tool/shared-object/views/View";
 import { Position } from "./ViewItemOverlay";
 
 export const ViewItem = forwardRef(({ id, ...props }: any, ref: any) => {
@@ -191,11 +191,7 @@ export const ViewItem = forwardRef(({ id, ...props }: any, ref: any) => {
           />
         </>
       )}
-      {props.item.view
-        .getComponents()
-        .map((component: UIComponentController) => {
-          return component.generateWidget();
-        })}
+      {(props.item.view as View).getRoot().generateWidget()}
       {props.insertPosition === Position.Before ? (
         <Box
           h={"100%"}

@@ -21,12 +21,14 @@ import { CrossDeviceApplication } from "../../Application";
 import { FocusButton } from "./FocusButton";
 import { RiMusicLine } from "react-icons/ri";
 import { TestInteractionModal } from "../../InteractionModal";
+import { FaPencilRuler } from "react-icons/fa";
 
 interface HeaderProps {
   roles: string[];
   myRole: string;
   onRoleClick: (role: string) => void;
   onManagerClick: () => void;
+  onDesignClick: () => void;
   app: CrossDeviceApplication;
 }
 
@@ -51,6 +53,13 @@ export const Header: FC<HeaderProps> = (props: HeaderProps) => {
         <DrawerContent>
           <Box bg={"#272B35"} h={"60px"} py={"10px"} px={"20px"}>
             <Flex>
+              <Button
+                display={{ base: "none", md: "block" }}
+                leftIcon={<FaPencilRuler />}
+                onClick={props.onDesignClick}
+              >
+                Design
+              </Button>
               <Box key={"header-box"}>
                 <Box display={{ base: "block", md: "none" }}>
                   <Menu>

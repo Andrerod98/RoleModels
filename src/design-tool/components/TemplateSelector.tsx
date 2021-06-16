@@ -19,11 +19,10 @@ import {
 import React, { useState } from "react";
 import { TemplateEditor } from "./TemplateEditor";
 import { TemplateItem } from "./TemplateItem";
-import { Link as ReactLink } from "react-router-dom";
-import { ITemplate, Project } from "../Project";
+import { ITemplate } from "../Project";
 
 export interface TemplateSelectorProps {
-  project: Project;
+  onCreate: (name: string) => void;
 }
 
 export const TemplateSelector: React.FC<TemplateSelectorProps> = (
@@ -31,7 +30,7 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = (
 ) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [name, setName] = useState("untitled");
-  const [templates, setTemplates] = useState(props.project.getTemplates());
+  const [templates] = useState([]);
   const handleChange = (event: any) => setName(event.target.value);
   const [selected, setSelected] = useState(0);
 
@@ -42,8 +41,8 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = (
         onOpen={onOpen}
         onClose={onClose}
         onCreate={(template: ITemplate) => {
-          props.project.addTemplate(template);
-          setTemplates(props.project.getTemplates());
+          //props.project.addTemplate(template);
+          //setTemplates(props.project.getTemplates());
           onClose();
         }}
       />
@@ -82,11 +81,9 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = (
         <HStack spacing={"24px"}>
           <Spacer />
           <Button
-            as={ReactLink}
             to={"/project"}
             onClick={() => {
-              props.project.setName(name);
-              props.project.setTemplate(templates[selected]);
+              props.onCreate(name);
             }}
           >
             Create Project

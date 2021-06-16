@@ -20,7 +20,6 @@ import {
   EditableInput,
   EditablePreview,
   useTab,
-  Spacer,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { BoxUI } from "../../../prototyping-tool/shared-object/components/Box";
@@ -69,6 +68,7 @@ export const SingleTab = (props: SingleTabProps) => {
   const views = props.project.getLayoutManager(curTab).getViews();
 
   const preview = (newValue?: string) => {
+    console.log("Preview");
     //props.project.stringToViews(value)
     props.project
       .getLayoutManager(curTab)
@@ -156,6 +156,7 @@ export const SingleTab = (props: SingleTabProps) => {
   };
 
   const addUIComponentToEditor = (str: string) => {
+    console.log("add ui component");
     const oldValue = value;
     const rows = oldValue.split("\n");
     const row = cursorPosition.row;
@@ -183,16 +184,19 @@ export const SingleTab = (props: SingleTabProps) => {
   };
 
   const handleFocus = (value: any) => {
+    console.log("handle focus");
     setCursorPosition(value.cursor);
   };
 
   const handleChange = (value: any, event?: any) => {
+    console.log("handle change");
     setValue(value);
     setCursorPosition(event.end);
     props.onChange(value);
   };
 
   const handleChangeView = (newView: View) => {
+    console.log("view change");
     props.project.getLayoutManager(curTab).changeView(newView);
     setValue(
       Utils.jsonToString(
@@ -205,6 +209,7 @@ export const SingleTab = (props: SingleTabProps) => {
   };
 
   const handleChangeViews = (newViews: View[]) => {
+    console.log("change views");
     props.project
       .getLayoutManager(curTab)
       .setViews(newViews.map((v) => v.toView()));
@@ -230,7 +235,16 @@ export const SingleTab = (props: SingleTabProps) => {
   }, [props.template]);*/
 
   const loadRole = (role: string) => {
+    console.log("role " + role + " loading");
     setCurTab(role);
+
+    const layoutManager = props.project.getLayoutManager(role);
+
+    if (layoutManager === undefined) {
+      console.warn("The layout manager of " + role + " was not found.");
+      console.table(Array.from(props.project.getRoles()));
+      return;
+    }
 
     //Load role
     setValue(
@@ -246,29 +260,39 @@ export const SingleTab = (props: SingleTabProps) => {
     setAlert(false);
   };
   const handleTabClick = (role: string) => {
+    console.log("Tab click");
     loadRole(role);
   };
 
   const handleTabClose = (role: string) => {
+    console.log("Tab close");
     props.project.removeRole(role);
     loadRole("individual");
   };
 
-  const handleTabChange = (role: string, nextValue: string) => {
+  const handleTabSubmit = (role: string, e: any) => {
+    console.log("Tab is changing");
+    const nextValue = e;
+    if (nextValue === "") {
+      return;
+    }
+
     props.project.renameRole(role, nextValue);
     loadRole(nextValue);
   };
 
   const curIndex = tabs.indexOf(curTab);
   return (
-    <Tabs
-      size={"sm"}
-      variant={"enclosed"}
-      h={"100%"}
-      index={curIndex === -1 ? 0 : curIndex}
-    >
-      <Box h={"100%"} overflow={"hidden"}>
-        <SingleTabCatalogBar onClick={(element) => addUIComponent(element)} />
+    <Box h={"100%"} overflow={"hidden"}>
+      <SingleTabCatalogBar onClick={(element) => addUIComponent(element)} />
+      <Tabs
+        size={"sm"}
+        variant={"enclosed"}
+        h={"100%"}
+        mt={"5px"}
+        isManual
+        index={curIndex === -1 ? 0 : curIndex}
+      >
         <Box>
           <TabList pl={5}>
             {tabs.map((tab, index) => (
@@ -281,8 +305,8 @@ export const SingleTab = (props: SingleTabProps) => {
                 onClose={() => {
                   handleTabClose(tab);
                 }}
-                onChange={(nextValue) => {
-                  handleTabChange(tab, nextValue);
+                onSubmit={(e) => {
+                  handleTabSubmit(tab, e);
                 }}
               />
             ))}
@@ -344,8 +368,8 @@ export const SingleTab = (props: SingleTabProps) => {
             </TabPanel>
           ))}
         </TabPanels>
-      </Box>
-    </Tabs>
+      </Tabs>
+    </Box>
   );
 };
 
@@ -354,8 +378,9 @@ class Examples {
     return {
       id: "view-id",
       root: {
-        id: "",
-        name: "",
+        id: "button",
+        name: "Button",
+        children: [],
       },
       rows: 1,
       cols: 1,
@@ -537,21 +562,10 @@ const CustomTab = (props: any) => {
   const tabProps = useTab(props);
   const isSelected = !!tabProps["aria-selected"];
 
-  // 3. Hook into the Tabs `size`, `variant`, props
-
-  const [isOver, setOver] = useState(false);
-
   return (
-    <Tab {...tabProps}>
-      <Box
-        onMouseOver={() => {
-          setOver(true);
-        }}
-        onMouseLeave={() => {
-          setOver(false);
-        }}
-      >
-        <Flex m={"2px"}>
+    <Tab {...tabProps} _hover={{ bg: "gray.200" }}>
+      <Box>
+        <Flex my={"2px"} mx={"1px"}>
           {isSelected ? (
             <Editable
               onClick={(e) => {
@@ -559,7 +573,10 @@ const CustomTab = (props: any) => {
                 props.onClick();
               }}
               onSubmit={(nextValue) => {
-                props.onChange(nextValue);
+                props.onSubmit(nextValue);
+              }}
+              onKeyDown={(e: any) => {
+                e.stopPropagation();
               }}
               defaultValue={tabProps.title as string}
             >
@@ -567,20 +584,19 @@ const CustomTab = (props: any) => {
               <EditableInput />
             </Editable>
           ) : (
-            tabProps.title
+            <Box m={"2px"}>{tabProps.title}</Box>
           )}
-          <Spacer></Spacer>
-          {isOver ? (
-            <CloseButton
-              size={"sm"}
-              onClick={(e) => {
-                e.stopPropagation();
-                props.onClose();
-              }}
-            ></CloseButton>
-          ) : (
-            <Box w={"24px"}></Box>
-          )}
+          <Box w={"24px"} h={"24px"} ml={"4px"}>
+            <Center>
+              <CloseButton
+                size={"sm"}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  props.onClose();
+                }}
+              />
+            </Center>
+          </Box>
         </Flex>
       </Box>
     </Tab>

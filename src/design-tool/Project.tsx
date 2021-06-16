@@ -10,15 +10,18 @@ import { LayoutManager } from "./components/single-tab/LayoutManager";
 
 import { CrossDeviceApplication } from "../prototyping-tool/Application";
 import { IUIComponent } from "../prototyping-tool/shared-object/components/UIComponent";
-import { FactoriesManager } from "../prototyping-tool/shared-object/FactoriesManager";
 import { IRole } from "../prototyping-tool/shared-object/roles/IRole";
 import { IView } from "../prototyping-tool/shared-object/views/IView";
 import { View } from "../prototyping-tool/shared-object/views/View";
+import { FactoriesManager } from "../prototyping-tool/shared-object/FactoriesManager";
+import ReactDOM from "react-dom";
+import React from "react";
+import { ChakraProvider } from "@chakra-ui/react";
+import { MainComponent } from "../prototyping-tool";
 /* eslint-disable @typescript-eslint/no-empty-function */
 export class Project extends EventEmitter {
   private template: ITemplate;
   private fileSelector;
-  private factoriesManager: FactoriesManager;
   private rolesLayout: Map<string, LayoutManager>;
 
   private diagram: Diagram;
@@ -46,13 +49,20 @@ export class Project extends EventEmitter {
     },
   ];
 
-  constructor(private name: string) {
+  constructor(
+    private name: string,
+    protected readonly application: CrossDeviceApplication
+  ) {
     super();
     this.template = this.templates[0];
     this.fileSelector = this.buildFileSelector();
     this.diagram = new Diagram();
     this.rolesLayout = new Map<string, LayoutManager>();
-    this.rolesLayout.set("individual", new LayoutManager(this.changeEmitter));
+    const layoutManager = new LayoutManager();
+    layoutManager.on("change", () => {
+      this.emit("change");
+    });
+    this.rolesLayout.set("individual", layoutManager);
   }
 
   onDropCanvas = (event: any) => {
@@ -112,11 +122,11 @@ export class Project extends EventEmitter {
     });
     return fileSelector;
   }
-  public getFactoriesManager() {
-    return this.factoriesManager;
-  }
+
   public generateComponent(component: IUIComponent) {
-    return this.factoriesManager.getUIComponent(component).generateWidget();
+    return FactoriesManager.getInstance()
+      .getUIComponent(component)
+      .generateWidget();
   }
 
   public async loadFile(file: File): Promise<void> {
@@ -187,7 +197,11 @@ export class Project extends EventEmitter {
   }
 
   public addRole(role: string) {
-    this.rolesLayout.set(role, new LayoutManager(this.changeEmitter));
+    const layoutManager = new LayoutManager();
+    layoutManager.on("change", () => {
+      this.emit("change");
+    });
+    this.rolesLayout.set(role, layoutManager);
     this.emit("change");
   }
 
@@ -196,10 +210,10 @@ export class Project extends EventEmitter {
     this.emit("change");
   }
   public renameRole(role: string, nextValue: string) {
+    if (role === nextValue) return;
     this.rolesLayout.set(nextValue, this.rolesLayout.get(role));
     this.rolesLayout.delete(role);
 
-    console.log(this.rolesLayout.get(nextValue));
     this.emit("change");
   }
 
@@ -226,28 +240,87 @@ export class Project extends EventEmitter {
   public combine() {}
 
   public prototype() {
-    const application = new CrossDeviceApplication("127.0.0.1", this.name);
+    const sharedObj = this.application.getSharedObject();
+    sharedObj.clearAll();
 
-    application
-      .start()
-      .catch((e) => {
-        console.error(e);
-        console.log(
-          "%cEnsure you are running the Tinylicious Fluid Server\nUse:`npm run start:server`",
-          "font-size:30px"
-        );
-      })
-      .then(async () => {
-        if (application.isFirstClient()) {
-          for (const role of this.rolesLayout.keys()) {
-            const r = application.addRole(role);
-            const views = this.rolesLayout.get(role).getViews();
-            for (const view of views) {
-              r.addView(view);
-            }
-          }
+    setTimeout(() => {
+      /*window.location.href =
+        "https://" +
+        this.application.serverUrl +
+        ":8080/#project=" +
+        this.application.projectName;
+      window.location.reload();*/
+      console.log(
+        this.application.getSharedObject().getDevicesManager().getDevice()
+      );
+      ReactDOM.render(
+        <ChakraProvider>
+          <MainComponent key={"object"} app={this.application} />
+        </ChakraProvider>,
+
+        document.getElementById("content")
+      );
+    }, 5000);
+
+    /*const redirect = () => {
+      setTimeout(() => {
+        window.location.href =
+          "https://" +
+          this.application.serverUrl +
+          ":8080/#project=" +
+          this.application.projectName;
+        window.location.reload();
+      }, 6000);
+    };
+    const addRoles = async () => {
+      console.info("Adding roles...");
+      let rolesAdded = 0;
+      const addRole = (args) => {
+        const { key } = args;
+        const roleName = key;
+        sharedObj
+          .getRolesMap()
+          .wait<SharedCell>(key)
+          .then((r) => {
+            r.get().then(() => {
+              sharedObj.emit("rolesAdded", "Roles added");
+            });
+          });
+        if (rolesAdded === this.rolesLayout.size - 1) {
+          console.info("All roles added");
+          //sharedObj.getRolesMap().removeAllListeners();
+        } else {
+          rolesAdded++;
+          console.info(
+            "Role " +
+              roleName +
+              " added " +
+              rolesAdded +
+              "/" +
+              this.rolesLayout.size
+          );
         }
-      });
+      };
+
+      sharedObj.getRolesMap().on("valueChanged", addRole);
+      for (const role of this.rolesLayout.keys()) {
+        this.application.addRole(role).then((role) => {
+          const r = this.rolesLayout.get(role.getName());
+          const views = r.getViews();
+          for (const view of views) {
+            role.addView(view);
+          }
+        });
+      }
+    };*/
+
+    /*sharedObj.once("prototype", sharedObj.clearAll);
+    sharedObj.once("cleared", addRoles);
+    sharedObj.once("rolesAdded", redirect);
+    sharedObj.emit("prototype");*/
+
+    //window.location.href = this.application.getFullHost();
+    //window.location.reload();
   }
 
   public getTemplates(): ITemplate[] {

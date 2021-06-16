@@ -22,7 +22,82 @@ export class DevicesManager implements IDeviceManager {
   public constructor(
     private readonly devicesMap: SharedMap,
     private readonly runtime: IFluidDataStoreRuntime // private template: ITemplate
-  ) {}
+  ) {
+    this.clearDisconnectedDevices();
+    this.setEventListeners();
+  }
+
+  private clearDisconnectedDevices() {
+    const keys = this.runtime.getQuorum().getMembers();
+
+    const devicesKeys = this.devicesMap.keys();
+    for (const key of devicesKeys) {
+      if (!keys.has(key)) {
+        this.devicesMap.delete(key);
+      }
+    }
+  }
+
+  private setEventListeners() {
+    const quorum = this.runtime.getQuorum();
+
+    const keys = this.runtime.getQuorum().getMembers();
+
+    const devicesKeys = this.devicesMap.keys();
+    for (const key of devicesKeys) {
+      if (!keys.has(key)) {
+        this.devicesMap.delete(key);
+      }
+    }
+
+    this.runtime.on("connected", (clientId: string) => {
+      console.log("Connected");
+      console.log(clientId);
+      const device = {
+        id: clientId,
+        type: "smartphone",
+        role: "manager",
+        combined: false,
+        x: 0,
+        y: 0,
+      };
+      this.deviceId = device.id;
+      this.devicesMap.set(device.id, device);
+    });
+
+    //this.runtime.dispose();
+    quorum.on("addMember", (clientId: string, details: any) => {
+      const type = details.client.details.type;
+
+      if (type === undefined) {
+        console.log("Add member" + clientId);
+        console.log(details);
+        if (this.devicesMap.has(clientId)) {
+          return;
+        } else {
+          const device = {
+            id: clientId,
+            type: "smartphone",
+            role: "manager",
+            combined: false,
+            // capabilities: { width: 1000, height: 1000, touch: false },
+            // affordances: { privacy: 0 },
+            x: 0,
+            y: 0,
+          };
+
+          //sessionStorage.setItem("deviceId", device.id);
+          this.devicesMap.set(clientId, device);
+        }
+      }
+    });
+
+    quorum.on("removeMember", (id: string) => {
+      console.log("Deleted member");
+      this.devicesMap.delete(id);
+      console.log(id);
+    });
+  }
 
   /**
    * Changes the properties of a device
@@ -38,6 +113,21 @@ export class DevicesManager implements IDeviceManager {
     }
   }
 
+  /*public addMyDevice = () => {
+    const device = {
+      id: uuidv4(),
+      type: "smartphone",
+      role: "manager",
+      combined: false,
+      // capabilities: { width: 1000, height: 1000, touch: false },
+      // affordances: { privacy: 0 },
+      x: 0,
+      y: 0,
+    };
+    this.deviceId = device.id;
+    //sessionStorage.setItem("deviceId", device.id);
+    this.devicesMap.set(device.id, device);
+  };*/
   /**
    * Creates a "fake" user based on a fake user id and a fake name.
    * Only use this code for protoyping and demos.
@@ -45,36 +135,36 @@ export class DevicesManager implements IDeviceManager {
   public addDevice = (role: string): void => {
     // Check for a userId in SessionStorage - this prevents refresh from generating a new user
     let device: IDevice;
-    if (
+    /*if (
       sessionStorage.getItem("deviceId") &&
       this.devicesMap.get<IDevice>(sessionStorage.getItem("deviceId"))
     ) {
       this.deviceId = sessionStorage.getItem("deviceId"); // This session might have has a user
       device = this.getDevice();
-    } else {
-      // Extract automatically
-      // Device with capabilities and affordances
+    } else {*/
+    // Extract automatically
+    // Device with capabilities and affordances
 
-      const getRandomInt = (min, max) => {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min)) + min;
-      };
+    const getRandomInt = (min, max) => {
+      min = Math.ceil(min);
+      max = Math.floor(max);
+      return Math.floor(Math.random() * (max - min)) + min;
+    };
 
-      device = {
-        id: uuidv4(),
-        type: "smartphone",
-        role: role,
-        combined: false,
-        // capabilities: { width: 1000, height: 1000, touch: false },
-        // affordances: { privacy: 0 },
-        x: getRandomInt(200, 1200),
-        y: getRandomInt(200, 500),
-      };
-      this.deviceId = device.id;
-      sessionStorage.setItem("deviceId", device.id);
-      this.devicesMap.set(device.id, device);
-    }
+    device = {
+      id: uuidv4(),
+      type: "smartphone",
+      role: role,
+      combined: false,
+      // capabilities: { width: 1000, height: 1000, touch: false },
+      // affordances: { privacy: 0 },
+      x: getRandomInt(200, 1200),
+      y: getRandomInt(200, 500),
+    };
+    this.deviceId = device.id;
+    //sessionStorage.setItem("deviceId", device.id);
+    this.devicesMap.set(device.id, device);
+    // }
     // this.devicesMap.emit("deviceJoin", device);
   };
 

@@ -1,12 +1,14 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 
+import EventEmitter from "events";
 import { IView } from "../../../prototyping-tool/shared-object/views/IView";
 import { View } from "../../../prototyping-tool/shared-object/views/View";
 
-export class LayoutManager {
+export class LayoutManager extends EventEmitter {
   views: View[];
 
-  constructor(protected changeEmitter: () => void) {
+  constructor() {
+    super();
     this.views = [];
   }
 
@@ -14,7 +16,7 @@ export class LayoutManager {
     if (this.views.some((v) => v.getId() === view.getId())) return;
 
     this.views.push(view);
-    this.changeEmitter();
+    this.emit("change");
   }
 
   public changeView(view: View) {
@@ -35,6 +37,6 @@ export class LayoutManager {
   public setViews(views: IView[]) {
     if (views === undefined) return;
     this.views = views.map((v) => View.from(v));
-    this.changeEmitter();
+    this.emit("change");
   }
 }

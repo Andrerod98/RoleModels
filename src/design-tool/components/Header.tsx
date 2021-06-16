@@ -23,8 +23,9 @@ import {
   AlertDialogHeader,
   AlertDialogOverlay,
   AlertDialogCloseButton,
+  Spinner,
 } from "@chakra-ui/react";
-import React, {  } from "react";
+import React, { useState } from "react";
 import { Link as ReactLink } from "react-router-dom";
 import { BiDevices, BiMobileAlt } from "react-icons/bi";
 import { RiFileListLine } from "react-icons/ri";
@@ -40,6 +41,7 @@ interface HeaderProps {
 export const Header = (props: HeaderProps) => {
   const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isLoading, setLoading] = useState(false);
   const cancelRef = React.useRef();
 
   return (
@@ -115,9 +117,20 @@ export const Header = (props: HeaderProps) => {
           </Center>
         </Box>
         <Box>
-          <Button colorScheme={"blue"} mr={"4"} onClick={props.onPrototype}>
-            Prototype
-          </Button>
+          {isLoading ? (
+            <Spinner mr={"4"} />
+          ) : (
+            <Button
+              colorScheme={"blue"}
+              mr={"4"}
+              onClick={() => {
+                setLoading(true);
+                props.onPrototype();
+              }}
+            >
+              Prototype
+            </Button>
+          )}
         </Box>
       </HStack>
       <AlertDialog

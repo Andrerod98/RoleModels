@@ -6,6 +6,7 @@ import { SharedMap } from "@fluidframework/map";
 import { FactoriesManager } from "../FactoriesManager";
 import { View } from "../views/View";
 import { SharedCell } from "@fluidframework/cell";
+import { IFluidHandle } from "@fluidframework/core-interfaces";
 
 export interface IRolesManager {
   getRole: (roleName: string) => Role;
@@ -44,12 +45,21 @@ export class RolesManager implements IRolesManager {
     this.rolesMap.on("valueChanged", async (e: any, ...args) => {
       const roleName = e.key;
       if (e.previousValue === undefined) {
+
+        
         // added
-        /* const sharedCell = await this.rolesMap
+        const sharedCell = await this.rolesMap
           .get<IFluidHandle<SharedCell>>(roleName)
-          .get();*/
-        // this.roles.set(roleName, new Role(sharedCell, this.factoriesManager));
-        // console.log("Adding " + roleName + " from map");
+          .get();
+
+        sharedCell.on("valueChanged", () => {
+          this.rolesMap.emit("changeState");
+        });
+
+        this.addRole(sharedCell);
+        //this.roles.set(roleName, new Role(sharedCell, this.factoriesManager));
+        console.log("Adding " + roleName + " from map");
+        this.rolesMap.emit("changeState");
       } else {
         const role = this.rolesMap.get(roleName);
         if (role === undefined) {
@@ -112,14 +122,9 @@ export class RolesManager implements IRolesManager {
 
   public addRole(sharedRole: SharedCell): Role {
     const role = sharedRole.get();
-    // console.log("Adding " + role.name);
-    if (this.roles.has(role.name)) {
-      return;
-    }
 
     const r = new Role(sharedRole, this.factoriesManager);
     this.roles.set(role.name, r);
-    this.rolesMap.set(role.name, sharedRole.handle);
 
     return r;
   }

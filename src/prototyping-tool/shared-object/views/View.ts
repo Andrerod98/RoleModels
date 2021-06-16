@@ -5,7 +5,6 @@ import { IView } from "./IView";
 export class View {
   private updateEvent: () => void = () => {};
   protected root: UIComponentController;
-
   constructor(
     protected id: string,
     protected rows: number,
@@ -14,7 +13,6 @@ export class View {
     root: IUIComponent
   ) {
     this.combinedViewID = combinedViewID;
-    console.log(root);
     this.root = FactoriesManager.getInstance().getUIComponent(root);
   }
 

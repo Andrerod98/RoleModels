@@ -116,6 +116,9 @@ export const RoleComponent: FC<RoleProps> = (props: RoleProps) => {
             model.promoteToRole(role);
             // setUI(props.model.getCombinedUI());
           }}
+          onDesignClick={() => {
+            props.app.redirectToDesign();
+          }}
         />
       </Box>
     </Box>
