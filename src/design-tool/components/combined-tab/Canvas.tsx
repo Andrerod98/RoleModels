@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import * as React from "react";
 import styled from "@emotion/styled";
-import { css, Global } from "@emotion/react";
 import { useColorMode } from "@chakra-ui/react";
 
 export interface CanvasProps {
@@ -50,20 +49,13 @@ namespace S {
       );
   `;
 
-  export const Expand = css`
-    html,
-    body,
-    #root {
-      height: 100%;
-    }
-  `;
+  
 }
 
 export const Canvas = (props: CanvasProps) => {
   const { colorMode } = useColorMode();
   return (
     <>
-      <Global styles={S.Expand} />
       <S.Container
         background={colorMode === "light" ? "#D0D0D0" : "rgb(60, 60, 60)"}
         color={

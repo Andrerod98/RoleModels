@@ -16,7 +16,7 @@ module.exports = (env) => {
   return {
     devServer: {
       host: "192.168.1.72",
-      // port: 8080,
+      port: 8080,
       headers: {
         "Access-Control-Allow-Origin": "*",
       },
@@ -24,8 +24,8 @@ module.exports = (env) => {
         ignored: "**/node_modules/**",
       },
       https: {
-        key: fs.readFileSync("./host.key"),
-        cert: fs.readFileSync("./host.crt"),
+        key: fs.readFileSync("./certificates/host.key"),
+        cert: fs.readFileSync("./certificates/host.crt"),
       },
     },
     entry: {

@@ -121,7 +121,7 @@ export class CrossDeviceApplication {
   public render(div: HTMLElement) {
     ReactDOM.render(
       <ChakraProvider>
-        <MainComponent key={"object"} app={this} />
+        <MainComponent app={this} />
       </ChakraProvider>,
       div
     );

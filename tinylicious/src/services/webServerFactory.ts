@@ -15,13 +15,13 @@ import {
   IWebServerFactory,
   IWebSocket,
   IWebSocketServer,
-  RequestListener,
+  RequestListener
 } from "../https/https";
 import { WebServer } from "./webServer";
 
-const keyPath = path.join(__dirname, "../../../host.key");
+const keyPath = path.join(__dirname, "../../../certificates/host.key");
 const privateKey = fs.readFileSync(keyPath, "utf8");
-const certPath = path.join(__dirname, "../../../host.crt");
+const certPath = path.join(__dirname, "../../../certificates/host.crt");
 const certificate = fs.readFileSync(certPath, "utf8");
 
 class SocketIoSocket implements IWebSocket {

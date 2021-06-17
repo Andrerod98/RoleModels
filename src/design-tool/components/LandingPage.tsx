@@ -114,10 +114,6 @@ export const LandingPage: React.FC<TemplateSelectorProps> = (
             <Spacer />
             <Button
               onClick={() => {
-                setTimeout(() => {
-                  window.location.reload();
-                }, 5000);
-
                 props.onCreate(name);
               }}
             >

@@ -6,6 +6,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { LandingPage } from "./design-tool/components/LandingPage";
 import { CrossDeviceApplication } from "./prototyping-tool/Application";
+import { ErrorPage } from "./prototyping-tool/ErrorPage";
 import Utils from "./prototyping-tool/utils/utils";
 
 const HASH = window.location.hash.substring(1);
@@ -15,7 +16,7 @@ const IP = window.location.hostname;
 
 if (PROJECT_NAME === undefined) {
   ReactDOM.render(
-    <ChakraProvider>
+    <ChakraProvider resetCSS>
       <LandingPage
         ip={IP}
         onCreate={(name: string) => {
@@ -44,11 +45,19 @@ if (PROJECT_NAME === undefined) {
 
   application
     .start()
-    .catch((e) => {
-      console.error(e);
+    .catch((e: Error) => {
+      // The container does not exist
+      console.error(e.message);
       console.log(
         "%cEnsure you are running the Tinylicious Fluid Server\nUse:`npm run start:server`",
         "font-size:30px"
+      );
+      ReactDOM.render(
+        <ChakraProvider resetCSS>
+          <ErrorPage error={e} />
+        </ChakraProvider>,
+
+        document.getElementById("content")
       );
     })
     .then(() => {

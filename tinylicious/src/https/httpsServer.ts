@@ -13,13 +13,13 @@ import {
   IHttpsServer,
   IWebServer,
   IWebServerFactory,
-  IWebSocketServer,
+  IWebSocketServer
 } from "./https";
 import * as socketIo from "./socketIoServer";
 
-const keyPath = path.join(__dirname, "../../../host.key");
+const keyPath = path.join(__dirname, "../../../certificates/host.key");
 const privateKey = fs.readFileSync(keyPath, "utf8");
-const certPath = path.join(__dirname, "../../../host.crt");
+const certPath = path.join(__dirname, "../../../certificates/host.crt");
 const certificate = fs.readFileSync(certPath, "utf8");
 
 export type RequestListener = (
@@ -59,7 +59,7 @@ export class WebServer implements IWebServer {
   public async close(): Promise<void> {
     await Promise.all([
       this.httpsServer.close(),
-      this.webSocketServer ? this.webSocketServer.close() : Promise.resolve(),
+      this.webSocketServer ? this.webSocketServer.close() : Promise.resolve()
     ]);
   }
 }

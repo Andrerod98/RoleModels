@@ -35,13 +35,7 @@ export function getDocumentServiceFactory(
   return MultiDocumentServiceFactory.create([
     new LocalDocumentServiceFactory(localServer),
     new RouterliciousDocumentServiceFactory(
-      new DefaultTokenProvider(documentId),
-      false,
-      // new DefaultErrorTracking(),
-      false,
-      true,
-      undefined,
-      undefined
+      new DefaultTokenProvider(documentId)
     ),
   ]);
 }
