@@ -1,8 +1,3 @@
-/*!
- * Copyright (c) Microsoft Corporation and contributors. All rights reserved.
- * Licensed under the MIT License.
- */
-
 import fs from "fs";
 import { LocalOrdererManager } from "@fluidframework/server-local-server";
 import { DocumentStorage } from "@fluidframework/server-services-shared";

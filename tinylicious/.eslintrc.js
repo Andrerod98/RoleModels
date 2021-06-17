@@ -1,15 +1,15 @@
-/*!
- * Copyright (c) Microsoft Corporation and contributors. All rights reserved.
- * Licensed under the MIT License.
- */
+
 
  module.exports = {
+    "root":true,
     "extends": [
         "@fluidframework/eslint-config-fluid/eslint7"
     ],
     "parserOptions": {
-        "project": ["./tsconfig.json", "./src/test/tsconfig.json"]
-    },
+        "project": "tsconfig.json",
+        "tsconfigRootDir": __dirname,
+        "sourceType": "module",
+      },
     "rules": {
         "@typescript-eslint/no-use-before-define":"off",
         "@typescript-eslint/promise-function-async":"off",

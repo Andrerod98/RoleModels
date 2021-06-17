@@ -1,8 +1,3 @@
-/*!
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License.
- */
-
 import * as https from "https";
 import * as http from "http";
 import { AddressInfo } from "net";

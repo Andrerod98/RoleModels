@@ -1,4 +1,4 @@
-/*!
+/*
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License.
  */
@@ -90,7 +90,7 @@ export function create(
   const options: any = { auth_pass: redisConfig.pass };
   if (redisConfig.tls) {
     options.tls = {
-      servername: redisConfig.host,
+      servername: redisConfig.host
     };
   }
 
