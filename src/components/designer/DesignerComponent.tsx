@@ -35,6 +35,9 @@ export const DesignerComponent: FC<ManagerComponentProps> = (props) => {
           onDesignClick={() => {
             model.promoteToDesigner();
           }}
+          onLoggingOpen={() => {
+           
+          }}
         />
         <DesignTool app={props.app} />
       </div>

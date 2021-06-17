@@ -51,8 +51,7 @@ export class DevicesManager implements IDeviceManager {
     }
 
     this.runtime.on("connected", (clientId: string) => {
-      console.log("Connected");
-      console.log(clientId);
+      console.log("This device has been connected and has id:" + clientId);
       const device = {
         id: clientId,
         type: "smartphone",
@@ -67,14 +66,13 @@ export class DevicesManager implements IDeviceManager {
 
     //this.runtime.dispose();
     quorum.on("addMember", (clientId: string, details: any) => {
-      const type = details.client.details.type;
+      const interactive = details.client.details.capabilities.interactive;
 
-      if (type === undefined) {
-        console.log("Add member" + clientId);
-        console.log(details);
+      if (interactive) {
         if (this.devicesMap.has(clientId)) {
           return;
         } else {
+          console.log("Member " + clientId + " added.");
           const device = {
             id: clientId,
             type: "smartphone",
@@ -93,9 +91,8 @@ export class DevicesManager implements IDeviceManager {
     });
 
     quorum.on("removeMember", (id: string) => {
-      console.log("Deleted member");
+      console.log("Member " + id + " deleted.");
       this.devicesMap.delete(id);
-      console.log(id);
     });
   }
 
@@ -282,7 +279,7 @@ export class DevicesManager implements IDeviceManager {
     this.promoteToRole("manager");
   }
 
-  public promoteToDesigner(): void{
+  public promoteToDesigner(): void {
     this.promoteToRole("designer");
   }
 

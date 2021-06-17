@@ -75,13 +75,19 @@ export class CombinedViewsManager {
     this.combinedViews.set(combinedView.getId(), combinedView);
   }
 
-  public async loadCombinedViews(factoriesManager: FactoriesManager) {
+  public async loadCombinedViews() {
+    const promises = [];
     for (const handle of this.combinedViewsSharedMap.values()) {
-      const sharedCell = await handle.get();
-      if (sharedCell !== undefined) {
-        this.loadCombinedView(sharedCell);
-      }
+      promises.push(handle.get());
     }
+
+    const combinedViews = await Promise.all(promises);
+    combinedViews.forEach((combinedView) => {
+      if (combinedView !== undefined) {
+        this.loadCombinedView(combinedView);
+      }
+    });
+
     console.log(this.combinedViewsSharedMap.size + " Combined Views Loaded.");
   }
 

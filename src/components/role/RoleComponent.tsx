@@ -85,6 +85,7 @@ export const RoleComponent: FC<RoleProps> = (props: RoleProps) => {
           onDesignClick={() => {
             model.promoteToDesigner();
           }}
+          onLoggingOpen={() => {}}
         />
       </Box>
     </Box>

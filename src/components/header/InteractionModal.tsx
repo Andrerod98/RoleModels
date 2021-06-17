@@ -39,6 +39,9 @@ export const TestInteractionModal: FC<FocusButtonProps> = (
     <>
       <IconButton
         aria-label={"Focus"}
+        size={"sm"}
+        ml={"10px"}
+        my={"5px"}
         icon={<Icon as={AiOutlineExpand} />}
         onClick={() => {
           onOpen();

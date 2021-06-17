@@ -12,23 +12,6 @@ interface DesignToolProps {
   app: CrossDeviceApplication;
 }
 export const DesignTool = (props: DesignToolProps) => {
-  /*const generateState = () => {
-    return {
-      views: [],
-    };
-  };
-  const [state, setState] = useState<AppState>(generateState());
-  useEffect(() => {
-    const onChange = () => {
-      console.log("The state has changed...");
-      setState(generateState());
-    };
-    props.project.on("change", onChange);
-    onChange();
-    return () => {
-      props.project.off("change", onChange);
-    };
-  }, []);*/
 
   const [loggingOpen, setLoggingOpen] = useState(false);
 

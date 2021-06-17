@@ -32,12 +32,17 @@ export class RolesManager implements IRolesManager {
   }
 
   public async loadRoles() {
+    const promises = [];
     for (const handle of this.rolesMap.values()) {
-      const sharedCell = await handle.get();
-      if (sharedCell !== undefined) {
-        this.loadRole(sharedCell);
-      }
+      promises.push(handle.get());
     }
+
+    const roles = await Promise.all(promises);
+    roles.forEach((role) => {
+      if (role !== undefined) {
+        this.loadRole(role);
+      }
+    });
     console.log("" + this.rolesMap.size + " Roles loaded.");
   }
 

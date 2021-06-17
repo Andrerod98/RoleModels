@@ -110,6 +110,7 @@ export const ManagerComponent: FC<ManagerComponentProps> = (props) => {
           onDesignClick={() => {
             model.promoteToDesigner();
           }}
+          onLoggingOpen={() => {}}
         />
         <Stack
           m='40px'
@@ -141,7 +142,7 @@ export const ManagerComponent: FC<ManagerComponentProps> = (props) => {
             isExternal
           >
             <Text fontSize={{ base: "10px", md: "16px", lg: "24px" }}>
-              https://{props.app.getServerUrl()}:8080#documentId=
+              https://{props.app.getServerUrl()}:8080#project=
               {model.getId()}
             </Text>
           </Link>

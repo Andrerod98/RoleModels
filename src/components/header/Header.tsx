@@ -1,4 +1,4 @@
-import { ChevronDownIcon, ViewIcon } from "@chakra-ui/icons";
+import { ChevronDownIcon, MoonIcon, SunIcon, ViewIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -14,13 +14,15 @@ import {
   Spacer,
   Tag,
   TagLabel,
+  useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
 import React, { FC } from "react";
 import { CrossDeviceApplication } from "../../CrossDeviceApplication";
-import { RiMusicLine } from "react-icons/ri";
+import { RiFileListLine, RiMusicLine } from "react-icons/ri";
 import { FaPencilRuler } from "react-icons/fa";
 import { TestInteractionModal } from "./InteractionModal";
+import { Logger } from "../../Logger";
 
 interface HeaderProps {
   roles: string[];
@@ -28,11 +30,13 @@ interface HeaderProps {
   onRoleClick: (role: string) => void;
   onManagerClick: () => void;
   onDesignClick: () => void;
+  onLoggingOpen: () => void;
   app: CrossDeviceApplication;
 }
 
 export const Header: FC<HeaderProps> = (props: HeaderProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { colorMode, toggleColorMode } = useColorMode();
   const btnRef = React.useRef();
   return (
     <>
@@ -112,6 +116,7 @@ export const Header: FC<HeaderProps> = (props: HeaderProps) => {
                     } else if (role === "designer") {
                       return (
                         <Button
+                          key={"header-button-" + index}
                           leftIcon={<FaPencilRuler />}
                           onClick={props.onDesignClick}
                         >
@@ -134,7 +139,7 @@ export const Header: FC<HeaderProps> = (props: HeaderProps) => {
 
               <Spacer />
 
-              <Box>
+              <Flex>
                 <Tag
                   size={"lg"}
                   key={"lg"}
@@ -144,16 +149,46 @@ export const Header: FC<HeaderProps> = (props: HeaderProps) => {
                 >
                   <TagLabel>{props.myRole}</TagLabel>
                 </Tag>
-                <IconButton
-                  aria-label={"Focus"}
-                  icon={<Icon as={RiMusicLine} />}
-                  mx={"5px"}
-                  onClick={() => {
-                    props.app.pingAll();
-                  }}
-                />
-                <TestInteractionModal app={props.app} />
-              </Box>
+                <Flex wrap={"wrap"} mx={"10px"}>
+                  <IconButton
+                    size={"sm"}
+                    my={"5px"}
+                    aria-label={"Search database"}
+                    onClick={() => {
+                      Logger.getInstance().info(
+                        "The color was changed to " + colorMode
+                      );
+                      Logger.getInstance().warning(
+                        "The color was changed to " + colorMode
+                      );
+                      Logger.getInstance().error(
+                        "The color was changed to " + colorMode
+                      );
+                      toggleColorMode();
+                    }}
+                    icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+                  ></IconButton>
+                  <IconButton
+                    ml={"10px"}
+                    my={"5px"}
+                    size={"sm"}
+                    aria-label={"Search database"}
+                    onClick={props.onLoggingOpen}
+                    icon={<RiFileListLine />}
+                  ></IconButton>
+                  <IconButton
+                    aria-label={"Focus"}
+                    icon={<Icon as={RiMusicLine} />}
+                    ml={"10px"}
+                    my={"5px"}
+                    size={"sm"}
+                    onClick={() => {
+                      props.app.pingAll();
+                    }}
+                  />
+                  <TestInteractionModal app={props.app} />
+                </Flex>
+              </Flex>
             </Flex>
           </Box>
         </DrawerContent>

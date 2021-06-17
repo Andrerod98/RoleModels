@@ -29,12 +29,7 @@ import {
   IMultiViewCombinedView,
 } from "./combined-views/multi-combined-view";
 import { UIComponentFactory } from "./components/UIComponent/UIComponentFactory";
-import { ImageFactory } from "./components/Image";
-import { InputFactory } from "./components/Input";
-import { ListFactory } from "./components/List";
-import { RadioFactory } from "./components/Radio";
-import { MapFactory } from "./components/Map";
-import { LinkFactory } from "./components/Link";
+
 import { FactoriesManager } from "./FactoriesManager";
 import { IInk, Ink } from "@fluidframework/ink";
 import { InkCanvasFactory } from "./components/InkCanvas";
@@ -48,22 +43,26 @@ import {
   PositionMap,
 } from "./combined-views/stitching-combined-view/IStitchingCombinedView";
 import { IView } from "./views/IView";
-import { BoxFactory } from "./components/Box";
-import { CenterFactory } from "./components/Center";
-import { CheckboxFactory } from "./components/CheckBox";
-import { EditableFactory } from "./components/Editable";
-import { FlexFactory } from "./components/Flex";
-import { GridFactory } from "./components/Grid";
-import { SliderFactory } from "./components/Slider";
-import { SpacerFactory } from "./components/Spacer";
-import { StackFactory } from "./components/Stack";
-
-export interface IPrototypingToolInitialState {
-  combinedViews: string;
-}
+import {
+  BoxFactory,
+  CenterFactory,
+  CheckboxFactory,
+  EditableFactory,
+  FlexFactory,
+  GridFactory,
+  ImageFactory,
+  InputFactory,
+  LinkFactory,
+  ListFactory,
+  RadioFactory,
+  SliderFactory,
+  SpacerFactory,
+  StackFactory,
+  MapFactory,
+} from "./components";
 
 export class PrototypingToolDataObject
-  extends DataObject<{}, IPrototypingToolInitialState>
+  extends DataObject
   implements IPrototypingToolDataModel
 {
   /* The Map with the connected devices */
@@ -94,11 +93,7 @@ export class PrototypingToolDataObject
     return "prototyping_tool";
   }
 
-  protected async initializingFirstTime(
-    initialState?: IPrototypingToolInitialState
-  ) {
-    console.log("INITIALIZING FIRST TIME");
-
+  protected async initializingFirstTime() {
     /* Creating device Shared Map...*/
     const devicesMap = SharedMap.create(this.runtime);
 
@@ -142,12 +137,6 @@ export class PrototypingToolDataObject
       qrIds: [],
     } as IRole);
 
-    /* Creating shared Cells...*/
-    /* for (let i = 0; i < 5; i++) {
-      const sharedCell = SharedCell.create(this.runtime);
-      rolesMap.set("role-" + i, sharedCell.handle);
-    }*/
-
     rolesMap.set("manager", managerRole.handle);
     rolesMap.set("designer", designerRole.handle);
     rolesMap.set("default", defaultRole.handle);
@@ -161,65 +150,54 @@ export class PrototypingToolDataObject
     this.root.set("ping", sharedPing.handle);
   }
 
-  /**
-   * Helper function to set up event listeners for shared objects
-   */
-  /* private createEventListeners(sharedMap: SharedMap): void {
-    // Set up an event listener for changes to values in the SharedMap
-    sharedMap.on("valueChanged", () => {
-      this.emit("change");
-    });
+  protected async hasInitialized() {
+    /* Loading shared objects...*/
+    await this.loadSharedObjects();
 
-    // Set up an event listener for clearing the data in a SharedMap
-    sharedMap.on("clear", () => {
-      this.emit("change");
-    });
+    this.loadManagers();
 
-    /* const quorum = this.context.getQuorum();
-    quorum.on("addMember", () => {
-      this.emit("change");
-    });
+    /* Registering factories...*/
+    this.registerDefaultFactories();
 
-    quorum.on("removeMember", () => {
-      this.emit("change");
-    });
-  }*/
+    this.createAllEventListeners();
 
-  public getRolesMap() {
-    return this.rolesMap;
+    /* Loading combined views...*/
+
+    await Promise.all([
+      this.rolesManager.loadRoles(),
+      this.combinedViewsManager.loadCombinedViews(),
+      this.qrManager.loadQRCodes(),
+    ]);
+
+    this.runtime.once("connected", () => {
+      this.emit("connected");
+    });
   }
 
   private async loadSharedObjects() {
-    /* Getting devices shared map...*/
-    this.devicesMap = await this.root
-      .get<IFluidHandle<SharedMap>>("devices")
-      .get();
+    const sharedObjects = await Promise.all([
+      this.root.get<IFluidHandle<SharedMap>>("devices").get(),
+      this.root.get<IFluidHandle<SharedMap>>("combined-views").get(),
+      this.root.get<IFluidHandle<SharedMap>>("roles").get(),
+      this.root.get<IFluidHandle<SharedMap>>("qrs").get(),
+      this.root.wait<IFluidHandle<IInk>>("ink"),
+      this.root.get<IFluidHandle<SharedCounter>>("ping").get(),
+    ]);
 
-    /* Getting combined views shared map...*/
-    this.combinedViewsMap = await this.root
-      .get<IFluidHandle<SharedMap>>("combined-views")
-      .get();
-
-    /* Getting views shared map...*/
-    this.rolesMap = await this.root.get<IFluidHandle<SharedMap>>("roles").get();
-
-    /* Getting views shared map...*/
-    this.qrMap = await this.root.get<IFluidHandle<SharedMap>>("qrs").get();
-
-    /* Getting shared ink...*/
-    const handle = await this.root.wait<IFluidHandle<IInk>>("ink");
-    this.ink = await handle.get();
-
-    this.pingCounter = await this.root
-      .get<IFluidHandle<SharedCounter>>("ping")
-      .get();
+    this.devicesMap = sharedObjects[0];
+    this.combinedViewsMap = sharedObjects[1];
+    this.rolesMap = sharedObjects[2];
+    this.qrMap = sharedObjects[3];
+    this.pingCounter = sharedObjects[5];
+    this.ink = await sharedObjects[4].get();
   }
 
   private loadManagers() {
     /* Creating devices manager...*/
     this.devicesManager = new DevicesManager(this.devicesMap, this.runtime);
-    this.factoriesManager = new FactoriesManager();
+
     /* Creating factories manager...*/
+    this.factoriesManager = new FactoriesManager();
 
     /* Creating Roles manager...*/
     this.rolesManager = new RolesManager(this.rolesMap, this.factoriesManager);
@@ -235,31 +213,6 @@ export class PrototypingToolDataObject
 
     /* Creating combined views Manager...*/
     this.qrManager = new QRManager(this.qrMap);
-  }
-
-  public getRoot() {
-    return this.root;
-  }
-
-  public clearAll(): void {
-    //this.devicesMap.clear();
-    this.combinedViewsMap.clear();
-    this.rolesMap.clear();
-    this.qrMap.clear();
-    this.ink.clear();
-
-    this.emit("cleared", "Clear all");
-  }
-
-  public getDevicesMap() {
-    return this.devicesMap;
-  }
-  public getCombinedViewsMap() {
-    return this.combinedViewsMap;
-  }
-
-  public getQRMap() {
-    return this.qrMap;
   }
 
   private registerDefaultFactories() {
@@ -319,18 +272,15 @@ export class PrototypingToolDataObject
     );
   }
 
-  public changeState = () => {
-    this.emit("change");
-  };
-
-  public playSound() {
-    this.audio.pause();
-    this.audio.currentTime = 0;
-    this.audio.play();
+  public clearAll(): void {
+    this.devicesMap.clear();
+    this.combinedViewsMap.clear();
+    this.rolesMap.clear();
+    this.qrMap.clear();
+    this.ink.clear();
   }
 
   public deleteAllEventListeners() {
-    console.warn("DELETING ALL EVENT LISTENERS");
     this.devicesMap.removeAllListeners();
     this.combinedViewsMap.removeAllListeners();
     this.rolesMap.removeAllListeners();
@@ -384,18 +334,23 @@ export class PrototypingToolDataObject
     });*/
   }
 
+  public changeState = () => {
+    this.emit("change");
+  };
+
   private async deleteMapEventListeners(name: string, map: SharedMap) {
     for (const value of map.values()) {
       const cell = await value.get();
       cell.removeAllListeners();
     }
   }
-  private async createMapEventListeners(name: string, map: SharedMap) {
+  private createMapEventListeners(name: string, map: SharedMap) {
     for (const value of map.values()) {
-      const cell = await value.get();
-      cell.on("valueChanged", () => {
-        this.emit("change", "Cell of " + name + " changed.");
-      });
+      value.get().then((cell) =>
+        cell.on("valueChanged", () => {
+          this.emit("change", "Cell of " + name + " changed.");
+        })
+      );
     }
   }
 
@@ -403,33 +358,10 @@ export class PrototypingToolDataObject
     this.pingCounter.increment(1);
   }
 
-  protected async hasInitialized() {
-    console.log("HAS INITIALIZED");
-    /* Has initialized...*/
-
-    /* Loading shared objects...*/
-    await this.loadSharedObjects();
-
-    this.loadManagers();
-
-    /* Registering factories...*/
-
-    this.registerDefaultFactories();
-
-    this.createAllEventListeners();
-
-    /* Adding current device...*/
-    //this.devicesManager.addDevice("manager");
-    //this.devicesManager.addMyDevice();
-
-    /* Loading combined views...*/
-    await this.rolesManager.loadRoles();
-    await this.combinedViewsManager.loadCombinedViews(this.factoriesManager);
-    await this.qrManager.loadQRCodes();
-
-    this.runtime.once("connected", () => {
-      this.emit("connected");
-    });
+  public playSound() {
+    this.audio.pause();
+    this.audio.currentTime = 0;
+    this.audio.play();
   }
 
   /* Device Management Functions*/
@@ -912,7 +844,7 @@ export class PrototypingToolDataObject
 export const PrototypingToolInstantiationFactory = new DataObjectFactory<
   PrototypingToolDataObject,
   undefined,
-  IPrototypingToolInitialState,
+  undefined,
   IEvent
 >(
   PrototypingToolDataObject.name,

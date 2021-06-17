@@ -7,7 +7,7 @@ module.exports = (env) => {
   return {
     devServer: {
       host: '192.168.1.72',
-      port: 8080,
+      //port: 80,
       headers: {
         'Access-Control-Allow-Origin': '*'
       },
