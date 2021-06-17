@@ -1,7 +1,7 @@
 import React from "react";
-import { Box, Center, Heading, Text } from "@chakra-ui/react";
+import { Box, Center, Heading, Spinner, Text } from "@chakra-ui/react";
 interface ErrorPageProps {
-  error?: Error;
+  message?: string;
 }
 
 export function ErrorPage(props: ErrorPageProps) {
@@ -9,7 +9,8 @@ export function ErrorPage(props: ErrorPageProps) {
     <Center h={"100vh"}>
       <Box>
         <Heading>Error</Heading>
-        <Text fontSize={"20px"}>{props.error.message}</Text>
+        <Spinner></Spinner>
+        <Text fontSize={"20px"}>{props.message}</Text>
         <Text fontSize={"20px"}>
           Ensure you are running the Tinylicious Fluid Server\nUse:`npm run
           start:server`

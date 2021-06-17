@@ -25,14 +25,20 @@ if (PROJECT_NAME === undefined) {
             .start()
             .catch((e) => {
               console.error(e);
-              console.log(
-                "%cEnsure you are running the Tinylicious Fluid Server\nUse:`npm run start:server`",
-                "font-size:30px"
+
+              ReactDOM.render(
+                <ChakraProvider resetCSS>
+                  <ErrorPage
+                    message={"The project already exists! Redirecting..."}
+                  />
+                </ChakraProvider>,
+
+                document.getElementById("content")
               );
             })
             .then(() => {
-              //window.location.href = application.getFullHost();
-              //window.location.reload();
+              window.location.href = application.getFullHost();
+              window.location.reload();
             });
         }}
       />
@@ -48,36 +54,43 @@ if (PROJECT_NAME === undefined) {
     .catch((e: Error) => {
       // The container does not exist
       console.error(e.message);
-      console.log(
-        "%cEnsure you are running the Tinylicious Fluid Server\nUse:`npm run start:server`",
-        "font-size:30px"
-      );
+
       ReactDOM.render(
         <ChakraProvider resetCSS>
-          <ErrorPage error={e} />
+          <ErrorPage message={e.message} />
         </ChakraProvider>,
 
         document.getElementById("content")
       );
     })
     .then(() => {
-      console.log("started");
-
-      console.log(application.getContainer().attachState);
-      application.getContainer().on("connected", () => {
-        console.log("Container connected");
-      });
       application.getContainer().on("disconnected", () => {
-        console.log("Container disconnected");
+        ReactDOM.render(
+          <ChakraProvider resetCSS>
+            <ErrorPage
+              message={"The container has been disconnected. Reconnecting..."}
+            />
+          </ChakraProvider>,
+
+          document.getElementById("content")
+        );
       });
       application.getContainer().on("closed", () => {
-        console.log("Container closed");
+        ReactDOM.render(
+          <ChakraProvider resetCSS>
+            <ErrorPage message={"The container has been closed."} />
+          </ChakraProvider>,
+
+          document.getElementById("content")
+        );
       });
+
+      application.getContainer().on("connected", () => {
+        console.log("The container is connected.");
+      });
+
       application.getSharedObject().on("connected", () => {
-        console.log("Data object connected");
-      });
-      /* application.getSharedObject().once("connected", () => {
         application.render(document.getElementById("content"));
-      }); */
+      });
     });
 }

@@ -21,8 +21,6 @@ import { Container } from "@fluidframework/container-loader";
 export class CrossDeviceApplication {
   protected sharedObject: PrototypingToolDataObject;
   protected container: Container;
-  private viewId: string;
-  private combinedViewId: string;
 
   private setInteractions: () => void = () => {};
 
@@ -30,10 +28,7 @@ export class CrossDeviceApplication {
     public readonly serverUrl: string,
     public readonly projectName,
     readonly isFirst
-  ) {
-    this.viewId = "";
-    this.combinedViewId = "";
-  }
+  ) {}
 
   public getServerUrl(): string {
     return this.serverUrl;
@@ -69,24 +64,6 @@ export class CrossDeviceApplication {
 
   public reRender() {
     this.sharedObject.emit("change");
-  }
-
-  public redirectToDesign() {
-    window.location.href =
-      "https://" +
-      this.serverUrl +
-      ":8080/#project=" +
-      this.projectName +
-      "&mode=design";
-    window.location.reload();
-  }
-
-  public getViewId(): string {
-    return this.viewId;
-  }
-
-  public getCombinedViewId(): string {
-    return this.combinedViewId;
   }
 
   public getProjectName(): string {
@@ -129,18 +106,8 @@ export class CrossDeviceApplication {
     return div;
   }
 
-  public setViewId(viewId: string) {
-    this.viewId = viewId;
-  }
-
   public getFullHost() {
-    return (
-      "https://" +
-      this.serverUrl +
-      ":8080/#project=" +
-      this.projectName +
-      "&mode=design"
-    );
+    return "https://" + this.serverUrl + ":8080/#project=" + this.projectName;
   }
 
   public grabView(view: View): void {
