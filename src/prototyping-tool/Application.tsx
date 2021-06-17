@@ -4,7 +4,6 @@ import { getDefaultObjectFromContainer } from "@fluidframework/aqueduct";
 import React from "react";
 import ReactDOM from "react-dom";
 import { MainComponent } from ".";
-import { Project } from "../design-tool/Project";
 import { Utils } from "../design-tool/Utils";
 import { CombinedView } from "./shared-object/combined-views/combined-view";
 import { PositionMap } from "./shared-object/combined-views/stitching-combined-view/IStitchingCombinedView";
@@ -17,9 +16,11 @@ import { Role } from "./shared-object/roles/Role";
 import { IView } from "./shared-object/views/IView";
 import { View } from "./shared-object/views/View";
 import { TinyliciousServiceWithUrl } from "./utils/tinyliciousService";
+import { Container } from "@fluidframework/container-loader";
 
 export class CrossDeviceApplication {
   protected sharedObject: PrototypingToolDataObject;
+  protected container: Container;
   private viewId: string;
   private combinedViewId: string;
 
@@ -49,7 +50,11 @@ export class CrossDeviceApplication {
   public getSharedObject(): PrototypingToolDataObject {
     return this.sharedObject;
   }
-  
+
+  public getContainer(): Container {
+    return this.container;
+  }
+
   public viewsToString = (views: IView[]) => {
     let fullStr = "";
     views.forEach((view) => {
@@ -93,19 +98,9 @@ export class CrossDeviceApplication {
   }
 
   public async start() {
-    /*if (this.isNewDocument()) {
-      window.location.hash = "documentId=" + this.projectName;
-    }
-*/
     const serviceTiny = new TinyliciousServiceWithUrl(this.serverUrl, 7070);
-    /* const serviceRouter = new RouterliciousService({
-      orderer: "http://localhost:3003",
-      storage: "http://gitrest:3000",
-      tenantId: "local",
-      key: "43cfc3fbf04a97c0921fd23ff10f9e4b",
-    });*/
 
-    const container = await getContainer(
+    this.container = await getContainer(
       serviceTiny,
       this.projectName,
       PrototypingToolContainerFactory,
@@ -114,17 +109,19 @@ export class CrossDeviceApplication {
 
     // Get the Default Object from the Container
     this.sharedObject =
-      await getDefaultObjectFromContainer<PrototypingToolDataObject>(container);
+      await getDefaultObjectFromContainer<PrototypingToolDataObject>(
+        this.container
+      );
 
     // Setting "fluidStarted" is just for our test automation
     // eslint-disable-next-line dot-notation
     window["fluidStarted"] = true;
   }
 
-  public render(div: HTMLElement, project: Project) {
+  public render(div: HTMLElement) {
     ReactDOM.render(
       <ChakraProvider>
-        <MainComponent key={"object"} app={this} project={project} />
+        <MainComponent key={"object"} app={this} />
       </ChakraProvider>,
       div
     );

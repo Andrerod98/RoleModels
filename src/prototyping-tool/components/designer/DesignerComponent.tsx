@@ -9,13 +9,11 @@
 
 import React, { FC } from "react";
 import { DesignTool } from "../../../design-tool/App";
-import { Project } from "../../../design-tool/Project";
 import { CrossDeviceApplication } from "../../Application";
 import { Header } from "../header/Header";
 
 interface ManagerComponentProps {
   readonly app: CrossDeviceApplication;
-  readonly project: Project;
 }
 
 export const DesignerComponent: FC<ManagerComponentProps> = (props) => {

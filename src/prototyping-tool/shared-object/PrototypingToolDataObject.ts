@@ -98,6 +98,7 @@ export class PrototypingToolDataObject
     initialState?: IPrototypingToolInitialState
   ) {
     console.log("INITIALIZING FIRST TIME");
+
     /* Creating device Shared Map...*/
     const devicesMap = SharedMap.create(this.runtime);
 

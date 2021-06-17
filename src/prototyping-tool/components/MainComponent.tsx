@@ -15,12 +15,10 @@ import { Box } from "@chakra-ui/react";
 import { CrossDeviceApplication } from "../Application";
 import { View } from "../shared-object/views/View";
 import { QRCodeController } from "../shared-object/qrcode/QRCodeController";
-import { Project } from "../../design-tool/Project";
 import { DesignerComponent } from "./designer";
 
 interface MainComponentProps {
   readonly app: CrossDeviceApplication;
-  readonly project: Project;
 }
 
 interface MainComponentState {
@@ -83,7 +81,7 @@ export const MainComponent: FC<MainComponentProps> = (
       {model.isManager() ? (
         <ManagerComponent app={props.app} devices={state.devices} />
       ) : model.isDesigner() ? (
-        <DesignerComponent app={props.app} project={props.project} />
+        <DesignerComponent app={props.app} />
       ) : (
         <RoleComponent
           app={props.app}

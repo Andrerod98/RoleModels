@@ -1,5 +1,23 @@
 /* eslint-disable guard-for-in */
 export default class Utils {
+  static getURLHashParts(hash: string): string[] {
+    return hash.split("&").reduce(function (res, item) {
+      const parts = item.split("=");
+      res[parts[0]] = parts[1];
+      return res;
+    }, {}) as string[];
+  }
+
+  static async runAsync(promise: () => any) {
+    try {
+      const data = await promise();
+      return [data, null];
+    } catch (error) {
+      console.error(error);
+      return [null, error];
+    }
+  }
+
   static validURL(str) {
     const pattern = new RegExp(
       "(https?://(?:www.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9].[^s]{2,}|www.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9].[^s]{2,}|https?://(?:www.|(?!www))[a-zA-Z0-9]+.[^s]{2,}|www.[a-zA-Z0-9]+.[^s]{2,})"
