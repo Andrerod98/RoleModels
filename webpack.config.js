@@ -1,16 +1,7 @@
-/* eslint-disable no-undef */
-/* !
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License.
- */
-
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const webpack = require("webpack");
 const fs = require("fs");
-
-// const fs = require("fs");
-// const https = require("https");
 
 module.exports = (env) => {
   return {
@@ -83,11 +74,7 @@ module.exports = (env) => {
       filename: "[name].bundle.js",
       path: path.resolve(__dirname, "dist"),
       library: "[name]",
-      // https://github.com/webpack/webpack/issues/5767
-      // https://github.com/webpack/webpack/issues/7939
       devtoolNamespace: "RoleModels",
-      // This is required to run webpacked code in webworker/node
-      // https://github.com/webpack/webpack/issues/6522
       globalObject: "(typeof self !== 'undefined' ? self : this)",
       libraryTarget: "umd",
     },

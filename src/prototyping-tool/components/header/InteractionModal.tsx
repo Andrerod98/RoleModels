@@ -21,9 +21,9 @@ import {
 import React, { FC, useState } from "react";
 import { AiOutlineExpand } from "react-icons/ai";
 import { CgArrowsExpandDownRight, CgScreenMirror } from "react-icons/cg";
-import { CrossDeviceApplication } from "./Application";
 import QrReader from "react-qr-reader";
-import Utils from "./utils/utils";
+import { CrossDeviceApplication } from "../../Application";
+import Utils from "../../utils/utils";
 
 interface FocusButtonProps {
   app: CrossDeviceApplication;

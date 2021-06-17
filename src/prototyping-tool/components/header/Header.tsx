@@ -19,8 +19,8 @@ import {
 import React, { FC } from "react";
 import { CrossDeviceApplication } from "../../Application";
 import { RiMusicLine } from "react-icons/ri";
-import { TestInteractionModal } from "../../InteractionModal";
 import { FaPencilRuler } from "react-icons/fa";
+import { TestInteractionModal } from "./InteractionModal";
 
 interface HeaderProps {
   roles: string[];
