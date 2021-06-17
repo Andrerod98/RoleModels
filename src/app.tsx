@@ -4,10 +4,10 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import React from "react";
 import ReactDOM from "react-dom";
-import { LandingPage } from "./design-tool/components/LandingPage";
-import { CrossDeviceApplication } from "./prototyping-tool/Application";
-import { ErrorPage } from "./prototyping-tool/ErrorPage";
-import Utils from "./prototyping-tool/utils/utils";
+import { CrossDeviceApplication } from "./CrossDeviceApplication";
+import { ErrorPage } from "./ErrorPage";
+import { LandingPage } from "./LandingPage";
+import Utils from "./utils/Utils";
 
 const HASH = window.location.hash.substring(1);
 const HASH_PARTS = Utils.getURLHashParts(HASH);

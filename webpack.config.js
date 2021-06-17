@@ -1,92 +1,92 @@
-const path = require("path");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const webpack = require("webpack");
-const fs = require("fs");
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack');
+const fs = require('fs');
 
 module.exports = (env) => {
   return {
     devServer: {
-      host: "192.168.1.72",
+      host: '192.168.1.72',
       port: 8080,
       headers: {
-        "Access-Control-Allow-Origin": "*",
+        'Access-Control-Allow-Origin': '*'
       },
       watchOptions: {
-        ignored: "**/node_modules/**",
+        ignored: '**/node_modules/**'
       },
       https: {
-        key: fs.readFileSync("./certificates/host.key"),
-        cert: fs.readFileSync("./certificates/host.crt"),
-      },
+        key: fs.readFileSync('./certificates/host.key'),
+        cert: fs.readFileSync('./certificates/host.crt')
+      }
     },
     entry: {
-      app: "./src/app.tsx",
+      app: './src/App.tsx'
     },
     resolve: {
       fallback: {
-        util: require.resolve("util/"),
-        stream: require.resolve("stream-browserify"),
-        crypto: require.resolve("crypto-browserify"),
-        
+        util: require.resolve('util/'),
+        stream: require.resolve('stream-browserify'),
+        crypto: require.resolve('crypto-browserify')
+
       },
-      extensions: [".ts", ".tsx", ".js"],
+      extensions: ['.ts', '.tsx', '.js']
     },
     module: {
       rules: [
         {
           test: /\.tsx?$/,
-          loader: "ts-loader",
+          loader: 'ts-loader'
         },
         {
           test: /\.(sa|sc|c)ss$/,
           use: [
             {
-              loader: "style-loader",
+              loader: 'style-loader'
             },
             {
-              loader: "css-loader", options: {
-                    url: false,
-                            importLoaders: 2,
-                            modules: {
-                              mode: 'local'
-                              },
-                          },
-              
+              loader: 'css-loader', options: {
+                url: false,
+                importLoaders: 2,
+                modules: {
+                  mode: 'local'
+                }
+              }
+
             },
             {
-              loader: "sass-loader",
+              loader: 'sass-loader',
               options: {
-                sourceMap: true,
-              },
-            },
-          ],
+                sourceMap: true
+              }
+            }
+          ]
         },
         {
           test: /\.(png|jpg|gif|svg|eot|ttf|woff|woff2)$/,
-          loader: "url-loader",
+          loader: 'url-loader',
           options: {
-            limit: 10000,
-          },
-        },
-      ],
+            limit: 10000
+          }
+        }
+      ]
     },
     output: {
-      filename: "[name].bundle.js",
-      path: path.resolve(__dirname, "dist"),
-      library: "[name]",
-      devtoolNamespace: "RoleModels",
-      globalObject: "(typeof self !== 'undefined' ? self : this)",
-      libraryTarget: "umd",
+      filename: '[name].bundle.js',
+      path: path.resolve(__dirname, 'dist'),
+      library: '[name]',
+      devtoolNamespace: 'RoleModels',
+      globalObject: '(typeof self !== \'undefined\' ? self : this)',
+      libraryTarget: 'umd'
     },
     plugins: [
       new HtmlWebpackPlugin({
-        template: "./public/index.html",
+        template: './public/index.html'
       }),
       new webpack.ProvidePlugin({
-        process: "process/browser",
-      }),
+        process: 'process/browser'
+      })
     ],
-    mode: "development",
-    devtool: "inline-source-map",
+    mode: 'development',
+    devtool: 'inline-source-map'
   };
 };
