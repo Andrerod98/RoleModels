@@ -26,6 +26,8 @@ export const Previewer = (props: PreviewerProps) => {
     setItems(props.views.map((v: View) => ({ id: uuidv4(), view: v })));
   }, [props.views]);
 
+  //console.trace("PREVIEWER RENDER");
+
   const handleItemDelete = (i: any) => {
     const index = items.findIndex((item: any) => item.id === i.id);
 

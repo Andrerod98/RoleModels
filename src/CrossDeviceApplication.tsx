@@ -134,7 +134,7 @@ export class CrossDeviceApplication {
   }
 
   public getMyRole(): Role {
-    return this.sharedObject.getRole();
+    return this.sharedObject.getMyRole();
   }
 
   public addDevice(device: string) {}
@@ -184,7 +184,7 @@ export class CrossDeviceApplication {
   }
 
   public getRole(role: string) {
-    return this.sharedObject.getRolesManager().getRole(role);
+    return this.sharedObject.getRole(role);
   }
 
   public getViewOrCombinedView(role: string, id: string): View {

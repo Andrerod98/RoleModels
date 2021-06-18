@@ -5,26 +5,28 @@ import { CombinedViewFactory } from "../combined-views/CombinedViewFactory";
 import { FactoriesManager } from "../FactoriesManager";
 import { SingleCombinedView } from "../combined-views/single-combined-view";
 import { MultiCombinedView } from "../combined-views/multi-combined-view";
-import { IFluidHandle } from "@fluidframework/core-interfaces";
+import EventEmitter from "events";
 
 /* This class is responsible for managing the combined views */
-export class CombinedViewsManager {
+export class CombinedViewsManager extends EventEmitter {
   private combinedViews: Map<String, CombinedView>;
 
   private combinedViewsFactory = new CombinedViewFactory();
 
   public constructor(
     private readonly combinedViewsSharedMap: SharedMap,
-    private readonly factoriesManager: FactoriesManager,
-    private readonly changeState: () => void
+    private readonly factoriesManager: FactoriesManager
   ) {
+    super();
     this.combinedViews = new Map<String, CombinedView>();
     this.setEventListener();
   }
 
   private setEventListener() {
     this.combinedViewsSharedMap.on("valueChanged", async (e: any, ...args) => {
-      const combinedViewID = e.key;
+      this.loadCombinedViews();
+      this.emit("changeState");
+      /* const combinedViewID = e.key;
       if (e.previousValue === undefined) {
         // added
         const sharedCell = await this.combinedViewsSharedMap
@@ -33,12 +35,12 @@ export class CombinedViewsManager {
 
         this.addCombinedView(sharedCell);
         sharedCell.on("valueChanged", () => {
-          this.changeState();
+          this.emit("changeState");
         });
 
         // this.roles.set(roleName, new Role(sharedCell, this.factoriesManager));
         // console.log("Adding " + roleName + " from map");
-      }
+      }*/
     });
   }
 
@@ -67,12 +69,23 @@ export class CombinedViewsManager {
   }
 
   public loadCombinedView(sharedCombinedView: SharedCell): void {
-    const combinedView = this.combinedViewsFactory.getCombinedView(
-      sharedCombinedView,
-      this.factoriesManager
-    );
+    const combinedView = sharedCombinedView.get();
+    if (this.combinedViews.has(combinedView.name)) {
+      this.combinedViews.get(combinedView.name).updateObjects();
+    } else {
+      const combinedView = this.combinedViewsFactory.getCombinedView(
+        sharedCombinedView,
+        this.factoriesManager
+      );
 
-    this.combinedViews.set(combinedView.getId(), combinedView);
+      this.combinedViews.set(combinedView.getId(), combinedView);
+    }
+    sharedCombinedView.off("valueChanged", () => {
+      this.emit("changeState", "Cell of " + name + " changed.");
+    });
+    sharedCombinedView.on("valueChanged", () => {
+      this.emit("changeState", "Cell of " + name + " changed.");
+    });
   }
 
   public async loadCombinedViews() {

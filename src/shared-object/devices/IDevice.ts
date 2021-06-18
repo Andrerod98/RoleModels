@@ -1,12 +1,9 @@
 export interface IDevice {
   id: string;
   type: string;
-  role?: string;
-  combined?: boolean;
+  role: string;
   // capabilities: ICapabilities;
   // affordances: IAffordances;
-  x?: number;
-  y?: number;
 }
 
 export interface ICapabilities {

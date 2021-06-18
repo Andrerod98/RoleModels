@@ -73,11 +73,12 @@ export const Preview = (props: PreviewProps) => {
           {props.items.map((item: ItemView) => (
             <SortableViewItem
               key={"sortable-item" + item.id}
-              item={item}
+              id={item.id}
+              view={item.view}
               onClickRight={() => {
                 props.onItemChange(item, 1, 0);
               }}
-              onClickDown={() => {
+              onClickBottom={() => {
                 props.onItemChange(item, 0, 1);
               }}
               onClickTop={() => {
@@ -110,9 +111,8 @@ export const Preview = (props: PreviewProps) => {
               gap={2}
             >
               <ViewItemOverlay
-                id={activeIndex}
-                items={props.items}
-                activeIndex={activeIndex}
+                id={"" + activeIndex}
+                view={props.items[activeIndex].view}
               />
             </Grid>
           ) : null}

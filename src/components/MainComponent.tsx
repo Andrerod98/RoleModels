@@ -34,7 +34,7 @@ export const MainComponent: FC<MainComponentProps> = (
   const model = props.app.getSharedObject();
   const generateState = () => {
     return {
-      devices: model.getDevices(),
+      devices: Array.from(model.getDevices()),
       combinedViews: model.getMyCombinedViews(),
       views: model.getMyViews(),
       qrCodes: model.getMyQrCodes(),

@@ -24,8 +24,6 @@ export class UIComponentController {
   }
 
   createController(model: IUIComponent) {
-    console.log("Adding child,");
-    console.log(model);
     const controller = this.factoriesManager.getUIComponent(model);
     // .new UIComponentController(model, this);
     return controller;
@@ -90,10 +88,6 @@ export class UIComponentController {
     model.children.forEach((child) => {
       this.addChild(child);
     });
-
-    console.log(model);
-    console.log("UPDATED");
-    console.log(this.children);
   }
 
   addEventListener(listener: { [event: string]: (...args) => any }) {

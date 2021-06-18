@@ -36,7 +36,6 @@ export class TinyliciousResourcesFactory
     );
     const collectionNames = config.get("mongo:collectionNames");
     const ip = process.env.HOSTNAME ?? config.get("ip");
-    console.log(ip);
 
     const tenantManager = new TenantManager(`https://${ip}:${port}`);
     const dbFactory = new DbFactory(config);

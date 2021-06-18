@@ -7,81 +7,97 @@ import { FactoriesManager } from "../FactoriesManager";
 import { View } from "../views/View";
 import { SharedCell } from "@fluidframework/cell";
 import { IFluidHandle } from "@fluidframework/core-interfaces";
-
-export interface IRolesManager {
-  getRole: (roleName: string) => Role;
-  getRoles: () => Role[];
-  addRole: (sharedRole: SharedCell) => Role;
-
-  // getCombinations(): { [role: string]: string }[];
-  // switchToCombination: (combination: { [role: string]: string }) => void;
-
-  onRolesChange(listener: () => void): this;
-}
+import EventEmitter from "events";
 
 /* This class is responsible for controlling assigning the roles to the devices */
-export class RolesManager implements IRolesManager {
+export class RolesManager extends EventEmitter {
   private roles: Map<string, Role>;
+  private lastCommit: number;
 
   constructor(
     readonly rolesMap: SharedMap,
     readonly factoriesManager: FactoriesManager
   ) {
+    super();
     this.roles = new Map<string, Role>();
     this.setEventListener();
+    this.lastCommit = 0;
   }
 
-  public async loadRoles() {
+  public async loadRoles(commit: number) {
     const promises = [];
     for (const handle of this.rolesMap.values()) {
       promises.push(handle.get());
     }
 
     const roles = await Promise.all(promises);
+    if (this.lastCommit > commit) {
+      return;
+    }
+    const newRoles = new Map<string, Role>();
+    console.log({
+      roles: Array.from(this.rolesMap.entries()),
+      size: this.rolesMap.size,
+    });
     roles.forEach((role) => {
       if (role !== undefined) {
-        this.loadRole(role);
+        const r = this.loadRole(role);
+        newRoles.set(r.getName(), r);
       }
     });
+
+    console.log(newRoles);
+    this.roles = newRoles;
     console.log("" + this.rolesMap.size + " Roles loaded.");
   }
 
   private setEventListener() {
     this.rolesMap.on("valueChanged", async (e: any, ...args) => {
-      const roleName = e.key;
-      if (e.previousValue === undefined) {
-        // added
-        const sharedCell = await this.rolesMap
+      this.lastCommit++;
+      console.log("Loading role started");
+      await this.loadRoles(this.lastCommit);
+      this.emit("changeState");
+      console.log("Loading role finished");
+      /*const roleName = e.key;
+      const sharedCell = await this.rolesMap
           .get<IFluidHandle<SharedCell>>(roleName)
           .get();
-
+      if (e.previousValue === undefined) {
+        // added
+        
+        //Set event listener
         sharedCell.on("valueChanged", () => {
-          this.rolesMap.emit("changeState");
+          this.emit("changeState");
         });
 
-        this.addRole(sharedCell);
+        // Add the role to the map
+        this.loadRole(sharedCell);
         //this.roles.set(roleName, new Role(sharedCell, this.factoriesManager));
         console.log("Adding " + roleName + " from map");
-        this.rolesMap.emit("changeState");
+        this.emit("changeState");
       } else {
         const role = this.rolesMap.get(roleName);
-        if (role === undefined) {
+        if (role) {
+          // updated
+          console.log("Updating " + roleName + " from map");
+          this.roles.get(roleName).loadObject();
+        } else {
           // removed
           this.roles.delete(roleName);
-          // console.log("Deleting " + roleName + " from map");
-        } else {
-          // updated
-          // console.log("Updating " + roleName + " from map");
-          this.roles.get(roleName).loadObject();
+          console.log("Deleting " + roleName + " from map");
+          this.emit("changeState");
         }
-      }
+      }*/
     });
   }
 
-  public renameRole(role: string, nextValue: string) {
+  public async renameRole(role: string, nextValue: string) {
     if (role === nextValue) return;
-    this.roles.set(nextValue, this.roles.get(role));
-    this.roles.delete(role);
+    const cell = await this.rolesMap.get<IFluidHandle<SharedCell>>(role).get();
+
+    this.rolesMap.set(nextValue, cell.handle);
+    this.rolesMap.delete(role);
+    cell.set({ ...cell.get(), name: nextValue });
   }
 
   public getRole(roleName: string): Role {
@@ -124,23 +140,56 @@ export class RolesManager implements IRolesManager {
     // this.rolesMap.set(roleName, role.toRole());
   }
 
-  public loadRole(sharedRole: SharedCell): void {
-    const r = new Role(sharedRole, this.factoriesManager);
-    this.roles.set(r.getName(), r);
+  public loadRole(sharedRole: SharedCell): Role {
+    const role = sharedRole.get();
+    let r: Role;
+    if (this.roles.has(role.name)) {
+      r = this.roles.get(role.name);
+      r.loadObject();
+    } else {
+      r = new Role(sharedRole, this.factoriesManager);
+      this.roles.set(r.getName(), r);
+    }
+
+    sharedRole.off("valueChanged", () => {
+      this.emit(
+        "changeState",
+        "Role " + role.name + " changed so changing state"
+      );
+    });
+    sharedRole.on("valueChanged", () => {
+      this.emit(
+        "changeState",
+        "Role " + role.name + " changed so changing state"
+      );
+    });
+
+    return r;
   }
 
   public addRole(sharedRole: SharedCell): Role {
     const role = sharedRole.get();
 
+    if (this.rolesMap.has(role.name)) return;
+
     const r = new Role(sharedRole, this.factoriesManager);
-    this.rolesMap.set(role.name, sharedRole);
+    this.rolesMap.set(role.name, sharedRole.handle);
     this.roles.set(role.name, r);
 
     return r;
   }
 
   public removeRole(name: string): void {
+    for (const key of this.rolesMap.keys()) {
+      console.log(key);
+    }
+
+    for (const key of this.roles.keys()) {
+      console.log(key);
+    }
     this.rolesMap.delete(name);
+    this.roles.delete(name);
+    this.emit("changeState");
   }
 
   /* public loadRoles() {

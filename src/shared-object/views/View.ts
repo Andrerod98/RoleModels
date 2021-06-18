@@ -131,8 +131,7 @@ export class View {
     this.rows = object.rows;
     this.columns = object.cols;
     this.combinedViewID = object.combinedViewID;
-    console.log("updated");
-    console.log(object);
+
     this.setRoot(object.root);
     //this.root.update(object.root);
 
@@ -140,7 +139,6 @@ export class View {
   }
 
   static from(object: IView, factoriesManager: FactoriesManager) {
-    console.log(object);
     const view = new View(
       object.id,
       object.rows,

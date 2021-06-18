@@ -87,9 +87,11 @@ if (PROJECT_NAME === undefined) {
 
       application.getContainer().on("connected", () => {
         console.log("The container is connected.");
+        //application.render(document.getElementById("content"));
       });
 
       application.getSharedObject().on("connected", () => {
+        console.log("The data object is connected.");
         application.render(document.getElementById("content"));
       });
     });

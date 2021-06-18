@@ -16,10 +16,6 @@ export class FactoriesManager {
     if (factory === undefined) {
       factory = this.factories.get("uicomponent");
     }
-
-    console.log("GETTING UI COMPONENT");
-    console.log(component);
-    console.log(factory);
     return factory.generateComponent(component);
 
     /*

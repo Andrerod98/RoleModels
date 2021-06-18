@@ -3,26 +3,19 @@
 import { SharedMap } from "@fluidframework/map";
 import { IFluidDataStoreRuntime } from "@fluidframework/datastore-definitions";
 import { IDevice } from "../devices/IDevice";
-import { v4 as uuidv4 } from "uuid";
-export interface IDeviceManager {
-  getDevices: () => IDevice[];
-  getDevice: () => IDevice;
-  getDeviceByRole(role: string): IDevice;
-  getDeviceById(id: string): IDevice;
-  getDevicesWithRoles(): IDevice[];
-  addDevice: (role: string) => void;
-  deleteDevice: () => void;
-  changeDevice: (device: IDevice) => void;
-}
 
 /* This class is responsible for managing the connected devices */
-export class DevicesManager implements IDeviceManager {
+export class DevicesManager {
   private deviceId: string;
 
   public constructor(
     private readonly devicesMap: SharedMap,
     private readonly runtime: IFluidDataStoreRuntime // private template: ITemplate
   ) {
+    this.load();
+  }
+
+  public load() {
     this.clearDisconnectedDevices();
     this.setEventListeners();
   }
@@ -41,58 +34,22 @@ export class DevicesManager implements IDeviceManager {
   private setEventListeners() {
     const quorum = this.runtime.getQuorum();
 
-    const keys = this.runtime.getQuorum().getMembers();
-
-    const devicesKeys = this.devicesMap.keys();
-    for (const key of devicesKeys) {
-      if (!keys.has(key)) {
-        this.devicesMap.delete(key);
-      }
-    }
-
     this.runtime.on("connected", (clientId: string) => {
-      console.log("This device has been connected and has id:" + clientId);
-      const device = {
-        id: clientId,
-        type: "smartphone",
-        role: "manager",
-        combined: false,
-        x: 0,
-        y: 0,
-      };
-      this.deviceId = device.id;
-      this.devicesMap.set(device.id, device);
+      this.hasConnected(clientId);
     });
 
-    //this.runtime.dispose();
-    quorum.on("addMember", (clientId: string, details: any) => {
-      const interactive = details.client.details.capabilities.interactive;
-
-      if (interactive) {
-        if (this.devicesMap.has(clientId)) {
-          return;
-        } else {
-          console.log("Member " + clientId + " added.");
-          const device = {
-            id: clientId,
-            type: "smartphone",
-            role: "manager",
-            combined: false,
-            // capabilities: { width: 1000, height: 1000, touch: false },
-            // affordances: { privacy: 0 },
-            x: 0,
-            y: 0,
-          };
-
-          //sessionStorage.setItem("deviceId", device.id);
-          this.devicesMap.set(clientId, device);
-        }
-      }
+    quorum.on("removeMember", (clientId: string) => {
+      this.memberRemoved(clientId);
     });
+  }
 
-    quorum.on("removeMember", (id: string) => {
-      console.log("Member " + id + " deleted.");
-      this.devicesMap.delete(id);
+  public removeEventListeners() {
+    this.runtime.off("connected", (clientId: string) => {
+      this.hasConnected(clientId);
+    });
+    const quorum = this.runtime.getQuorum();
+    quorum.off("removeMember", (clientId: string) => {
+      this.memberRemoved(clientId);
     });
   }
 
@@ -109,72 +66,12 @@ export class DevicesManager implements IDeviceManager {
       );
     }
   }
-
-  /*public addMyDevice = () => {
-    const device = {
-      id: uuidv4(),
-      type: "smartphone",
-      role: "manager",
-      combined: false,
-      // capabilities: { width: 1000, height: 1000, touch: false },
-      // affordances: { privacy: 0 },
-      x: 0,
-      y: 0,
-    };
-    this.deviceId = device.id;
-    //sessionStorage.setItem("deviceId", device.id);
-    this.devicesMap.set(device.id, device);
-  };*/
-  /**
-   * Creates a "fake" user based on a fake user id and a fake name.
-   * Only use this code for protoyping and demos.
-   */
-  public addDevice = (role: string): void => {
-    // Check for a userId in SessionStorage - this prevents refresh from generating a new user
-    let device: IDevice;
-    /*if (
-      sessionStorage.getItem("deviceId") &&
-      this.devicesMap.get<IDevice>(sessionStorage.getItem("deviceId"))
-    ) {
-      this.deviceId = sessionStorage.getItem("deviceId"); // This session might have has a user
-      device = this.getDevice();
-    } else {*/
-    // Extract automatically
-    // Device with capabilities and affordances
-
-    const getRandomInt = (min, max) => {
-      min = Math.ceil(min);
-      max = Math.floor(max);
-      return Math.floor(Math.random() * (max - min)) + min;
-    };
-
-    device = {
-      id: uuidv4(),
-      type: "smartphone",
-      role: role,
-      combined: false,
-      // capabilities: { width: 1000, height: 1000, touch: false },
-      // affordances: { privacy: 0 },
-      x: getRandomInt(200, 1200),
-      y: getRandomInt(200, 500),
-    };
-    this.deviceId = device.id;
-    //sessionStorage.setItem("deviceId", device.id);
-    this.devicesMap.set(device.id, device);
-    // }
-    // this.devicesMap.emit("deviceJoin", device);
-  };
-
   /**
    * Get an array of all devices objects for the devices
    * who have joined the session (even if they have left).
    */
-  public getDevices(): IDevice[] {
-    const devices: IDevice[] = [];
-    this.devicesMap.forEach((i: IDevice) => {
-      devices.push(i);
-    });
-    return devices;
+  public getDevices(): IterableIterator<IDevice> {
+    return this.devicesMap.values();
   }
 
   /**
@@ -187,57 +84,26 @@ export class DevicesManager implements IDeviceManager {
   /**
    * Get the device object with a role.
    */
-  public getDeviceByRole(role: string): IDevice {
-    return this.getDevices().find((device) => device.role === role);
+  public getDevicesByRole(role: string): IDevice[] {
+    const devices = Array.from(this.getDevices());
+    return devices.filter((device) => device.role === role);
   }
 
   /**
    * Get the device object with an id.
    */
   public getDeviceById(id: string): IDevice {
-    return this.getDevices().find((device) => device.id === id);
+    const devices = Array.from(this.getDevices());
+    return devices.find((device) => device.id === id);
   }
-
-  /**
-   * Get the devices with roles.
-   */
-  public getDevicesWithRoles(): IDevice[] {
-    return this.getDevices().filter((device) => device.role !== undefined);
-  }
-
-  /**
-   * Deletes the current device from the session
-   */
-  public deleteDevice = (): void => {
-    this.devicesMap.delete(this.deviceId);
-    // this.devicesMap.emit("deviceLeave");
-  };
 
   /**
    * Retrieves the number of connected devices
    */
-  public get connectedDevices() {
+  public getConnectedDevices() {
     return this.runtime.getAudience().getMembers();
   }
 
-  /*
-  public onDeviceJoin(listener: (device: IDevice) => void) {
-    const quorum = this.context.getQuorum();
-    quorum.on("addMember", listener);
-
-    this.devicesMap.on("deviceJoin", listener);
-  }
-
-  public onDeviceLeave(listener: () => void) {
-    const quorum = this.context.getQuorum();
-    quorum.on("removeMember", listener);
-    this.devicesMap.on("deviceLeave", listener);
-  }
-
-  public onDeviceChanges(listener: (device: IDevice) => void) {
-    this.devicesMap.on("deviceChanges", listener);
-  }
-  */
   public promoteToRole(role: string, deviceId?: string) {
     let device: IDevice;
     if (deviceId === undefined) {
@@ -249,31 +115,6 @@ export class DevicesManager implements IDeviceManager {
     device.role = role;
     this.changeDevice(device);
   }
-
-  private resetRoles() {
-    const devices = this.getDevices();
-    devices.forEach((device) =>
-      this.changeDevice({ ...device, role: undefined })
-    );
-  }
-
-  public switchToCombination(combination: { [role: string]: string }) {
-    // Remove all roles from devices
-    this.resetRoles();
-    Object.keys(combination).forEach((role) =>
-      this.promoteToRole(role, combination[role])
-    );
-  }
-
-  /**
-   * Get the possible combinations.
-   */
-  /* public getCombinations = (): { [role: string]: string }[] => {
-    const devices: string[] = this.devicesManager
-      .getDevices()
-      .map((device: IDevice) => device.id);
-    return Utils.getCombinations(Object.keys(this.template.roles), devices);
-  };*/
 
   public promoteToManager(): void {
     this.promoteToRole("manager");
@@ -291,7 +132,41 @@ export class DevicesManager implements IDeviceManager {
     return this.getDevice().role === "designer";
   }
 
-  public getManager(): IDevice {
-    return this.getDeviceByRole("manager");
+  /* Callback functions */
+
+  private hasConnected(clientId: string) {
+    console.log("This device has been connected and has id:" + clientId);
+    const device = {
+      id: clientId,
+      type: "smartphone",
+      role: "manager",
+    };
+    this.deviceId = device.id;
+    this.devicesMap.set(device.id, device);
+  }
+
+  /*private memberAdded(clientId: string, details: any) {
+    const interactive = details.client.details.capabilities.interactive;
+
+    if (interactive) {
+      if (!this.devicesMap.has(clientId)) {
+        
+        console.log("Member " + clientId + " added.");
+        const device = {
+          id: clientId,
+          type: "smartphone",
+          role: "manager",
+        };
+
+        this.devicesMap.set(clientId, device);
+      }
+    }
+  }*/
+
+  private memberRemoved(clientId: string) {
+    if (this.devicesMap.has(clientId)) {
+      console.log("Member " + clientId + " deleted.");
+      this.devicesMap.delete(clientId);
+    }
   }
 }

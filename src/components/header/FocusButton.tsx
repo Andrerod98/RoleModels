@@ -208,7 +208,7 @@ export const FocusButton: FC<FocusButtonProps> = (props: FocusButtonProps) => {
                           const value = data.substr(14);
                           props.app
                             .getSharedObject()
-                            .getRole()
+                            .getMyRole()
                             .addCombinedView(value);
                           onClose();
                         }

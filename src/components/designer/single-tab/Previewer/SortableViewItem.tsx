@@ -3,8 +3,22 @@ import React from "react";
 import { ViewItem } from "./ViewItem";
 import { Position } from "./ViewItemOverlay";
 import { CSS } from "@dnd-kit/utilities";
+import { View } from "../../../../shared-object/views/View";
 
-export const SortableViewItem = (props: any) => {
+interface SortableViewItemProps {
+  id: string;
+  view: View;
+  onClickRight: () => void;
+  onClickLeft: () => void;
+  onClickTopLeft: () => void;
+  onClickBottomRight: () => void;
+  onClickTop: () => void;
+  onClickBottom: () => void;
+  onClose: () => void;
+
+  activeIndex: number;
+}
+export const SortableViewItem = (props: SortableViewItemProps) => {
   const {
     attributes,
     listeners,
@@ -15,7 +29,7 @@ export const SortableViewItem = (props: any) => {
     transform,
     transition,
   } = useSortable({
-    id: props.item.id,
+    id: props.id,
     animateLayoutChanges: () => {
       return true;
     },
@@ -29,17 +43,16 @@ export const SortableViewItem = (props: any) => {
     <ViewItem
       ref={setNodeRef}
       style={style}
-      isOver={over?.id === props.item.id}
       attributes={attributes}
       listeners={listeners}
-      {...props}
       insertPosition={
-        over?.id === props.item.id
+        over?.id === props.id
           ? index > props.activeIndex
             ? Position.After
             : Position.Before
           : undefined
       }
+      {...props}
     />
   );
 };

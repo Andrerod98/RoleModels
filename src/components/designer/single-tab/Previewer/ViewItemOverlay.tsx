@@ -7,12 +7,18 @@ export enum Position {
   After = 1,
 }
 
-export function ViewItemOverlay({ id, items, ...props }: any) {
-  const item = items[props.activeIndex];
+export function ViewItemOverlay({
+  id,
+  view,
+  ...props
+}: {
+  id: string;
+  view: View;
+}) {
   return (
     <GridItem
-      rowSpan={item.view.getColumns()}
-      colSpan={item.view.getRows()}
+      rowSpan={view.getColumns()}
+      colSpan={view.getRows()}
       bg={"papayawhip"}
       opacity={0.7}
       {...props}
@@ -29,12 +35,10 @@ export function ViewItemOverlay({ id, items, ...props }: any) {
           background: "blackAlpha.100",
         }}
         top={"1"}
-        {...props.listeners}
-        {...props.attributes}
         zIndex={2}
         icon={<DragHandleIcon />}
       />
-      {(props.item.view as View).getRoot().generateWidget()}
+      {view.getRoot().generateWidget()}
     </GridItem>
   );
 }

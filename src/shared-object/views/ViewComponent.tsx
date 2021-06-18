@@ -37,7 +37,7 @@ export const ViewComponent: FC<ViewComponentProps> = (
     //   props.view.addEventListeners();
   }, []);
   // const uiComponentFactory = new UIComponentFactory();
-  console.log(props.view.getRoot());
+
   return (
     <Box
       // ref={drop}

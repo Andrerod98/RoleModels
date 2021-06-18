@@ -10,7 +10,6 @@ export class CenterView extends UIComponentView {
     const controller = this.props.controller as CenterController;
     const component = controller.get() as CenterUI;
 
-    console.log(controller.getChildren());
     return (
       <Center key={"center_" + component.id} {...component}>
         {controller

@@ -188,11 +188,12 @@ export class InkCanvas {
     this.redraw();
   }
 
-  public sizeCanvasBackingStore() {
+  public sizeCanvasBackingStore(width?: number, height?: number) {
     const canvasBoundingClientRect = this.canvas.getBoundingClientRect();
     // Scale the canvas size to match the physical pixel to avoid blurriness
     const scale = window.devicePixelRatio;
     this.canvas.width = Math.floor(canvasBoundingClientRect.width * scale);
+
     this.canvas.height = Math.floor(canvasBoundingClientRect.height * scale);
     // Scale the context to bring back coordinate system in CSS pixels
     this.context.setTransform(1, 0, 0, 1, 0, 0);

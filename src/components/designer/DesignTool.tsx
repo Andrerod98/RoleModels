@@ -12,11 +12,9 @@ interface DesignToolProps {
   app: CrossDeviceApplication;
 }
 export const DesignTool = (props: DesignToolProps) => {
-
   const [loggingOpen, setLoggingOpen] = useState(false);
 
   const handleLoggingClose = () => {
-    console.log("Closing");
     setLoggingOpen(false);
   };
   return (
@@ -58,7 +56,7 @@ export const DesignTool = (props: DesignToolProps) => {
             </TabPanel>
           </TabPanels>
         </Tabs>*/}
-        <SingleTab app={props.app} onChange={(value) => {}} />
+        <SingleTab app={props.app} />
 
         <LoggingWindow
           isOpen={loggingOpen}

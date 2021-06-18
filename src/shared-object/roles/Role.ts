@@ -1,5 +1,6 @@
 import { SharedCell } from "@fluidframework/cell";
 import { FactoriesManager } from "../FactoriesManager";
+import { IView } from "../views/IView";
 import { View } from "../views/View";
 import { IRole } from "./IRole";
 
@@ -75,11 +76,16 @@ export class Role {
   }
 
   public updateViews(newViews: View[]) {
-    console.log("UPDATING VIEWS");
-    console.log(newViews);
     this.sharedRole.set({
       ...this.getObject(),
       views: newViews.map((v) => v.toView()),
+    });
+  }
+
+  public updateIViews(newViews: IView[]) {
+    this.sharedRole.set({
+      ...this.getObject(),
+      views: newViews,
     });
   }
 

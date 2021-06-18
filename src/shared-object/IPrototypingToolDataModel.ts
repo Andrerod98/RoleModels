@@ -5,28 +5,23 @@ import { Role } from "./roles/Role";
 
 export interface IPrototypingToolDataModel extends EventEmitter {
   /* Device Management Functions*/
-  getDevices: () => IDevice[];
+  getDevices: () => IterableIterator<IDevice>;
   getDevice: () => IDevice;
-  getDeviceByRole(role: string): IDevice;
-  getDevicesWithRoles: () => IDevice[];
-  addDevice: (role: string) => void;
-  deleteDevice: () => void;
+  getDevicesByRole(role: string): IDevice[];
   changeDevice: (device: IDevice) => void;
   onDeviceJoin(listener: () => void): this;
   onDeviceLeave(listener: () => void): this;
   onDeviceChanges(listener: () => void): this;
 
   /* Roles */
-  getRole: () => Role;
+  getRole: (role: string) => Role;
+  getMyRole: () => Role;
   getDeviceRole: () => string;
   getRoles: () => Role[];
-  // switchToCombination(combination: { [role: string]: string });
   promoteToRole: (role: string, deviceId?: string) => void;
-  // getCombinations: () => { [role: string]: string }[];
 
   promoteToManager: () => void;
   isManager: () => boolean;
-  getManagerDevice: () => IDevice;
 
   onRolesChange(listener: () => void): this;
 

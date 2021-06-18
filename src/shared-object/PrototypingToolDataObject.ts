@@ -73,13 +73,15 @@ export class PrototypingToolDataObject
   private combinedViewsMap: SharedMap; // <combined view Id, ICombinedView>
   private combinedViewsManager: CombinedViewsManager;
 
-  /* The Map with the Views */
+  /* The Map with the roles */
   private rolesMap: SharedMap; // <role name, IView>
   private rolesManager: RolesManager;
 
+  /* The Map with the qr codes */
   private qrMap: SharedMap;
   private qrManager: QRManager;
 
+  /* The Manager responsible for rendering components */
   private factoriesManager: FactoriesManager;
 
   /* Ink */
@@ -93,23 +95,24 @@ export class PrototypingToolDataObject
     return "prototyping_tool";
   }
 
+  public getId(): string {
+    return this.context.documentId;
+  }
+
   protected async initializingFirstTime() {
-    /* Creating device Shared Map...*/
     const devicesMap = SharedMap.create(this.runtime);
 
-    /* Creating combined view Shared Map...*/
     const combinedViewsMap = SharedMap.create(this.runtime);
 
-    /* Creating view Shared Map...*/
     const rolesMap = SharedMap.create(this.runtime);
 
-    /* Creating qr Shared Map...*/
     const qrMap = SharedMap.create(this.runtime);
 
     const ink = Ink.create(this.runtime);
 
     const sharedPing = SharedCounter.create(this.runtime);
 
+    /* Creating default roles */
     const managerRole = SharedCell.create(this.runtime);
 
     managerRole.set({
@@ -141,7 +144,7 @@ export class PrototypingToolDataObject
     rolesMap.set("designer", designerRole.handle);
     rolesMap.set("default", defaultRole.handle);
 
-    /* Setting shared Cells in combined views Map...*/
+    /* Setting shared objects in the root Map...*/
     this.root.set("devices", devicesMap.handle);
     this.root.set("roles", rolesMap.handle);
     this.root.set("combined-views", combinedViewsMap.handle);
@@ -154,24 +157,22 @@ export class PrototypingToolDataObject
     /* Loading shared objects...*/
     await this.loadSharedObjects();
 
+    /* Loading managers...*/
     this.loadManagers();
 
     /* Registering factories...*/
     this.registerDefaultFactories();
 
+    /* Creating event listeners...*/
     this.createAllEventListeners();
 
     /* Loading combined views...*/
 
     await Promise.all([
-      this.rolesManager.loadRoles(),
+      this.rolesManager.loadRoles(1),
       this.combinedViewsManager.loadCombinedViews(),
       this.qrManager.loadQRCodes(),
     ]);
-
-    this.runtime.once("connected", () => {
-      this.emit("connected");
-    });
   }
 
   private async loadSharedObjects() {
@@ -205,10 +206,7 @@ export class PrototypingToolDataObject
     /* Creating combined views Manager...*/
     this.combinedViewsManager = new CombinedViewsManager(
       this.combinedViewsMap,
-      this.factoriesManager,
-      () => {
-        this.emit("change", "CVM");
-      }
+      this.factoriesManager
     );
 
     /* Creating combined views Manager...*/
@@ -272,6 +270,46 @@ export class PrototypingToolDataObject
     );
   }
 
+  public async createAllEventListeners() {
+    this.runtime.on("connected", () => {
+      this.emit("connected");
+    });
+
+    this.devicesMap.on("valueChanged", () => {
+      this.emit("change", "Devices map changed");
+    });
+    this.combinedViewsMap.on("valueChanged", () => {
+      this.emit("change", "Combined views map changed");
+    });
+    this.rolesMap.on("valueChanged", () => {
+      this.emit("change", "Roles map changed");
+    });
+
+    this.qrMap.on("valueChanged", () => {
+      this.emit("change", "QR map changed");
+    });
+
+    this.combinedViewsManager.on("changeState", () => {
+      this.emit("change", "Combined view manager state changed.");
+    });
+
+    this.rolesManager.on("changeState", () => {
+      this.emit("change", "Roles manager state changed.");
+    });
+
+    /* Creating shared cell event listeners*/
+    await Promise.all([
+      //this.createMapEventListeners("Combined View", this.combinedViewsMap),
+
+      /* Creating views event listeners*/
+      //this.createMapEventListeners("roles", this.rolesMap),
+
+      this.createMapEventListeners("qrs", this.qrMap),
+    ]);
+
+    this.pingCounter.on("incremented", this.playSound);
+  }
+
   public clearAll(): void {
     this.devicesMap.clear();
     this.combinedViewsMap.clear();
@@ -290,67 +328,36 @@ export class PrototypingToolDataObject
     this.deleteMapEventListeners("roles", this.rolesMap);
     this.deleteMapEventListeners("qrs", this.qrMap);
     this.pingCounter.removeAllListeners();
+    this.runtime.off("connected", () => {
+      this.emit("connected");
+    });
     this.removeAllListeners();
   }
 
-  public createAllEventListeners() {
-    this.devicesMap.on("valueChanged", () => {
-      this.emit("change", "Devices map changed");
-    });
-    this.combinedViewsMap.on("valueChanged", () => {
-      this.emit("change", "Combined views map changed");
-    });
-    this.rolesMap.on("valueChanged", () => {
-      this.emit("change", "Roles map changed");
-    });
-    this.rolesMap.on("changeState", () => {
-      this.emit("change", "Roles map adeed");
-    });
-    this.qrMap.on("valueChanged", () => {
-      this.emit("change", "QR map changed");
-    });
-
-    /* Creating shared cell event listeners*/
-    this.createMapEventListeners("Combined View", this.combinedViewsMap);
-
-    /* Creating views event listeners*/
-    this.createMapEventListeners("roles", this.rolesMap);
-
-    this.createMapEventListeners("qrs", this.qrMap);
-
-    this.pingCounter.on("incremented", this.playSound);
-
-    /*
-    const quorum = this.context.getQuorum();
-
-    quorum.on("addMember", () => {
-      this.audio.play();
-      this.emit("change");
-    });
-
-    quorum.on("removeMember", () => {
-      this.audio.play();
-      this.emit("change");
-    });*/
-  }
-
-  public changeState = () => {
-    this.emit("change");
-  };
-
   private async deleteMapEventListeners(name: string, map: SharedMap) {
+    const promises = [];
     for (const value of map.values()) {
-      const cell = await value.get();
-      cell.removeAllListeners();
+      promises.push(value.get());
+    }
+
+    const results = await Promise.all([]);
+
+    for (const result of results) {
+      result.removeAllListeners();
     }
   }
-  private createMapEventListeners(name: string, map: SharedMap) {
+  private async createMapEventListeners(name: string, map: SharedMap) {
+    const promises = [];
     for (const value of map.values()) {
-      value.get().then((cell) =>
-        cell.on("valueChanged", () => {
-          this.emit("change", "Cell of " + name + " changed.");
-        })
-      );
+      promises.push(value.get());
+    }
+
+    const results = await Promise.all([]);
+
+    for (const result of results) {
+      result.on("valueChanged", () => {
+        this.emit("change", "Cell of " + name + " changed.");
+      });
     }
   }
 
@@ -364,23 +371,9 @@ export class PrototypingToolDataObject
     this.audio.play();
   }
 
-  /* Device Management Functions*/
-
-  public getDevicesManager = () => this.devicesManager;
-  public getCombinedViewsManager = () => this.combinedViewsManager;
-  public getRolesManager = () => this.rolesManager;
-
-  /**
-   * Creates a "fake" user based on a fake user id and a fake name.
-   * Only use this code for protoyping and demos.
-   */
-  public addDevice = (role: string): void =>
-    this.devicesManager.addDevice(role);
-
-  /**
-   * Deletes the current device from the session
-   */
-  public deleteDevice = (): void => this.devicesManager.deleteDevice();
+  /* ******************************************************** 
+                Device Management Functions
+   ******************************************************** */
 
   /**
    * Get the device object for the current device.
@@ -391,9 +384,164 @@ export class PrototypingToolDataObject
    * Get an array of all devices objects for the devices
    * who have joined the session (even if they have left).
    */
-  public getDevices = (): IDevice[] => this.devicesManager.getDevices();
+  public getDevices = (): IterableIterator<IDevice> =>
+    this.devicesManager.getDevices();
 
+  /**
+   * Get a connected device with a role
+   */
+  public getDevicesByRole = (role: string): IDevice[] =>
+    this.devicesManager.getDevicesByRole(role);
+
+  /**
+   * Returns true if the current device is the manager
+   */
+  public isManager = (): boolean => this.devicesManager.isManager();
+
+  public isDesigner = (): boolean => this.devicesManager.isDesigner();
+
+  /**
+   * Promotes the current device to the manager
+   */
+  public promoteToManager = (): void => {
+    this.devicesManager.promoteToManager();
+  };
+
+  public promoteToDesigner = (): void => {
+    this.devicesManager.promoteToDesigner();
+  };
+
+  /**
+   * Promotes the current device to a specific role
+   */
+  public promoteToRole = (role: string, deviceId?: string): void => {
+    this.devicesManager.promoteToRole(role, deviceId);
+    // this.combinedViewsManager.changeRole(role);
+  };
+
+  /**
+   * Updates the properties of a device
+   */
+  public changeDevice = (device: IDevice): void =>
+    this.devicesManager.changeDevice(device);
+
+  /* ******************************************************** 
+                          Ink
+   ******************************************************** */
   public getInk = (): IInk => this.ink;
+
+  /* ******************************************************** 
+                QR Codes Management Functions
+   ******************************************************** */
+  public getMyQrCodes = (): QRCodeController[] => {
+    return this.qrManager.getQRsWithIds(this.getMyRole().getQRIds());
+  };
+
+  public getQrsWithIds = (qrIDs: string[]): QRCodeController[] => {
+    return this.qrManager.getQRsWithIds(qrIDs);
+  };
+
+  public getQRCode = (id: string): QRCodeController => {
+    return this.qrManager.getQR(id);
+  };
+
+  public addQRCode(id: string, qrCode: IQRCode): QRCodeController {
+    if (this.qrMap.has(id)) {
+      return this.qrManager.getQR(id);
+    }
+    const sharedCell = SharedCell.create(this.runtime);
+
+    sharedCell.set(qrCode);
+    this.qrMap.set(id, sharedCell.handle);
+    return this.qrManager.addQR(sharedCell);
+  }
+
+  /* ******************************************************** 
+                Role Management Functions
+   ******************************************************** */
+  public getMyViews = (): View[] => {
+    return this.getMyRole()
+      .getViews()
+      .filter((view) => !view.isCombined());
+  };
+
+  public getViewOwners = (viewId: string): Role[] => {
+    const roles = this.rolesManager.getRoles();
+    const owners = [];
+    for (const role of roles) {
+      if (role.hasViewWithId(viewId)) {
+        owners.push(role);
+      }
+    }
+
+    return owners;
+  };
+
+  public getView = (viewId: string): View => {
+    const roles = this.rolesManager.getRoles();
+    for (const role of roles) {
+      if (role.hasViewWithId(viewId)) {
+        return role.getView(viewId);
+      }
+    }
+
+    return undefined;
+  };
+
+  public grabView = (view: View): void => {
+    this.getViewOwners(view.getId()).forEach((role) => {
+      this.rolesManager.removeView(role.getName(), view.getId());
+    });
+    this.rolesManager.addView(this.getMyRole().getName(), view);
+  };
+
+  /* Roles */
+  /**
+   * Get the role for the current device.
+   */
+  public getMyRole = (): Role => this.getRole(this.getDeviceRole());
+
+  public getRole = (role: string): Role => this.rolesManager.getRole(role);
+
+  public getDeviceRole = (): string => this.devicesManager.getDevice().role;
+
+  public removeRole(roleName: string) {
+    this.rolesManager.removeRole(roleName);
+  }
+
+  public renameRole(oldName: string, newName: string) {
+    this.rolesManager.renameRole(oldName, newName);
+  }
+
+  public addRole = async (role: string): Promise<Role> => {
+    if (this.rolesMap.has(role)) {
+      return this.rolesManager.getRole(role);
+    }
+
+    const sharedRole = SharedCell.create(this.runtime);
+    sharedRole.on("valueChanged", () => {
+      this.emit("change");
+    });
+    sharedRole.set({
+      name: role,
+      views: [],
+      combinedViewsIds: [],
+      qrIds: [],
+    } as IRole);
+
+    this.rolesManager.addRole(sharedRole);
+
+    await this.rolesMap.wait<IFluidHandle<SharedCell>>(role);
+    return this.rolesManager.getRole(role);
+  };
+  /**
+   * Get the available roles.
+   */
+  public getRoles = (): Role[] => this.rolesManager.getRoles();
+
+  /* ******************************************************** 
+                Combined Views Management Functions
+   ******************************************************** */
   /**
    * Returns the combined views of the device
    */
@@ -405,7 +553,7 @@ export class PrototypingToolDataObject
    */
   public getMyCombinedViews = (): CombinedView[] => {
     return this.combinedViewsManager.getCombinedViewsWithIds(
-      this.getRole().getCombinedViewsIds()
+      this.getMyRole().getCombinedViewsIds()
     );
   };
 
@@ -440,108 +588,6 @@ export class PrototypingToolDataObject
     return this.combinedViewsManager.getCombinedViewsWithIds(combinedViewsIDs);
   };
 
-  public getMyQrCodes = (): QRCodeController[] => {
-    return this.qrManager.getQRsWithIds(this.getRole().getQRIds());
-  };
-
-  public getQrsWithIds = (qrIDs: string[]): QRCodeController[] => {
-    return this.qrManager.getQRsWithIds(qrIDs);
-  };
-
-  public getMyViews = (): View[] => {
-    return this.getRole()
-      .getViews()
-      .filter((view) => !view.isCombined());
-  };
-
-  public getViewOwners = (viewId: string): Role[] => {
-    const roles = this.rolesManager.getRoles();
-    const owners = [];
-    for (const role of roles) {
-      if (role.hasViewWithId(viewId)) {
-        owners.push(role);
-      }
-    }
-
-    return owners;
-  };
-
-  public getQRCode = (id: string): QRCodeController => {
-    return this.qrManager.getQR(id);
-  };
-
-  public getView = (viewId: string): View => {
-    const roles = this.rolesManager.getRoles();
-    for (const role of roles) {
-      if (role.hasViewWithId(viewId)) {
-        return role.getView(viewId);
-      }
-    }
-
-    return undefined;
-  };
-
-  public grabView = (view: View): void => {
-    this.getViewOwners(view.getId()).forEach((role) => {
-      this.rolesManager.removeView(role.getName(), view.getId());
-    });
-    this.rolesManager.addView(this.getRole().getName(), view);
-  };
-
-  /* Roles */
-  /**
-   * Get the role for the current device.
-   */
-  public getRole = (): Role => this.rolesManager.getRole(this.getDeviceRole());
-
-  public getDeviceRole = (): string => this.devicesManager.getDevice().role;
-
-  public addRole = async (role: string): Promise<Role> => {
-    if (this.rolesMap.has(role)) {
-      console.log("ROLE ALREADY EXISTS");
-      return this.rolesManager.getRole(role);
-    }
-
-    const sharedRole = SharedCell.create(this.runtime);
-    sharedRole.on("valueChanged", () => {
-      this.emit("change");
-    });
-    sharedRole.set({
-      name: role,
-      views: [],
-      combinedViewsIds: [],
-      qrIds: [],
-    } as IRole);
-
-    this.rolesMap.set(role, sharedRole.handle);
-
-    await this.rolesMap.wait<IFluidHandle<SharedCell>>(role);
-    return this.rolesManager.getRole(role);
-  };
-  /**
-   * Get the available roles.
-   */
-  public getRoles = (): Role[] => this.rolesManager.getRoles();
-
-  /* private async setView(role: string, view: View) {
-    console.log("Creating a shared cell. (View)");
-    const sharedCell = await this.combinedViewsMap
-      .get("view-" + this.combinedViewsCounter)
-      .get();
-    sharedCell.set(view.toView());
-  }*/
-
-  public addQRCode(id: string, qrCode: IQRCode): QRCodeController {
-    if (this.qrMap.has(id)) {
-      return this.qrManager.getQR(id);
-    }
-    const sharedCell = SharedCell.create(this.runtime);
-
-    sharedCell.set(qrCode);
-    this.qrMap.set(id, sharedCell.handle);
-    return this.qrManager.addQR(sharedCell);
-  }
-
   private createCombinedView(
     id: string,
     combinedView: ICombinedView
@@ -573,7 +619,6 @@ export class PrototypingToolDataObject
     // Adds the combined view id to the view
     view1.setCombinedViewID(id);
     view2.setCombinedViewID(id);
-    console.log(view1);
 
     // Creates a combined view
     const combinedView = this.createCombinedView(id, {
@@ -607,7 +652,7 @@ export class PrototypingToolDataObject
   }
 
   public getViewOrCombinedView(role: string, id: string): View {
-    const view = this.getRolesManager().getRole(role).getView(id);
+    const view = this.rolesManager.getRole(role).getView(id);
     if (view === undefined) return undefined;
 
     if (view.isCombined()) {
@@ -629,8 +674,7 @@ export class PrototypingToolDataObject
         (cv as MultiCombinedView).updateView(view.toView(), role);
       }
     } else {
-      console.log("Updating view");
-      this.getRolesManager().getRole(role).updateView(view);
+      this.rolesManager.getRole(role).updateView(view);
     }
   }
 
@@ -644,7 +688,6 @@ export class PrototypingToolDataObject
     const id = view1.getId() + "-" + view2.getId();
     view1.setCombinedViewID(id);
     view2.setCombinedViewID(id);
-    console.log(view1);
 
     const roles = this.getRoles();
     for (const role of roles) {
@@ -750,78 +793,11 @@ export class PrototypingToolDataObject
     return combinedView;
   };
 
+  /* ******************************************************** 
+                Factory Manager Management Functions
+   ******************************************************** */
   public registerFactory(factory: UIComponentFactory) {
     this.factoriesManager.registerFactory(factory);
-  }
-
-  /**
-   * Get the manager device
-   */
-  public getManagerDevice = (): IDevice => this.devicesManager.getManager();
-
-  /**
-   * Get the manager device
-   */
-  public getFactoriesManager = (): FactoriesManager => this.factoriesManager;
-
-  /**
-   * Get a connected device with a role
-   */
-  public getDeviceByRole = (role: string): IDevice =>
-    this.devicesManager.getDeviceByRole(role);
-
-  /**
-   * Returns true if the current device is the manager
-   */
-  public isManager = (): boolean => this.devicesManager.isManager();
-
-  public isDesigner = (): boolean => this.devicesManager.isDesigner();
-
-  /**
-   * Promotes the current device to the manager
-   */
-  public promoteToManager = (): void => {
-    this.devicesManager.promoteToManager();
-  };
-
-  public promoteToDesigner = (): void => {
-    this.devicesManager.promoteToDesigner();
-  };
-
-  /**
-   * Promotes the current device to a specific role
-   */
-  public promoteToRole = (role: string, deviceId?: string): void => {
-    this.devicesManager.promoteToRole(role, deviceId);
-    // this.combinedViewsManager.changeRole(role);
-  };
-
-  /**
-   * Updates the properties of a device
-   */
-  public changeDevice = (device: IDevice): void =>
-    this.devicesManager.changeDevice(device);
-
-  /**
-   * Get an array of all active roles.
-   */
-  public getDevicesWithRoles = (): IDevice[] => {
-    return this.devicesManager.getDevicesWithRoles();
-  };
-
-  /**
-   * Get an array of all possible combinations of connected devices and roles
-   
-  public getCombinations(): { [role: string]: string }[] {
-    return this.rolesManager.getCombinations();
-  }
-
-  public switchToCombination(combination: { [role: string]: string }) {
-    this.rolesManager.switchToCombination(combination);
-  }
-*/
-  public getId(): string {
-    return this.context.documentId;
   }
 
   /**

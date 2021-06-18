@@ -23,6 +23,7 @@ import {
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { CrossDeviceApplication } from "../../../CrossDeviceApplication";
+import { Role } from "../../../shared-object/roles/Role";
 import { View } from "../../../shared-object/views/View";
 import Utils from "../../../utils/Utils";
 import { ComponentsExamples } from "../ComponentsExamples";
@@ -32,34 +33,191 @@ import { CodeEditor } from "./CodeEditor";
 import { Previewer } from "./Previewer/Previewer";
 interface SingleTabProps {
   app: CrossDeviceApplication;
-  onChange: (value: string) => void;
 }
 
 export const SingleTab = (props: SingleTabProps) => {
   const [curTab, setCurTab] = useState("default");
 
-  const views = props.app.getRole(curTab).getViews();
-  console.log(views);
+  const tabs = props.app.getSharedObject().getRoles();
+
+  const curIndex = tabs.findIndex((tab) => tab.getName() === curTab);
+
+  /*const refresh = ()=>{
+    props.project.getLayoutManager().setLayout(value);
+  }*/
+
+  const loadRole = (role: string) => {
+    console.log("role " + role + " loading");
+    setCurTab(role);
+
+    const r = props.app.getRole(curTab);
+
+    if (r === undefined) {
+      console.warn("The layout manager of " + role + " was not found.");
+      console.table(Array.from(props.app.getSharedObject().getRoles()));
+      return;
+    }
+
+    //Load role
+    /* setValue(
+      Utils.jsonToString(
+        props.app
+          .getRole(curTab)
+          .getViews()
+          .map((v) => v.toView())
+      )
+    );
+
+    setCursorPosition({ row: 0, column: 0 });
+    setAlert(false);*/
+  };
+  const handleTabClick = (role: string) => {
+    console.log("Tab click");
+    loadRole(role);
+  };
+
+  const handleTabClose = (role: string) => {
+    console.log("Tab close");
+    props.app.getSharedObject().removeRole(role);
+    loadRole("default");
+  };
+
+  const handleTabSubmit = async (role: string, e: any) => {
+    console.log("Tab is changing");
+    const nextValue = e;
+    if (nextValue === "") {
+      return;
+    }
+
+    await props.app.getSharedObject().renameRole(role, nextValue);
+    loadRole(nextValue);
+  };
+
+  console.log("render");
+
+  return (
+    <Box h={"100%"} overflow={"hidden"}>
+      <Tabs
+        size={"sm"}
+        variant={"enclosed"}
+        h={"100%"}
+        mt={"5px"}
+        isManual
+        onChange={() => {
+          console.log("Changed");
+        }}
+        index={curIndex === -1 ? 0 : curIndex}
+      >
+        <Box>
+          <TabList pl={5}>
+            {tabs.map((tab, index) => (
+              <CustomTab
+                key={"tab-" + index}
+                title={tab.getName()}
+                onClick={() => {
+                  handleTabClick(tab.getName());
+                }}
+                onClose={() => {
+                  handleTabClose(tab.getName());
+                }}
+                onSubmit={(e) => {
+                  handleTabSubmit(tab.getName(), e);
+                }}
+              />
+            ))}
+
+            <Tab
+              bg={"blackAlpha.100"}
+              onClick={() => {
+                props.app.addRole("new");
+              }}
+            >
+              Add...
+            </Tab>
+          </TabList>
+        </Box>
+        <TabPanels h={"100%"}>
+          {tabs.map((tab, index) => (
+            <TabPanel key={"tab-panel-" + index} p={0} h={"100%"}>
+              <MemoizedRole role={tab} app={props.app} />
+            </TabPanel>
+          ))}
+        </TabPanels>
+      </Tabs>
+    </Box>
+  );
+};
+
+export const MemoizedRole = React.memo(RoleTab);
+
+const CustomTab = (props: any) => {
+  // 2. Reuse the `useTab` hook
+  const tabProps = useTab(props);
+  const isSelected = !!tabProps["aria-selected"];
+
+  return (
+    <Tab {...tabProps} _hover={{ bg: "gray.200" }}>
+      <Box>
+        <Flex my={"2px"} mx={"1px"}>
+          {isSelected ? (
+            <Editable
+              onClick={(e) => {
+                e.stopPropagation();
+                props.onClick();
+              }}
+              onSubmit={(nextValue) => {
+                props.onSubmit(nextValue);
+              }}
+              onKeyDown={(e: any) => {
+                e.stopPropagation();
+              }}
+              defaultValue={tabProps.title as string}
+            >
+              <EditablePreview />
+              <EditableInput />
+            </Editable>
+          ) : (
+            <Box m={"2px"}>{tabProps.title}</Box>
+          )}
+          <Box w={"24px"} h={"24px"} ml={"4px"}>
+            <Center>
+              <CloseButton
+                size={"sm"}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  props.onClose();
+                }}
+              />
+            </Center>
+          </Box>
+        </Flex>
+      </Box>
+    </Tab>
+  );
+};
+
+interface RoleTabProps {
+  role: Role;
+  app: CrossDeviceApplication;
+}
+
+export function RoleTab(props: RoleTabProps) {
+  const views = props.role.getViews();
   const [value, setValue] = useState(
     Utils.jsonToString(views.map((v) => v.toView()))
   );
-
   const [cursorPosition, setCursorPosition] = useState({ row: 0, column: 0 });
   const [alert, setAlert] = useState(false);
-  const tabs = Array.from(props.app.getSharedObject().getRoles());
-  const curIndex = tabs.findIndex((tab) => tab.getName() === curTab);
+
+  console.log("RENDERED");
+
   const preview = (newValue?: string) => {
     console.log("Preview");
     //props.project.stringToViews(value)
 
-    props.app
-      .getRole(curTab)
-      .updateViews(
-        Utils.stringToJson(newValue === undefined ? value : newValue).map(
-          (iview) =>
-            View.from(iview, props.app.getSharedObject().getFactoriesManager())
-        )
-      );
+    props.role.updateIViews(
+      Utils.stringToJson(newValue === undefined ? value : newValue)
+    );
   };
 
   const addUIComponent = (name: string) => {
@@ -179,227 +337,67 @@ export const SingleTab = (props: SingleTabProps) => {
     console.log("handle change");
     setValue(value);
     setCursorPosition(event.end);
-    props.onChange(value);
   };
 
   const handleChangeView = (newView: View) => {
     console.log("view change");
-    props.app.getRole(curTab).updateView(newView);
-    setValue(
-      Utils.jsonToString(
-        props.app
-          .getRole(curTab)
-          .getViews()
-          .map((v) => v.toView())
-      )
-    );
+    props.role.updateView(newView);
+    setValue(Utils.jsonToString(props.role.getViews().map((v) => v.toView())));
   };
 
   const handleChangeViews = (newViews: View[]) => {
     console.log("change views");
 
-    props.app.getRole(curTab).updateViews(newViews);
+    props.role.updateViews(newViews);
 
-    setValue(
-      Utils.jsonToString(
-        props.app
-          .getRole(curTab)
-          .getViews()
-          .map((v) => v.toView())
-      )
-    );
+    setValue(Utils.jsonToString(props.role.getViews().map((v) => v.toView())));
   };
-
-  /*const refresh = ()=>{
-    props.project.getLayoutManager().setLayout(value);
-  }*/
-
-  /* useEffect(() => {
-    console.log(props.template);
-    if (props.project.viewsToString(props.template.views) !== value) {
-      setValue(props.project.viewsToString(props.template.views));
-    }
-  }, [props.template]);*/
-
-  const loadRole = (role: string) => {
-    console.log("role " + role + " loading");
-    setCurTab(role);
-
-    const r = props.app.getRole(curTab);
-
-    if (r === undefined) {
-      console.warn("The layout manager of " + role + " was not found.");
-      console.table(Array.from(props.app.getSharedObject().getRoles()));
-      return;
-    }
-
-    //Load role
-    setValue(
-      Utils.jsonToString(
-        props.app
-          .getRole(curTab)
-          .getViews()
-          .map((v) => v.toView())
-      )
-    );
-
-    setCursorPosition({ row: 0, column: 0 });
-    setAlert(false);
-  };
-  const handleTabClick = (role: string) => {
-    console.log("Tab click");
-    loadRole(role);
-  };
-
-  const handleTabClose = (role: string) => {
-    console.log("Tab close");
-    props.app.getSharedObject().getRolesManager().removeRole(role);
-    loadRole("default");
-  };
-
-  const handleTabSubmit = (role: string, e: any) => {
-    console.log("Tab is changing");
-    const nextValue = e;
-    if (nextValue === "") {
-      return;
-    }
-
-    props.app.getSharedObject().getRolesManager().renameRole(role, nextValue);
-    loadRole(nextValue);
-  };
-
   return (
-    <Box h={"100%"} overflow={"hidden"}>
+    <Box>
       <SingleTabCatalogBar onClick={(element) => addUIComponent(element)} />
-      <Tabs
-        size={"sm"}
-        variant={"enclosed"}
-        h={"100%"}
-        mt={"5px"}
-        isManual
-        index={curIndex === -1 ? 0 : curIndex}
-      >
-        <Box>
-          <TabList pl={5}>
-            {tabs.map((tab, index) => (
-              <CustomTab
-                key={"tab-" + index}
-                title={tab.getName()}
+
+      <Flex h={"100%"}>
+        <Box boxShadow={"xs"} mr={"10px"}>
+          {alert ? (
+            <Alert status={"error"}>
+              <AlertIcon />
+              <AlertDescription>
+                The Json is incorrect fix it to add new components
+              </AlertDescription>
+              <CloseButton
+                position={"absolute"}
+                right={"8px"}
+                top={"8px"}
                 onClick={() => {
-                  handleTabClick(tab.getName());
-                }}
-                onClose={() => {
-                  handleTabClose(tab.getName());
-                }}
-                onSubmit={(e) => {
-                  handleTabSubmit(tab.getName(), e);
+                  setAlert(false);
                 }}
               />
-            ))}
-
-            <Tab
-              bg={"blackAlpha.100"}
-              onClick={() => {
-                props.app.addRole("new");
-              }}
-            >
-              Add...
-            </Tab>
-          </TabList>
+            </Alert>
+          ) : (
+            <></>
+          )}
+          <CodeEditor
+            title={"UI"}
+            value={value}
+            onChange={handleChange}
+            onFocus={handleFocus}
+          />
         </Box>
-        <TabPanels h={"100%"}>
-          {tabs.map((tab, index) => (
-            <TabPanel key={"tab-panel-" + index} p={0} h={"100%"}>
-              <Flex h={"100%"}>
-                <Box boxShadow={"xs"} mr={"10px"}>
-                  {alert ? (
-                    <Alert status={"error"}>
-                      <AlertIcon />
-                      <AlertDescription>
-                        The Json is incorrect fix it to add new components
-                      </AlertDescription>
-                      <CloseButton
-                        position={"absolute"}
-                        right={"8px"}
-                        top={"8px"}
-                        onClick={() => {
-                          setAlert(false);
-                        }}
-                      />
-                    </Alert>
-                  ) : (
-                    <></>
-                  )}
-                  <CodeEditor
-                    title={"UI"}
-                    value={value}
-                    onChange={handleChange}
-                    onFocus={handleFocus}
-                  />
-                </Box>
 
-                <Box flex={"1"} overflow={"auto"}>
-                  <Center>
-                    <Previewer
-                      onChangeView={handleChangeView}
-                      onChangeViews={handleChangeViews}
-                      views={views}
-                      handleClick={() => preview()}
-                    />
-                    {}
-                  </Center>
-                </Box>
-              </Flex>
-            </TabPanel>
-          ))}
-        </TabPanels>
-      </Tabs>
+        <Box flex={"1"} overflow={"auto"}>
+          <Center>
+            <Previewer
+              onChangeView={handleChangeView}
+              onChangeViews={handleChangeViews}
+              views={views}
+              handleClick={() => {
+                preview();
+              }}
+            />
+            {}
+          </Center>
+        </Box>
+      </Flex>
     </Box>
   );
-};
-
-const CustomTab = (props: any) => {
-  // 2. Reuse the `useTab` hook
-  const tabProps = useTab(props);
-  const isSelected = !!tabProps["aria-selected"];
-
-  return (
-    <Tab {...tabProps} _hover={{ bg: "gray.200" }}>
-      <Box>
-        <Flex my={"2px"} mx={"1px"}>
-          {isSelected ? (
-            <Editable
-              onClick={(e) => {
-                e.stopPropagation();
-                props.onClick();
-              }}
-              onSubmit={(nextValue) => {
-                props.onSubmit(nextValue);
-              }}
-              onKeyDown={(e: any) => {
-                e.stopPropagation();
-              }}
-              defaultValue={tabProps.title as string}
-            >
-              <EditablePreview />
-              <EditableInput />
-            </Editable>
-          ) : (
-            <Box m={"2px"}>{tabProps.title}</Box>
-          )}
-          <Box w={"24px"} h={"24px"} ml={"4px"}>
-            <Center>
-              <CloseButton
-                size={"sm"}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  props.onClose();
-                }}
-              />
-            </Center>
-          </Box>
-        </Flex>
-      </Box>
-    </Tab>
-  );
-};
+}

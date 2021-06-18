@@ -2,7 +2,8 @@
 import { UIComponentView } from "../UIComponent/UIComponentView";
 import React from "react";
 import { InkCanvasController } from ".";
-import { Box } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
+import { InkCanvasUI } from "./InkCanvasModel";
 /* const colorPickerColors: IColor[] = [
   { r: 253, g: 0, b: 12, a: 1 },
   { r: 134, g: 0, b: 56, a: 1 },
@@ -20,31 +21,29 @@ import { Box } from "@chakra-ui/react";
 export class InkCanvasView extends UIComponentView {
   public componentDidMount() {
     const controller = this.props.controller as InkCanvasController;
+    const { color, thickness } = controller.get() as InkCanvasUI;
     const canvas = document.getElementById("ink-canvas") as HTMLCanvasElement;
     controller.setInkCanvas(canvas);
-    controller.sizeCanvas();
-    controller.setStroke(20);
+    if (thickness) controller.setStroke(thickness);
+    if (color) {
+      //console.log(color);
+      controller.setColor(color);
+    }
+    //controller.sizeCanvas(100, 100);
 
-    window.addEventListener("resize", () => {
+    /*window.addEventListener("resize", () => {
       controller.sizeCanvas();
-    });
+    });*/
   }
 
   public render() {
     const controller = this.props.controller as InkCanvasController;
+    const component = controller.get() as InkCanvasUI;
+    const { color, thickness, ...props } = component;
+
     return (
-      <Box
-        className={"ink-component-root"}
-        w={controller.getWidth() + "px"}
-        h={controller.getHeight() + "px"}
-        bg={"transparent"}
-        position={"absolute"}
-        top={0}
-        left={0}
-      >
-        <Box className={"ink-surface"}>
-          <canvas id={"ink-canvas"} className={"ink-canvas"}></canvas>
-        </Box>
+      <Box {...props}>
+        <canvas id={"ink-canvas"} style={{ width: "100%", height: "100%" }} />
       </Box>
     );
   }

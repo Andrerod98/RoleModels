@@ -12,13 +12,27 @@ import { IoTrashOutline } from "react-icons/io5";
 import { View } from "../../../../shared-object/views/View";
 import { Position } from "./ViewItemOverlay";
 
-export const ViewItem = forwardRef(({ id, ...props }: any, ref: any) => {
+export interface ViewItemProps {
+  id: string;
+  view: View;
+  listeners: any;
+  attributes: any;
+  style:any;
+  insertPosition: number;
+  onClickRight: () => void;
+  onClickLeft: () => void;
+  onClickTopLeft: () => void;
+  onClickBottomRight: () => void;
+  onClickTop: () => void;
+  onClickBottom: () => void;
+  onClose: () => void;
+}
+export const ViewItem = forwardRef((props: ViewItemProps, ref: any) => {
   const [isOver, setOver] = useState(false);
-  console.log((props.item.view as View).getRoot());
   return (
     <GridItem
-      rowSpan={props.item.view.getColumns()}
-      colSpan={props.item.view.getRows()}
+      rowSpan={props.view.getColumns()}
+      colSpan={props.view.getRows()}
       onMouseOver={() => setOver(true)}
       onMouseLeave={() => setOver(false)}
       bg={"papayawhip"}
@@ -186,13 +200,13 @@ export const ViewItem = forwardRef(({ id, ...props }: any, ref: any) => {
             }}
             margin={"auto"}
             zIndex={2}
-            onClick={props.onClickDown}
+            onClick={props.onClickBottom}
             aria-label={"Search database"}
             icon={<ChevronDownIcon />}
           />
         </>
       )}
-      {(props.item.view as View).getRoot().generateWidget()}
+      {props.view.getRoot().generateWidget()}
       {props.insertPosition === Position.Before ? (
         <Box
           h={"100%"}

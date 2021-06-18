@@ -68,8 +68,8 @@ export class InkCanvasController extends UIComponentController {
     this.inkColorPicker.classList.toggle("show");
   }*/
 
-  public sizeCanvas() {
-    this.inkCanvas.sizeCanvasBackingStore();
+  public sizeCanvas(width?: number, height?: number) {
+    this.inkCanvas.sizeCanvasBackingStore(width, height);
   }
 
   generateWidget(): JSX.Element {
