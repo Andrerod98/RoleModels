@@ -187,33 +187,33 @@ export class CrossDeviceApplication {
     return this.sharedObject.getRole(role);
   }
 
-  public getViewOrCombinedView(role: string, id: string): View {
-    const view = this.getRole(role).getView(id);
-    if (view === undefined) return undefined;
+  public getCombinedViewOfView() {}
 
-    if (view.isCombined()) {
-      return this.fromCombinedViewToView(
-        this.getCombinedViewWithId(view.getCombinedViewID()),
-        role
-      );
+  public getViewOrCombinedView(role: string, viewID: string): [View, CombinedView] {
+    const view = this.getRole(role).getView(viewID);
+    if (view === undefined) {
+      console.error("The view does not exist in role " + role);
+      return undefined;
     }
 
-    return view;
+    if (view.isCombined()) {
+      const combinedView = this.sharedObject.getCombinedViewOfView(view);
+      const viewC = this.sharedObject.getViewOfCombinedView(combinedView, role);
+      return [viewC, combinedView];
+    }
+
+    return [view, null];
   }
 
-  public getViewsOrCombinedViews(role: string): View[] {
+  public getViewsOrCombinedViews(role: string): [View, CombinedView][] {
     const views = this.getRole(role).getViews();
+    let result = [];
 
     views.forEach((view, index) => {
-      if (view.isCombined()) {
-        views[index] = this.fromCombinedViewToView(
-          this.getCombinedViewWithId(view.getCombinedViewID()),
-          role
-        );
-      }
+      result.push(this.getViewOrCombinedView(role, view.getId()))
     });
 
-    return views;
+    return result;
   }
 
   public fromViewToCombinedView(view: View, role: string): View {
@@ -224,7 +224,7 @@ export class CrossDeviceApplication {
     combinedView: CombinedView,
     role: string
   ): View {
-    return this.sharedObject.fromCombinedViewToView(combinedView, role);
+    return this.sharedObject.getViewOfCombinedView(combinedView, role);
   }
 
   public alternateViews(

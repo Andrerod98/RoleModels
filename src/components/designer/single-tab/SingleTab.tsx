@@ -218,6 +218,7 @@ export function RoleTab(props: RoleTabProps) {
     props.role.updateIViews(
       Utils.stringToJson(newValue === undefined ? value : newValue)
     );
+    setValue(newValue === undefined ? value : newValue);
   };
 
   const addUIComponent = (name: string) => {

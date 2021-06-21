@@ -1,11 +1,12 @@
 /* eslint-disable no-undef */
 import * as React from "react";
+import { EventEmitter } from "stream";
 import { FactoriesManager } from "../../FactoriesManager";
 import { IUIComponent } from "./UIComponentModel";
 import { UIComponentView } from "./UIComponentView";
 
-export class UIComponentController {
-  protected listeners: { [event: string]: (...args) => any };
+export class UIComponentController extends EventEmitter {
+  //protected listeners: { [event: string]: (...args) => any };
   parent: UIComponentController;
   children: UIComponentController[];
 
@@ -14,7 +15,8 @@ export class UIComponentController {
     readonly factoriesManager: FactoriesManager,
     parent?: UIComponentController
   ) {
-    this.listeners = {};
+    super();
+    //this.listeners = {};
     this.parent = parent;
     this.children = [];
 
@@ -27,6 +29,18 @@ export class UIComponentController {
     const controller = this.factoriesManager.getUIComponent(model);
     // .new UIComponentController(model, this);
     return controller;
+  }
+
+  getSnapshot(): IUIComponent {
+    let snapshot = {...this.model, children: []};
+
+    this.children.forEach(child => 
+      {
+        snapshot.children.push(child.getSnapshot());
+      })
+
+    return snapshot;
+
   }
 
   isRoot() {
@@ -47,6 +61,14 @@ export class UIComponentController {
 
   getParent() {
     return this.parent;
+  }
+
+  getRoot(): UIComponentController {
+    if (this.parent == null) {
+      return this;
+    } else {
+      return this.getParent().getRoot();
+    }
   }
 
   addChild(model: IUIComponent) {
@@ -88,10 +110,13 @@ export class UIComponentController {
     model.children.forEach((child) => {
       this.addChild(child);
     });
+
+    this.getRoot().emit("componentChanged");
+    //TODO: Send change to root
   }
 
   addEventListener(listener: { [event: string]: (...args) => any }) {
-    this.listeners = { ...this.listeners, ...listener };
+    //this.listeners = { ...this.listeners, ...listener };
   }
 
   removeEventListener() {}
@@ -101,7 +126,8 @@ export class UIComponentController {
   }
 
   public getListeners(): { [event: string]: (...args) => any } {
-    return this.listeners;
+    return {};
+    //return this.listeners;
   }
 
   public getListener(event: string): (...args) => any {

@@ -26,8 +26,13 @@ module.exports = (env) => {
       fallback: {
         util: require.resolve('util/'),
         stream: require.resolve('stream-browserify'),
-        crypto: require.resolve('crypto-browserify')
-
+        crypto: require.resolve('crypto-browserify'),
+        path: false,
+        os: require.resolve('os-browserify/browser'),
+        https: require.resolve("https-browserify"),
+        http: require.resolve("stream-http"),
+        zlib: require.resolve("browserify-zlib"),
+        constants: require.resolve("constants-browserify")
       },
       extensions: ['.ts', '.tsx', '.js']
     },

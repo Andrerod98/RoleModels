@@ -563,11 +563,26 @@ export class PrototypingToolDataObject
 
       if (cv === undefined) return undefined;
 
-      return this.fromCombinedViewToView(cv, role);
+      return this.getViewOfCombinedView(cv, role);
     }
   }
 
-  public fromCombinedViewToView(
+  public getCombinedViewOfView(view: View): CombinedView{
+    if(view.getCombinedViewID() === "") {
+      console.error("The view is not combined.")
+      return undefined;
+    }
+
+    let combinedView = this.getCombinedViewWithId(view.getCombinedViewID());
+    if(!combinedView){
+      console.error("The view is associated but the combined view does not exist.")
+      return undefined;
+    }
+     
+    return combinedView;
+  }
+
+  public getViewOfCombinedView(
     combinedView: CombinedView,
     role: string
   ): View {
@@ -656,7 +671,7 @@ export class PrototypingToolDataObject
     if (view === undefined) return undefined;
 
     if (view.isCombined()) {
-      return this.fromCombinedViewToView(
+      return this.getViewOfCombinedView(
         this.getCombinedViewWithId(view.getCombinedViewID()),
         role
       );

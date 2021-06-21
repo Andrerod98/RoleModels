@@ -1,8 +1,9 @@
+import EventEmitter from "events";
 import { IUIComponent, UIComponentController } from "../components/UIComponent";
 import { FactoriesManager } from "../FactoriesManager";
 import { IView } from "./IView";
 
-export class View {
+export class View extends EventEmitter {
   private updateEvent: () => void = () => {};
   protected root: UIComponentController;
   constructor(
@@ -13,6 +14,7 @@ export class View {
     private readonly factoriesManager: FactoriesManager,
     root: IUIComponent
   ) {
+    super();
     this.combinedViewID = combinedViewID;
     this.setRoot(root);
   }
@@ -43,6 +45,9 @@ export class View {
 
   public setRoot(root: IUIComponent) {
     this.root = this.factoriesManager.getUIComponent(root);
+    this.root.on("componentChanged", () => {
+      this.emit("viewChanged", this.getRoot().getSnapshot());
+    });
   }
 
   public getRoot(): UIComponentController {
@@ -133,6 +138,13 @@ export class View {
     this.combinedViewID = object.combinedViewID;
 
     this.setRoot(object.root);
+    //this.root.update(object.root);
+
+    if (this.updateEvent !== undefined) this.updateEvent();
+  }
+
+  public updateRoot(object: IUIComponent) {
+    this.setRoot(object);
     //this.root.update(object.root);
 
     if (this.updateEvent !== undefined) this.updateEvent();

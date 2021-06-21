@@ -12,54 +12,37 @@ import {
   PopoverTrigger,
   Portal,
 } from "@chakra-ui/react";
-import React, { useEffect } from "react";
+import React from "react";
 import { FC } from "react";
 // import { UIComponentFactory } from "../components/UIComponentFactory";
 import { ImQrcode } from "react-icons/im";
+import { CombinedView } from "../combined-views/combined-view";
 import { View } from "./View";
 const QRCode = require("qrcode.react");
 
 interface ViewComponentProps {
-  qrUrl: string;
   view: View;
-  x?: number;
-  y?: number;
+  combinedView: CombinedView;
 }
 
 export const ViewComponent: FC<ViewComponentProps> = (
   props: ViewComponentProps
 ) => {
-  // if (cv === undefined || ui === undefined) return <div></div>;
-
-  useEffect(() => {
-    // Add event listeners
-    // props.cvm.removeEventListeners();
-    //   props.view.addEventListeners();
-  }, []);
-  // const uiComponentFactory = new UIComponentFactory();
+  let qrUrl = "";
+  if (props.view.isCombined()) {
+    // Get combined view of view
+    qrUrl = "combined/view/" + props.combinedView.getId();
+  } else {
+    qrUrl = "view/" + props.view.getId();
+  }
 
   return (
     <Box
-      // ref={drop}
-      // key={props.view.g}
       w={"100%"}
       h={"100%"}
       boxShadow={"xl"}
       bg={"white"}
       position={"relative"}
-
-      // top={y + "px"}
-      // left={x + "px"}
-
-      /* style={{
-        width: cv.width + "px",
-        height: cv.height + "px",
-         position: "absolute",
-         padding: "0px",
-        overflow: "hidden",
-        top: cv.y + "px",
-        left: cv.x + "px",
-      }}*/
     >
       {props.view.getRoot().generateWidget()}
       <Box position={"absolute"} top={"0px"} right={"0px"}>
@@ -79,7 +62,7 @@ export const ViewComponent: FC<ViewComponentProps> = (
               <PopoverHeader>QRCode</PopoverHeader>
               <PopoverBody>
                 <Center>
-                  <QRCode value={props.qrUrl} />
+                  <QRCode value={qrUrl} />
                 </Center>
               </PopoverBody>
             </PopoverContent>

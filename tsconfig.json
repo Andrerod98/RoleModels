@@ -18,14 +18,11 @@
             "react-dom",
             "jest",
             "puppeteer",
-             "jest-environment-puppeteer", "expect-puppeteer"
-            
-       
+            "jest-environment-puppeteer", 
+            "expect-puppeteer"
         ]
      
     },
 
-    "include": [
-        "src/**/*"
-, "test", "test", "demos"    ]
+    "include": ["src/**/*", "test", "certificates"]
 }

@@ -18,6 +18,8 @@ export class SliderView extends UIComponentView {
       <Slider
         key={"slider_" + component.id}
         aria-label={"slider-ex-1"}
+        defaultValue={component.value}
+        onChangeEnd={(val) => controller.update({ ...component, value: val })}
         {...component}
       >
         <SliderTrack>

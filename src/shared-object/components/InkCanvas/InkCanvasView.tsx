@@ -2,7 +2,7 @@
 import { UIComponentView } from "../UIComponent/UIComponentView";
 import React from "react";
 import { InkCanvasController } from ".";
-import { Box, Flex } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { InkCanvasUI } from "./InkCanvasModel";
 /* const colorPickerColors: IColor[] = [
   { r: 253, g: 0, b: 12, a: 1 },

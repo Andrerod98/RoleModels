@@ -54,6 +54,10 @@ export class SingleCombinedView
 
   private loadObject() {
     this.view = View.from(this.getCombinedView().view, this.factoriesManager);
+    this.view.on("viewChanged", (root) => {
+      this.view.updateRoot(root);
+      this.updateView();
+    });
   }
 
   private setEventListener() {

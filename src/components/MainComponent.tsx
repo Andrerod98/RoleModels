@@ -12,10 +12,8 @@ import { ManagerComponent } from "./manager/ManagerComponent";
 import { Box } from "@chakra-ui/react";
 import { CrossDeviceApplication } from "../CrossDeviceApplication";
 import { DesignerComponent } from "./designer";
-import { CombinedView } from "../shared-object/combined-views/combined-view";
 import { IDevice } from "../shared-object/devices/IDevice";
-import { QRCodeController } from "../shared-object/qrcode/QRCodeController";
-import { View } from "../shared-object/views/View";
+import { Role } from "../shared-object/roles/Role";
 
 interface MainComponentProps {
   readonly app: CrossDeviceApplication;
@@ -23,9 +21,7 @@ interface MainComponentProps {
 
 interface MainComponentState {
   devices: IDevice[];
-  combinedViews: CombinedView[];
-  views: View[];
-  qrCodes: QRCodeController[];
+  role: Role;
 }
 
 export const MainComponent: FC<MainComponentProps> = (
@@ -35,21 +31,12 @@ export const MainComponent: FC<MainComponentProps> = (
   const generateState = () => {
     return {
       devices: Array.from(model.getDevices()),
-      combinedViews: model.getMyCombinedViews(),
-      views: model.getMyViews(),
-      qrCodes: model.getMyQrCodes(),
+      role: model.getMyRole(),
     };
   };
   const [state, setState] = useState<MainComponentState>(generateState());
 
-  // Setup a listener that
   useEffect(() => {
-    const handleWindowBeforeUnload = (ev: BeforeUnloadEvent): any => {
-      // props.model.deleteDevice();
-      return undefined;
-    };
-    window.addEventListener("beforeunload", handleWindowBeforeUnload);
-
     const onChange = () => {
       console.log("The state has changed...");
       setState(generateState());
@@ -59,23 +46,13 @@ export const MainComponent: FC<MainComponentProps> = (
       onChange();
     });
 
-    // useEffect runs after the first render so we will update the view again incase there
-    // were changes that came into the model in between generating initialState and setting
-    // the above event handler
-
     onChange();
     return () => {
-      // When the view dismounts remove the listener to avoid memory leaks
-      window.removeEventListener("beforeunload", handleWindowBeforeUnload);
       model.off("change", onChange);
       model.deleteAllEventListeners();
     };
   }, []);
 
-  //  const cv = props.app.getCombinedView(props.app.getViewId());
-  /* Choose roles */
-  //   const view = props.app.getView(props.app.getViewId());
-  /* Migrate, Deposit, Mirror, Stitch */
   return (
     <Box h={"100vh"} maxW={"100vw"} overflowX={"hidden"}>
       {model.isManager() ? (
@@ -83,12 +60,7 @@ export const MainComponent: FC<MainComponentProps> = (
       ) : model.isDesigner() ? (
         <DesignerComponent app={props.app} />
       ) : (
-        <RoleComponent
-          app={props.app}
-          combinedViews={state.combinedViews}
-          views={state.views}
-          qrCodes={state.qrCodes}
-        ></RoleComponent>
+        <RoleComponent app={props.app} role={state.role} />
       )}
     </Box>
   );
