@@ -4,7 +4,6 @@ import { getDefaultObjectFromContainer } from "@fluidframework/aqueduct";
 import React from "react";
 import ReactDOM from "react-dom";
 import { CombinedView } from "./shared-object/combined-views/combined-view";
-import { PositionMap } from "./shared-object/combined-views/stitching-combined-view/IStitchingCombinedView";
 import { UIComponentFactory } from "./shared-object/components/UIComponent";
 import { PrototypingToolContainerFactory } from "./shared-object/container";
 import { PrototypingToolDataObject } from "./shared-object/PrototypingToolDataObject";
@@ -145,20 +144,8 @@ export class CrossDeviceApplication {
     return cvm;
   }
 
-  public stitchViews(
-    columns: number,
-    rows: number,
-    positions: PositionMap,
-    view1: View,
-    view2: View
-  ) {
-    const cvm = this.sharedObject.stitchViews(
-      columns,
-      rows,
-      positions,
-      view1,
-      view2
-    );
+  public stitchViews(view1: View, view2: View) {
+    const cvm = this.sharedObject.stitchViews(1, 1, {}, view1, view2);
     this.setInteractions();
     return cvm;
   }
@@ -189,7 +176,10 @@ export class CrossDeviceApplication {
 
   public getCombinedViewOfView() {}
 
-  public getViewOrCombinedView(role: string, viewID: string): [View, CombinedView] {
+  public getViewOrCombinedView(
+    role: string,
+    viewID: string
+  ): [View, CombinedView] {
     const view = this.getRole(role).getView(viewID);
     if (view === undefined) {
       console.error("The view does not exist in role " + role);
@@ -198,6 +188,7 @@ export class CrossDeviceApplication {
 
     if (view.isCombined()) {
       const combinedView = this.sharedObject.getCombinedViewOfView(view);
+      if (combinedView === undefined) return [view, null];
       const viewC = this.sharedObject.getViewOfCombinedView(combinedView, role);
       return [viewC, combinedView];
     }
@@ -210,7 +201,7 @@ export class CrossDeviceApplication {
     let result = [];
 
     views.forEach((view, index) => {
-      result.push(this.getViewOrCombinedView(role, view.getId()))
+      result.push(this.getViewOrCombinedView(role, view.getId()));
     });
 
     return result;

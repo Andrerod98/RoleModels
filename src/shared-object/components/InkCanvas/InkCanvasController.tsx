@@ -11,9 +11,10 @@ export class InkCanvasController extends UIComponentController {
   constructor(
     protected model: InkCanvasUI,
     private readonly ink: IInk,
-    readonly factoriesManager
+    readonly factoriesManager,
+    parent?: UIComponentController
   ) {
-    super(model, factoriesManager);
+    super(model, factoriesManager, parent);
   }
 
   getInk(): IInk {

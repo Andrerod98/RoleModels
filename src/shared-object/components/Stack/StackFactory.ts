@@ -1,8 +1,11 @@
 import { StackUI, StackController } from ".";
-import { UIComponentFactory } from "../UIComponent";
+import { UIComponentController, UIComponentFactory } from "../UIComponent";
 
 export class StackFactory extends UIComponentFactory {
-  public generateComponent(component: StackUI): StackController {
-    return new StackController(component, this.factoriesManager);
+  public generateComponent(
+    component: StackUI,
+    parent?: UIComponentController
+  ): StackController {
+    return new StackController(component, this.factoriesManager, parent);
   }
 }

@@ -1,8 +1,11 @@
 import { ImageUI, ImageController } from ".";
-import { UIComponentFactory } from "../UIComponent";
+import { UIComponentController, UIComponentFactory } from "../UIComponent";
 
 export class ImageFactory extends UIComponentFactory {
-  public generateComponent(component: ImageUI): ImageController {
-    return new ImageController(component, this.factoriesManager);
+  public generateComponent(
+    component: ImageUI,
+    parent?: UIComponentController
+  ): ImageController {
+    return new ImageController(component, this.factoriesManager, parent);
   }
 }

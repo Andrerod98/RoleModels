@@ -33,7 +33,7 @@ export const TestInteractionModal: FC<FocusButtonProps> = (
 ) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const [view, setView] = useState(undefined);
+  const [view, setView] = useState({ view: undefined, from: "" });
 
   return (
     <>
@@ -45,13 +45,13 @@ export const TestInteractionModal: FC<FocusButtonProps> = (
         icon={<Icon as={AiOutlineExpand} />}
         onClick={() => {
           onOpen();
-          setView(undefined);
+          setView({ view: undefined, from: "" });
         }}
       />
       <Modal isOpen={isOpen} onClose={onClose} size={"full"}>
         <ModalOverlay />
         <ModalContent m={0} bg={"transparent"} position={"relative"} h={"100%"}>
-          {view !== undefined ? (
+          {view.view !== undefined ? (
             <>
               <Flex
                 position={"absolute"}
@@ -69,7 +69,7 @@ export const TestInteractionModal: FC<FocusButtonProps> = (
                   h={"40%"}
                   onClick={(e) => {
                     e.stopPropagation();
-                    props.app.grabView(view);
+                    props.app.grabView(view.view);
 
                     onClose();
                   }}
@@ -86,8 +86,8 @@ export const TestInteractionModal: FC<FocusButtonProps> = (
                   h={"40%"}
                   onClick={(e) => {
                     e.stopPropagation();
-                    props.app.getMyRole().addView(view);
-                    props.app.mirrorViews(view, view);
+                    props.app.getMyRole().addView(view.view);
+                    props.app.mirrorViews(view.view, view.view);
                     onClose();
                   }}
                 >
@@ -109,6 +109,20 @@ export const TestInteractionModal: FC<FocusButtonProps> = (
                 h={"40px"}
                 borderTopRadius={"0"}
                 borderBottomRadius={"50px"}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  props.app.getMyRole().addView(view.view);
+                  const stitchingCV = props.app.stitchViews(
+                    view.view,
+                    view.view
+                  );
+
+                  stitchingCV.stitchBottom(
+                    props.app.getMyRole().getName(),
+                    view.from
+                  );
+                  onClose();
+                }}
               >
                 <ChevronUpIcon></ChevronUpIcon>
               </Button>
@@ -124,6 +138,20 @@ export const TestInteractionModal: FC<FocusButtonProps> = (
                   h={"95%"}
                   borderLeftRadius={"0"}
                   borderRightRadius={"50px"}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    props.app.getMyRole().addView(view.view);
+                    const stitchingCV = props.app.stitchViews(
+                      view.view,
+                      view.view
+                    );
+
+                    stitchingCV.stitchRight(
+                      props.app.getMyRole().getName(),
+                      view.from
+                    );
+                    onClose();
+                  }}
                 >
                   <ChevronLeftIcon />
                 </Button>
@@ -142,6 +170,20 @@ export const TestInteractionModal: FC<FocusButtonProps> = (
                   h={"95%"}
                   borderLeftRadius={"50px"}
                   borderRightRadius={"0"}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    props.app.getMyRole().addView(view.view);
+                    const stitchingCV = props.app.stitchViews(
+                      view.view,
+                      view.view
+                    );
+
+                    stitchingCV.stitchLeft(
+                      props.app.getMyRole().getName(),
+                      view.from
+                    );
+                    onClose();
+                  }}
                 >
                   <ChevronRightIcon />
                 </Button>
@@ -156,6 +198,20 @@ export const TestInteractionModal: FC<FocusButtonProps> = (
                 m={"auto"}
                 borderTopRadius={"50px"}
                 borderBottomRadius={"0"}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  props.app.getMyRole().addView(view.view);
+                  const stitchingCV = props.app.stitchViews(
+                    view.view,
+                    view.view
+                  );
+
+                  stitchingCV.stitchTop(
+                    props.app.getMyRole().getName(),
+                    view.from
+                  );
+                  onClose();
+                }}
               >
                 <ChevronDownIcon />
               </Button>
@@ -187,11 +243,14 @@ export const TestInteractionModal: FC<FocusButtonProps> = (
                         window.location.reload();
                       } else {
                         if (data.startsWith("view/")) {
-                          const value = data.substr(5);
+                          const subStr = data.substr(5).split("#from=");
+                          const value = subStr[0];
+                          const from = subStr[1];
                           const view = props.app
                             .getSharedObject()
                             .getView(value);
-                          setView(view);
+                          console.log({ view: view, from: from });
+                          setView({ view: view, from: from });
                         } else if (data.startsWith("qr/")) {
                           const value = data.substr(3);
                           props.app.getSharedObject().getQRCode(value).scan();

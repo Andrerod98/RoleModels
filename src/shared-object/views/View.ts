@@ -46,6 +46,7 @@ export class View extends EventEmitter {
   public setRoot(root: IUIComponent) {
     this.root = this.factoriesManager.getUIComponent(root);
     this.root.on("componentChanged", () => {
+      console.log("Component has changed");
       this.emit("viewChanged", this.getRoot().getSnapshot());
     });
   }

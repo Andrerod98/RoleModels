@@ -14,6 +14,16 @@ const HASH_PARTS = Utils.getURLHashParts(HASH);
 const PROJECT_NAME = HASH_PARTS["project"];
 const IP = window.location.hostname;
 
+/*ReactDOM.render(
+  <ChakraProvider resetCSS>
+    <Box w={"100px"} h={"100px"} overflow={"hidden"}>
+      <Stitching rows={4} columns={4} position={1} />
+    </Box>
+  </ChakraProvider>,
+
+  document.getElementById("content")
+);*/
+
 if (PROJECT_NAME === undefined) {
   ReactDOM.render(
     <ChakraProvider resetCSS>

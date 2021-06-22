@@ -1,8 +1,11 @@
 import { CenterUI, CenterController } from ".";
-import { UIComponentFactory } from "../UIComponent";
+import { UIComponentController, UIComponentFactory } from "../UIComponent";
 
 export class CenterFactory extends UIComponentFactory {
-  public generateComponent(component: CenterUI): CenterController {
-    return new CenterController(component, this.factoriesManager);
+  public generateComponent(
+    component: CenterUI,
+    parent?: UIComponentController
+  ): CenterController {
+    return new CenterController(component, this.factoriesManager, parent);
   }
 }

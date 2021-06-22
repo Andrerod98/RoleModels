@@ -1,8 +1,11 @@
 import { RadioController, RadioUI } from ".";
-import { UIComponentFactory } from "../UIComponent";
+import { UIComponentController, UIComponentFactory } from "../UIComponent";
 
 export class RadioFactory extends UIComponentFactory {
-  public generateComponent(component: RadioUI): RadioController {
-    return new RadioController(component, this.factoriesManager);
+  public generateComponent(
+    component: RadioUI,
+    parent?: UIComponentController
+  ): RadioController {
+    return new RadioController(component, this.factoriesManager, parent);
   }
 }

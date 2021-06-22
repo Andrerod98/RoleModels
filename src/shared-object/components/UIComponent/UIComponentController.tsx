@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
+import EventEmitter from "events";
 import * as React from "react";
-import { EventEmitter } from "stream";
 import { FactoriesManager } from "../../FactoriesManager";
 import { IUIComponent } from "./UIComponentModel";
 import { UIComponentView } from "./UIComponentView";
@@ -32,15 +32,13 @@ export class UIComponentController extends EventEmitter {
   }
 
   getSnapshot(): IUIComponent {
-    let snapshot = {...this.model, children: []};
+    let snapshot = { ...this.model, children: [] };
 
-    this.children.forEach(child => 
-      {
-        snapshot.children.push(child.getSnapshot());
-      })
+    this.children.forEach((child) => {
+      snapshot.children.push(child.getSnapshot());
+    });
 
     return snapshot;
-
   }
 
   isRoot() {
@@ -64,6 +62,7 @@ export class UIComponentController extends EventEmitter {
   }
 
   getRoot(): UIComponentController {
+    console.log(this.parent);
     if (this.parent == null) {
       return this;
     } else {
@@ -72,7 +71,7 @@ export class UIComponentController extends EventEmitter {
   }
 
   addChild(model: IUIComponent) {
-    const controller = this.factoriesManager.getUIComponent(model);
+    const controller = this.factoriesManager.getUIComponent(model, this);
     this.children.push(controller);
   }
 
@@ -103,7 +102,7 @@ export class UIComponentController extends EventEmitter {
     return this.children;
   }
 
-  update(model: IUIComponent) {
+  update(model: any) {
     this.model = model;
     this.children = [];
 
@@ -111,6 +110,7 @@ export class UIComponentController extends EventEmitter {
       this.addChild(child);
     });
 
+    console.log({ text: "Emitting change", root: this.getRoot() });
     this.getRoot().emit("componentChanged");
     //TODO: Send change to root
   }
@@ -146,7 +146,11 @@ export class UIComponentController extends EventEmitter {
 export class GenericController<
   M extends IUIComponent
 > extends UIComponentController {
-  constructor(protected model: M, readonly factoriesManager: FactoriesManager) {
-    super(model, factoriesManager);
+  constructor(
+    protected model: M,
+    readonly factoriesManager: FactoriesManager,
+    parent?: UIComponentController
+  ) {
+    super(model, factoriesManager, parent);
   }
 }

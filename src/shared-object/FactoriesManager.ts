@@ -1,4 +1,8 @@
-import { IUIComponent, UIComponentFactory } from "./components/UIComponent";
+import {
+  IUIComponent,
+  UIComponentController,
+  UIComponentFactory,
+} from "./components/UIComponent";
 
 export class FactoriesManager {
   private factories: Map<string, UIComponentFactory>;
@@ -11,12 +15,15 @@ export class FactoriesManager {
     this.factories.set(factory.name, factory);
   }
 
-  public getUIComponent(component: IUIComponent) {
+  public getUIComponent(
+    component: IUIComponent,
+    parent?: UIComponentController
+  ) {
     let factory = this.factories.get(component.name);
     if (factory === undefined) {
       factory = this.factories.get("uicomponent");
     }
-    return factory.generateComponent(component);
+    return factory.generateComponent(component, parent);
 
     /*
     switch (component.name) {

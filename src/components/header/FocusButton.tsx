@@ -159,13 +159,7 @@ export const FocusButton: FC<FocusButtonProps> = (props: FocusButtonProps) => {
                               positions[props.app.getMyRole().getName()] =
                                 index + 1;
 
-                              props.app.stitchViews(
-                                grid.columns,
-                                grid.rows,
-                                positions,
-                                view,
-                                view
-                              );
+                              props.app.stitchViews(view, view);
 
                               onClose();
                               props.app.reRender();

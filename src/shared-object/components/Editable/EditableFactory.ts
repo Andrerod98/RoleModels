@@ -1,8 +1,11 @@
 import { EditableUI, EditableController } from ".";
-import { UIComponentFactory } from "../UIComponent";
+import { UIComponentController, UIComponentFactory } from "../UIComponent";
 
 export class EditableFactory extends UIComponentFactory {
-  public generateComponent(component: EditableUI): EditableController {
-    return new EditableController(component, this.factoriesManager);
+  public generateComponent(
+    component: EditableUI,
+    parent?: UIComponentController
+  ): EditableController {
+    return new EditableController(component, this.factoriesManager, parent);
   }
 }

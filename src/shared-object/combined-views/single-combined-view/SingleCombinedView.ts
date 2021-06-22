@@ -55,6 +55,8 @@ export class SingleCombinedView
   private loadObject() {
     this.view = View.from(this.getCombinedView().view, this.factoriesManager);
     this.view.on("viewChanged", (root) => {
+      console.log("Updating state, snapshot =");
+      console.log(root);
       this.view.updateRoot(root);
       this.updateView();
     });

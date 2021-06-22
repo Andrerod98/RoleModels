@@ -6,7 +6,7 @@ import { Image } from "@chakra-ui/image";
 
 export class ImageView extends UIComponentView {
   render() {
-    const component = this.props.controller.get() as ImageUI;
+    const { children, ...component } = this.props.controller.get() as ImageUI;
 
     const element = (
       <Image

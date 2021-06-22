@@ -24,9 +24,120 @@ export class StitchingCombinedView extends SingleCombinedView {
     };
   }
 
-  public getStartingPositionFrom(
-    role: string
-  ): { startingX: number; startingY: number } {
+  hasPosition(position: number) {
+    const cell = this.combinedView.get();
+    let positions = cell.positions;
+    let result = false;
+    Object.keys(positions).forEach((p) => {
+      if (positions[p] === position) {
+        result = true;
+      }
+    });
+
+    return result;
+  }
+
+  hasRight(role: string) {
+    const cell = this.combinedView.get();
+    let positions = cell.positions;
+    return this.hasPosition(positions[role] + 1);
+  }
+
+  hasBottom(role: string) {
+    const cell = this.combinedView.get();
+    let positions = cell.positions;
+    return this.hasPosition(positions[role] + cell.rows);
+  }
+
+  hasTop(role: string) {
+    const cell = this.combinedView.get();
+    let positions = cell.positions;
+    return this.hasPosition(positions[role] - cell.rows);
+  }
+
+  stitchRight(role: string, sourceRole: string) {
+    const cell = this.combinedView.get();
+    let positions = cell.positions;
+    console.log({ text: "Previous", positions });
+    if (positions[sourceRole] === undefined) {
+      positions[sourceRole] = 0;
+    }
+    positions[role] = positions[sourceRole] + 1;
+    console.log({ text: "After", positions });
+    this.combinedView.set({
+      ...cell,
+      rows: cell.rows + 1,
+      positions: positions,
+    });
+  }
+
+  stitchLeft(role: string, sourceRole: string) {
+    const cell = this.combinedView.get();
+    let positions = cell.positions;
+    if (positions[sourceRole] === undefined) {
+      positions[sourceRole] = 0;
+    }
+    Object.keys(positions).forEach((p) => positions[p]++);
+    positions[role] = positions[sourceRole] - 1;
+    this.combinedView.set({
+      ...cell,
+      rows: cell.rows + 1,
+      positions: positions,
+    });
+  }
+
+  stitchTop(role: string, sourceRole: string) {
+    const cell = this.combinedView.get();
+    let positions = cell.positions;
+    Object.keys(positions).forEach((p) => (positions[p] += cell.rows));
+    positions[role] = positions[sourceRole] - cell.rows;
+
+    let newColumns = cell.columns;
+    if (positions[sourceRole] > cell.rows * cell.columns) newColumns++;
+
+    this.combinedView.set({
+      ...cell,
+      columns: newColumns,
+      positions: positions,
+    });
+  }
+
+  stitchBottom(role: string, sourceRole: string) {
+    const cell = this.combinedView.get();
+    let positions = cell.positions;
+
+    positions[role] = positions[sourceRole] + cell.rows;
+
+    let newColumns = cell.columns;
+    if (positions[role] > cell.rows * cell.columns) newColumns++;
+
+    this.combinedView.set({
+      ...cell,
+      columns: newColumns,
+      positions: positions,
+    });
+  }
+
+  getColumns(): number {
+    return this.combinedView.get().columns;
+  }
+
+  getRows(): number {
+    return this.combinedView.get().rows;
+  }
+
+  getPosition(role: string): number {
+    return this.combinedView.get().positions[role];
+  }
+
+  getPositions() {
+    return this.combinedView.get().positions;
+  }
+
+  public getStartingPositionFrom(role: string): {
+    startingX: number;
+    startingY: number;
+  } {
     const position = this.getCombinedView().positions[role];
     const nRows = this.getCombinedView().rows;
     const nColumns = this.getCombinedView().columns;

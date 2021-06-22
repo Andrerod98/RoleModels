@@ -1,8 +1,11 @@
 import { MapUI, MapController } from ".";
-import { UIComponentFactory } from "../UIComponent";
+import { UIComponentController, UIComponentFactory } from "../UIComponent";
 
 export class MapFactory extends UIComponentFactory {
-  public generateComponent(component: MapUI): MapController {
-    return new MapController(component, this.factoriesManager);
+  public generateComponent(
+    component: MapUI,
+    parent?: UIComponentController
+  ): MapController {
+    return new MapController(component, this.factoriesManager, parent);
   }
 }

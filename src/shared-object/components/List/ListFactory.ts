@@ -1,8 +1,11 @@
 import { ListUI, ListController } from ".";
-import { UIComponentFactory } from "../UIComponent";
+import { UIComponentController, UIComponentFactory } from "../UIComponent";
 
 export class ListFactory extends UIComponentFactory {
-  public generateComponent(component: ListUI): ListController {
-    return new ListController(component, this.factoriesManager);
+  public generateComponent(
+    component: ListUI,
+    parent?: UIComponentController
+  ): ListController {
+    return new ListController(component, this.factoriesManager, parent);
   }
 }

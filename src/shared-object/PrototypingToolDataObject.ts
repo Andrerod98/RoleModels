@@ -170,7 +170,7 @@ export class PrototypingToolDataObject
 
     await Promise.all([
       this.rolesManager.loadRoles(1),
-      this.combinedViewsManager.loadCombinedViews(),
+      this.combinedViewsManager.loadCombinedViews(1),
       this.qrManager.loadQRCodes(),
     ]);
   }
@@ -567,25 +567,25 @@ export class PrototypingToolDataObject
     }
   }
 
-  public getCombinedViewOfView(view: View): CombinedView{
-    if(view.getCombinedViewID() === "") {
-      console.error("The view is not combined.")
+  public getCombinedViewOfView(view: View): CombinedView {
+    if (view.getCombinedViewID() === "") {
+      console.error("The view is not combined.");
       return undefined;
     }
 
     let combinedView = this.getCombinedViewWithId(view.getCombinedViewID());
-    if(!combinedView){
-      console.error("The view is associated but the combined view does not exist.")
+    if (!combinedView) {
+      console.error(
+        "The view is associated but the combined view does not exist. Id:" +
+          view.getCombinedViewID()
+      );
       return undefined;
     }
-     
+
     return combinedView;
   }
 
-  public getViewOfCombinedView(
-    combinedView: CombinedView,
-    role: string
-  ): View {
+  public getViewOfCombinedView(combinedView: CombinedView, role: string): View {
     if (combinedView.isSingleView()) {
       return (combinedView as SingleCombinedView).getUI();
     } else {
