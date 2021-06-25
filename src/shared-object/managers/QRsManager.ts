@@ -1,15 +1,16 @@
 import { SharedMap } from "@fluidframework/map";
 import { SharedCell } from "@fluidframework/cell";
-import { QRCodeController } from "./QRCodeController";
+import { QRCodeController } from "../qrcode/QRCodeController";
 
-export class QRManager {
+// TODO - put as the same as the cv manager and role manager
+export class QRsManager {
   qrs: Map<string, QRCodeController>;
-  constructor(readonly qrSharedMap: SharedMap) {
+  constructor(readonly qrsSharedMap: SharedMap) {
     this.qrs = new Map<string, QRCodeController>();
   }
 
-  public loadQR(sharedCell: SharedCell): void {
-    const qrcode = new QRCodeController(sharedCell);
+  public loadQR(sharedQR: SharedCell): void {
+    const qrcode = new QRCodeController(sharedQR);
     this.qrs.set(qrcode.getQRCode().id, qrcode);
   }
 
@@ -19,7 +20,7 @@ export class QRManager {
       return this.qrs.get(id);
     }
 
-    this.qrSharedMap.set(id, sharedCell.handle);
+    this.qrsSharedMap.set(id, sharedCell.handle);
 
     const qrcode = new QRCodeController(sharedCell);
     this.qrs.set(id, qrcode);
@@ -31,13 +32,13 @@ export class QRManager {
   }
 
   public async loadQRCodes() {
-    for (const handle of this.qrSharedMap.values()) {
+    for (const handle of this.qrsSharedMap.values()) {
       const sharedCell = await handle.get();
       if (sharedCell !== undefined) {
         this.loadQR(sharedCell);
       }
     }
-    console.log("" + this.qrSharedMap.size + " QR Codes loaded.");
+    console.log("" + this.qrsSharedMap.size + " QR Codes loaded.");
   }
 
   public getQRsWithIds(ids: string[]) {

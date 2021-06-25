@@ -2,10 +2,7 @@
 /* eslint-disable no-unreachable */
 /* eslint-disable react/prop-types */
 /* eslint-disable react/jsx-key */
-/* !
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License.
- */
+
 
 import React, { FC } from "react";
 import { CrossDeviceApplication } from "../../CrossDeviceApplication";
@@ -24,7 +21,7 @@ export const DesignerComponent: FC<ManagerComponentProps> = (props) => {
         <Header
           app={props.app}
           myRole={model.getDeviceRole()}
-          roles={model.getRoles().map((role) => role.getName())}
+          roles={Array.from(model.getRoles()).map((role) => role.getName())}
           onManagerClick={() => {
             model.promoteToManager();
           }}
@@ -35,9 +32,7 @@ export const DesignerComponent: FC<ManagerComponentProps> = (props) => {
           onDesignClick={() => {
             model.promoteToDesigner();
           }}
-          onLoggingOpen={() => {
-           
-          }}
+          onLoggingOpen={() => {}}
         />
         <DesignTool app={props.app} />
       </div>

@@ -1,36 +1,25 @@
-/* eslint-disable no-invalid-this */
-/* eslint-disable valid-jsdoc */
 import { SharedMap } from "@fluidframework/map";
 import { IFluidDataStoreRuntime } from "@fluidframework/datastore-definitions";
 import { IDevice } from "../devices/IDevice";
+import DeviceDetector, { DeviceDetectorResult } from "device-detector-js";
 
 /* This class is responsible for managing the connected devices */
+enum DefaultRoles {
+  Manager = "manager",
+  Designer = "designer",
+  Default = "default",
+}
 export class DevicesManager {
   private deviceId: string;
 
   public constructor(
     private readonly devicesMap: SharedMap,
-    private readonly runtime: IFluidDataStoreRuntime // private template: ITemplate
+    private readonly runtime: IFluidDataStoreRuntime
   ) {
-    this.load();
-  }
-
-  public load() {
-    this.clearDisconnectedDevices();
     this.setEventListeners();
   }
 
-  private clearDisconnectedDevices() {
-    const keys = this.runtime.getQuorum().getMembers();
-
-    const devicesKeys = this.devicesMap.keys();
-    for (const key of devicesKeys) {
-      if (!keys.has(key)) {
-        this.devicesMap.delete(key);
-      }
-    }
-  }
-
+  /* Defines the event listeners needed */
   private setEventListeners() {
     const quorum = this.runtime.getQuorum();
 
@@ -43,6 +32,7 @@ export class DevicesManager {
     });
   }
 
+  /* Removes the event listeners */
   public removeEventListeners() {
     this.runtime.off("connected", (clientId: string) => {
       this.hasConnected(clientId);
@@ -53,20 +43,20 @@ export class DevicesManager {
     });
   }
 
-  /**
-   * Changes the properties of a device
-   */
-  public changeDevice(device: IDevice): void {
-    if (this.devicesMap.has(device.id)) {
-      this.devicesMap.set(device.id, device);
-      // this.devicesMap.emit("deviceChange", device);
-    } else {
-      console.error(
-        `The device with id ${device.id} was not found therefore was not changed.`
-      );
+  /* Removes the devices that are disconnected from the shared map */
+  private clearDisconnectedDevices() {
+    const quorumKeys = this.runtime.getQuorum().getMembers();
+    const devicesKeys = this.devicesMap.keys();
+
+    for (const key of devicesKeys) {
+      if (!quorumKeys.has(key)) {
+        this.devicesMap.delete(key);
+      }
     }
   }
-  /**
+
+  /* Getters */
+  /*
    * Get an array of all devices objects for the devices
    * who have joined the session (even if they have left).
    */
@@ -74,99 +64,131 @@ export class DevicesManager {
     return this.devicesMap.values();
   }
 
-  /**
+  /*
    * Get the device object for the current device.
    */
-  public getDevice = (): IDevice => {
+  public getMyDevice = (): IDevice => {
     return this.devicesMap.get<IDevice>(this.deviceId);
   };
 
-  /**
-   * Get the device object with a role.
+  /*
+   * Get the devices object with a specific role.
    */
-  public getDevicesByRole(role: string): IDevice[] {
+  public getDevicesWithRole(role: string): IDevice[] {
     const devices = Array.from(this.getDevices());
     return devices.filter((device) => device.role === role);
   }
 
-  /**
+  /*
    * Get the device object with an id.
    */
-  public getDeviceById(id: string): IDevice {
+  public getDevice(id: string): IDevice {
     const devices = Array.from(this.getDevices());
     return devices.find((device) => device.id === id);
   }
 
-  /**
+  /*
    * Retrieves the number of connected devices
    */
   public getConnectedDevices() {
     return this.runtime.getAudience().getMembers();
   }
 
+  /*
+   * Updates the properties of a device
+   */
+  public updateDevice(device: IDevice): void {
+    if (this.devicesMap.has(device.id)) {
+      this.devicesMap.set(device.id, device);
+    } else {
+      console.error(
+        `The device with id ${device.id} was not found therefore was not changed.`
+      );
+    }
+  }
+
+  /*
+   * Promoted a certain device to a role. In case the device ID is not specified
+   * it updates the current device
+   */
   public promoteToRole(role: string, deviceId?: string) {
     let device: IDevice;
     if (deviceId === undefined) {
-      device = this.getDevice();
+      device = this.getMyDevice();
     } else {
-      device = this.getDeviceById(deviceId);
+      device = this.getDevice(deviceId);
     }
 
     device.role = role;
-    this.changeDevice(device);
+    this.updateDevice(device);
   }
 
+  /* Remove from here */
+  /*
+   * Promotes the current device to manager
+   */
   public promoteToManager(): void {
-    this.promoteToRole("manager");
+    this.promoteToRole(DefaultRoles.Manager);
   }
 
+  /*
+   * Promotes the current device to manager
+   */
   public promoteToDesigner(): void {
-    this.promoteToRole("designer");
+    this.promoteToRole(DefaultRoles.Designer);
   }
 
   public isManager(): boolean {
-    return this.getDevice().role === "manager";
+    return this.getMyDevice().role === DefaultRoles.Manager;
   }
 
   public isDesigner(): boolean {
-    return this.getDevice().role === "designer";
+    return this.getMyDevice().role === DefaultRoles.Designer;
+  }
+
+  /*
+   * Extracts the properties of the current device
+   */
+  private extractDeviceProperties(): DeviceDetectorResult {
+    const deviceDetector = new DeviceDetector({ skipBotDetection: true });
+    return deviceDetector.parse(navigator.userAgent);
   }
 
   /* Callback functions */
 
+  /**
+   * This function is called when a device connects
+   */
   private hasConnected(clientId: string) {
-    console.log("This device has been connected and has id:" + clientId);
-    const device = {
-      id: clientId,
-      type: "smartphone",
-      role: "manager",
-    };
-    this.deviceId = device.id;
-    this.devicesMap.set(device.id, device);
-  }
+    this.clearDisconnectedDevices();
 
-  /*private memberAdded(clientId: string, details: any) {
+    const details = this.runtime.getQuorum().getMember(clientId);
     const interactive = details.client.details.capabilities.interactive;
 
+    this.deviceId = clientId;
     if (interactive) {
-      if (!this.devicesMap.has(clientId)) {
-        
-        console.log("Member " + clientId + " added.");
-        const device = {
-          id: clientId,
-          type: "smartphone",
-          role: "manager",
-        };
+      const properties = this.extractDeviceProperties();
 
-        this.devicesMap.set(clientId, device);
-      }
+      const device = {
+        id: clientId,
+        type:
+          properties.device.type === "" ? "smartphone" : properties.device.type,
+        role: "manager",
+      };
+
+      this.devicesMap.set(device.id, device);
     }
-  }*/
 
+    console.log("This device has been connected and has id:" + clientId);
+  }
+
+  /**
+   * This function is called when a device is removed
+   */
   private memberRemoved(clientId: string) {
     if (this.devicesMap.has(clientId)) {
-      console.log("Member " + clientId + " deleted.");
       this.devicesMap.delete(clientId);
+      console.log("Member " + clientId + " deleted.");
     }
   }
 }

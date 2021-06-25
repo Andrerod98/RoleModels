@@ -5,10 +5,10 @@ import { View } from "../views/View";
 import { IRole } from "./IRole";
 
 export class Role {
-  name: string;
-  views: View[];
-  combinedViewsIds: string[];
-  qrsIds: string[];
+  private name: string;
+  private views: View[];
+  private combinedViewsIds: string[];
+  private qrsIds: string[];
 
   constructor(
     protected readonly sharedRole: SharedCell,
@@ -22,26 +22,6 @@ export class Role {
     this.setEventListener();
   }
 
-  public loadObject() {
-    const role = this.sharedRole.get() as IRole;
-    this.name = role.name;
-    const tempArray = [];
-
-    role.views.forEach((v) => {
-      const viewId = this.views.findIndex((v2) => v2.getId() === v.id);
-      if (viewId === -1) {
-        tempArray.push(View.from(v, this.factoriesManager));
-      } else {
-        this.views[viewId].update(v);
-        tempArray.push(this.views[viewId]);
-      }
-    });
-    this.views = tempArray;
-
-    this.combinedViewsIds = role.combinedViewsIds;
-    this.qrsIds = role.qrIds;
-  }
-
   private setEventListener() {
     this.sharedRole.on("valueChanged", (e: any) => {
       console.log("Role " + e.name + " changed so loading object.");
@@ -49,69 +29,37 @@ export class Role {
     });
   }
 
+  public loadObject() {
+    const role = this.sharedRole.get() as IRole;
+    this.name = role.name;
+    this.combinedViewsIds = role.combinedViewsIds;
+    this.qrsIds = role.qrIds;
+
+    const tempArray = [];
+
+    role.views.forEach((v) => {
+      const view = this.views.find((v2) => v2.getId() === v.id);
+      if (view) {
+        view.update(v);
+        tempArray.push(view);
+      } else {
+        tempArray.push(View.from(v, this.factoriesManager));
+      }
+    });
+    this.views = tempArray;
+  }
+
   public onChange(listener: () => void) {
     this.sharedRole.on("valueChanged", listener);
   }
 
+  /* GETTERS */
   public getObject(): IRole {
     return this.sharedRole.get();
   }
 
-  public addView(view: View): void {
-    this.views.push(view);
-    this.updateViews(this.views);
-  }
-
-  public removeView(viewId: string): void {
-    const index = this.views.findIndex((view) => view.getId() === viewId);
-
-    if (index != -1) {
-      this.views.splice(index, 1);
-      this.updateViews(this.views);
-    }
-  }
-
-  public updateName(newName: string) {
-    this.sharedRole.set({ ...this.getObject(), name: newName });
-  }
-
-  public updateViews(newViews: View[]) {
-    this.sharedRole.set({
-      ...this.getObject(),
-      views: newViews.map((v) => v.toView()),
-    });
-  }
-
-  public updateIViews(newViews: IView[]) {
-    this.sharedRole.set({
-      ...this.getObject(),
-      views: newViews,
-    });
-  }
-
-  public updateView(view: View) {
-    const index = this.views.findIndex((v) => v.getId() === view.getId());
-
-    if (index == -1) {
-      return;
-    }
-
-    this.views[index] = view;
-    this.updateViews(this.views);
-  }
-
-  public updateCombinedViews(newCombinedViews: string[]) {
-    this.sharedRole.set({
-      ...this.getObject(),
-      combinedViews: newCombinedViews,
-    });
-  }
-
-  public updateQrs(newQrs: string[]) {
-    this.sharedRole.set({
-      ...this.getObject(),
-      qrIds: newQrs,
-    });
+  public getSharedObject(): SharedCell {
+    return this.sharedRole;
   }
 
   public getName(): string {
@@ -148,6 +96,63 @@ export class Role {
 
   public getViewWithCombinedView(cvid: string): View {
     return this.views.find((role) => role.getCombinedViewID() == cvid);
+  }
+
+  public addView(view: View): void {
+    this.views.push(view);
+    this.updateViews(this.views);
+  }
+
+  public removeView(viewId: string): void {
+    const index = this.views.findIndex((view) => view.getId() === viewId);
+
+    if (index !== -1) {
+      this.views.splice(index, 1);
+      this.updateViews(this.views);
+    }
+  }
+
+  public updateName(newName: string) {
+    this.sharedRole.set({ ...this.getObject(), name: newName });
+  }
+
+  public updateViews(newViews: View[]) {
+    this.sharedRole.set({
+      ...this.getObject(),
+      views: newViews.map((v) => v.toView()),
+    });
+  }
+
+  public updateIViews(newViews: IView[]) {
+    this.sharedRole.set({
+      ...this.getObject(),
+      views: newViews,
+    });
+  }
+
+  public updateCombinedViews(newCombinedViews: string[]) {
+    this.sharedRole.set({
+      ...this.getObject(),
+      combinedViews: newCombinedViews,
+    });
+  }
+
+  public updateQrs(newQrs: string[]) {
+    this.sharedRole.set({
+      ...this.getObject(),
+      qrIds: newQrs,
+    });
+  }
+
+  public updateView(view: View) {
+    const index = this.views.findIndex((v) => v.getId() === view.getId());
+
+    if (index == -1) {
+      return;
+    }
+
+    this.views[index] = view;
+    this.updateViews(this.views);
   }
 
   public addCombinedView(cvid: string) {

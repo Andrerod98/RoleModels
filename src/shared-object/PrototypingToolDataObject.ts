@@ -35,7 +35,6 @@ import { IInk, Ink } from "@fluidframework/ink";
 import { InkCanvasFactory } from "./components/InkCanvas";
 import { Role } from "./roles/Role";
 import { IRole } from "./roles/IRole";
-import { QRManager } from "./qrcode/QRManager";
 import { IQRCode } from "./qrcode/IQRCode";
 import { QRCodeController } from "./qrcode/QRCodeController";
 import {
@@ -60,6 +59,8 @@ import {
   StackFactory,
   MapFactory,
 } from "./components";
+import { ThrowableFactory } from "./components/Throwable";
+import { QRsManager } from "./managers/QRsManager";
 
 export class PrototypingToolDataObject
   extends DataObject
@@ -79,7 +80,7 @@ export class PrototypingToolDataObject
 
   /* The Map with the qr codes */
   private qrMap: SharedMap;
-  private qrManager: QRManager;
+  private qrManager: QRsManager;
 
   /* The Manager responsible for rendering components */
   private factoriesManager: FactoriesManager;
@@ -210,7 +211,7 @@ export class PrototypingToolDataObject
     );
 
     /* Creating combined views Manager...*/
-    this.qrManager = new QRManager(this.qrMap);
+    this.qrManager = new QRsManager(this.qrMap);
   }
 
   private registerDefaultFactories() {
@@ -264,6 +265,10 @@ export class PrototypingToolDataObject
     );
     this.factoriesManager.registerFactory(
       new SliderFactory("slider", this.factoriesManager)
+    );
+
+    this.factoriesManager.registerFactory(
+      new ThrowableFactory("throwable", this.factoriesManager)
     );
     this.factoriesManager.registerFactory(
       new InkCanvasFactory("ink", this.ink, this.factoriesManager)
@@ -378,7 +383,7 @@ export class PrototypingToolDataObject
   /**
    * Get the device object for the current device.
    */
-  public getDevice = (): IDevice => this.devicesManager.getDevice();
+  public getDevice = (): IDevice => this.devicesManager.getMyDevice();
 
   /**
    * Get an array of all devices objects for the devices
@@ -391,7 +396,7 @@ export class PrototypingToolDataObject
    * Get a connected device with a role
    */
   public getDevicesByRole = (role: string): IDevice[] =>
-    this.devicesManager.getDevicesByRole(role);
+    this.devicesManager.getDevicesWithRole(role);
 
   /**
    * Returns true if the current device is the manager
@@ -423,7 +428,7 @@ export class PrototypingToolDataObject
    * Updates the properties of a device
    */
   public changeDevice = (device: IDevice): void =>
-    this.devicesManager.changeDevice(device);
+    this.devicesManager.updateDevice(device);
 
   /* ******************************************************** 
                           Ink
@@ -490,9 +495,9 @@ export class PrototypingToolDataObject
 
   public grabView = (view: View): void => {
     this.getViewOwners(view.getId()).forEach((role) => {
-      this.rolesManager.removeView(role.getName(), view.getId());
+      this.rolesManager.getRole(role.getName()).removeView(view.getId());
     });
-    this.rolesManager.addView(this.getMyRole().getName(), view);
+    this.rolesManager.getRole(this.getMyRole().getName()).addView(view);
   };
 
   /* Roles */
@@ -503,7 +508,7 @@ export class PrototypingToolDataObject
 
   public getRole = (role: string): Role => this.rolesManager.getRole(role);
 
-  public getDeviceRole = (): string => this.devicesManager.getDevice().role;
+  public getDeviceRole = (): string => this.devicesManager.getMyDevice().role;
 
   public removeRole(roleName: string) {
     this.rolesManager.removeRole(roleName);
@@ -537,7 +542,7 @@ export class PrototypingToolDataObject
   /**
    * Get the available roles.
    */
-  public getRoles = (): Role[] => this.rolesManager.getRoles();
+  public getRoles = (): IterableIterator<Role> => this.rolesManager.getRoles();
 
   /* ******************************************************** 
                 Combined Views Management Functions
@@ -545,14 +550,14 @@ export class PrototypingToolDataObject
   /**
    * Returns the combined views of the device
    */
-  public getCombinedViews = (): CombinedView[] =>
+  public getCombinedViews = (): IterableIterator<CombinedView> =>
     this.combinedViewsManager.getCombinedViews();
 
   /**
    * Returns the combined views of the device
    */
   public getMyCombinedViews = (): CombinedView[] => {
-    return this.combinedViewsManager.getCombinedViewsWithIds(
+    return this.combinedViewsManager.getCombinedViewsByIds(
       this.getMyRole().getCombinedViewsIds()
     );
   };
@@ -600,7 +605,7 @@ export class PrototypingToolDataObject
   public getCombinedViewsWithIds = (
     combinedViewsIDs: string[]
   ): CombinedView[] => {
-    return this.combinedViewsManager.getCombinedViewsWithIds(combinedViewsIDs);
+    return this.combinedViewsManager.getCombinedViewsByIds(combinedViewsIDs);
   };
 
   private createCombinedView(
@@ -752,7 +757,7 @@ export class PrototypingToolDataObject
   };
 
   public uncombineViews = (combinedView: CombinedView): void => {
-    this.getRoles().forEach((role) => {
+    for (const role of this.getRoles()) {
       if (role.hasViewWithCombinedView(combinedView.getId())) {
         const view = role.getViewWithCombinedView(combinedView.getId());
 
@@ -760,7 +765,7 @@ export class PrototypingToolDataObject
 
         role.updateView(view);
       }
-    });
+    }
     this.combinedViewsMap.delete(combinedView.getId());
     this.combinedViewsManager.removeCombinedView(combinedView.getId());
   };
@@ -775,7 +780,7 @@ export class PrototypingToolDataObject
 
     const rm = {} as { [role: string]: IView };
 
-    this.getRoles().forEach((role) => {
+    for (const role of this.getRoles()) {
       if (role.hasViewWithId(view1New.getId())) {
         rm[role.getName()] = view1New.toView();
 
@@ -785,7 +790,7 @@ export class PrototypingToolDataObject
 
         roles.push(role);
       }
-    });
+    }
 
     const ICombinedView: IMultiViewCombinedView = {
       id: id,

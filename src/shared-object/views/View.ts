@@ -3,8 +3,10 @@ import { IUIComponent, UIComponentController } from "../components/UIComponent";
 import { FactoriesManager } from "../FactoriesManager";
 import { IView } from "./IView";
 
+enum ViewEvents {
+  Changed = "viewChanged",
+}
 export class View extends EventEmitter {
-  private updateEvent: () => void = () => {};
   protected root: UIComponentController;
   constructor(
     protected id: string,
@@ -15,10 +17,10 @@ export class View extends EventEmitter {
     root: IUIComponent
   ) {
     super();
-    this.combinedViewID = combinedViewID;
     this.setRoot(root);
   }
 
+  /* GETTERS */
   public getId() {
     return this.id;
   }
@@ -31,8 +33,24 @@ export class View extends EventEmitter {
     return this.columns;
   }
 
-  public setCombinedViewID(id: string) {
-    this.combinedViewID = id;
+  public getRoot() {
+    return this.root;
+  }
+
+  public getCombinedViewID() {
+    return this.combinedViewID;
+  }
+
+  public getComponentByID(componentId: string) {
+    return this.root.getChildByID(componentId);
+  }
+
+  public isCombined() {
+    return this.combinedViewID !== "";
+  }
+
+  public setCombinedViewID(combinedViewId: string) {
+    this.combinedViewID = combinedViewId;
   }
 
   public setRows(rows: number) {
@@ -47,89 +65,8 @@ export class View extends EventEmitter {
     this.root = this.factoriesManager.getUIComponent(root);
     this.root.on("componentChanged", () => {
       console.log("Component has changed");
-      this.emit("viewChanged", this.getRoot().getSnapshot());
+      this.emitChange(this.getRoot().getSnapshot());
     });
-  }
-
-  public getRoot(): UIComponentController {
-    return this.root;
-  }
-
-  public isCombined() {
-    return this.combinedViewID != "";
-  }
-
-  public getCombinedViewID() {
-    return this.combinedViewID;
-  }
-
-  public getComponentByID(id: string): UIComponentController {
-    return this.root.getChildByID(id);
-  }
-
-  /* public getComponent(id: string): UIComponentController {
-    const node = this.DOM.search(id);
-    if (node == null) {
-      console.error("Component " + id + " does not exist.");
-      return undefined;
-    } else {
-      return node.get();
-    }
-  }
-
-  public addComponent(comp: UIComponentController) {
-    if (
-      this.components.some(
-        (component) => component.component.id === comp.component.id
-      )
-    ) {
-      return console.error(
-        "Component" + comp.component.id + "already exists in the view."
-      );
-    } else {
-      this.components.push(comp);
-    }
-  }
-
-  public addComponents(...comps: UIComponentController[]) {
-    comps.forEach((comp) => {
-      if (
-        !this.components.some(
-          (component) => component.component.id === comp.component.id
-        )
-      )
-        this.components.push(comp);
-    });
-  }
-
-  public defineComponents(comps: UIComponentController[]) {
-    this.components = comps;
-  }
-
-  public updateComponent(component: UIComponentController) {
-    const elem = this.components.find(
-      (c) => c.component.id === component.component.id
-    );
-
-    if (elem === undefined) {
-      console.error("Element not found so it was not updated");
-    }
-
-    elem.update(component.component);
-  }
-*/
-  public toView(): IView {
-    return {
-      id: this.id,
-      rows: this.rows,
-      cols: this.columns,
-      combinedViewID: this.combinedViewID,
-      root: this.root.get(),
-    };
-  }
-
-  public onUpdate(listener: () => void) {
-    this.updateEvent = listener;
   }
 
   public update(object: IView) {
@@ -139,16 +76,18 @@ export class View extends EventEmitter {
     this.combinedViewID = object.combinedViewID;
 
     this.setRoot(object.root);
-    //this.root.update(object.root);
 
-    if (this.updateEvent !== undefined) this.updateEvent();
+    this.emitChange();
   }
 
-  public updateRoot(object: IUIComponent) {
-    this.setRoot(object);
-    //this.root.update(object.root);
-
-    if (this.updateEvent !== undefined) this.updateEvent();
+  public toView(): IView {
+    return {
+      id: this.id,
+      rows: this.rows,
+      cols: this.columns,
+      combinedViewID: this.combinedViewID,
+      root: this.root.getSnapshot(),
+    };
   }
 
   static from(object: IView, factoriesManager: FactoriesManager) {
@@ -162,5 +101,11 @@ export class View extends EventEmitter {
     );
 
     return view;
+  }
+
+  /* Callback functions */
+
+  private emitChange(data?: any) {
+    this.emit(ViewEvents.Changed, data);
   }
 }

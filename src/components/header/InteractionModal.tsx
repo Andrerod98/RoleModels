@@ -33,7 +33,11 @@ export const TestInteractionModal: FC<FocusButtonProps> = (
 ) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const [view, setView] = useState({ view: undefined, from: "" });
+  const [view, setView] = useState({
+    view: undefined,
+    combinedView: undefined,
+    from: "",
+  });
 
   return (
     <>
@@ -45,7 +49,7 @@ export const TestInteractionModal: FC<FocusButtonProps> = (
         icon={<Icon as={AiOutlineExpand} />}
         onClick={() => {
           onOpen();
-          setView({ view: undefined, from: "" });
+          setView({ view: undefined, combinedView: undefined, from: "" });
         }}
       />
       <Modal isOpen={isOpen} onClose={onClose} size={"full"}>
@@ -250,13 +254,20 @@ export const TestInteractionModal: FC<FocusButtonProps> = (
                             .getSharedObject()
                             .getView(value);
                           console.log({ view: view, from: from });
-                          setView({ view: view, from: from });
+                          setView({
+                            view: view,
+                            combinedView: undefined,
+                            from: from,
+                          });
                         } else if (data.startsWith("qr/")) {
                           const value = data.substr(3);
                           props.app.getSharedObject().getQRCode(value).scan();
                           onClose();
                         } else if (data.startsWith("combined/view/")) {
-                          const value = data.substr(14);
+                          const subStr = data.substr(14).split("#from=");
+                          const value = subStr[0];
+                          const from = subStr[1];
+                          console.log(from);
                           props.app
                             .getSharedObject()
                             .getMyRole()

@@ -34,7 +34,8 @@ export interface IMultiCombinedViewManager {
 
 export class MultiCombinedView
   extends CombinedView
-  implements IMultiCombinedViewManager {
+  implements IMultiCombinedViewManager
+{
   roleMap: Map<string, View>;
   public constructor(
     protected readonly combinedView: SharedCell,
@@ -43,19 +44,22 @@ export class MultiCombinedView
     super(combinedView);
     this.roleMap = new Map<string, View>();
 
-    this.loadObject();
+    this.initializeObject();
     this.setEventListener();
   }
 
-  private loadObject() {
+  private initializeObject() {
     Object.keys(this.combinedView.get().roleMap).forEach((role) =>
-      this.roleMap.set(role, View.from(this.combinedView.get().roleMap[role], this.factoriesManager))
+      this.roleMap.set(
+        role,
+        View.from(this.combinedView.get().roleMap[role], this.factoriesManager)
+      )
     );
   }
   /* Loads all the objects in the shared Cell */
   setEventListener() {
     this.combinedView.on("valueChanged", () => {
-      this.loadObject();
+      this.updateObjects();
     });
   }
 

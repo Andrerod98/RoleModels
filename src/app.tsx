@@ -6,7 +6,9 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { CrossDeviceApplication } from "./CrossDeviceApplication";
 import { ErrorPage } from "./ErrorPage";
+
 import { LandingPage } from "./LandingPage";
+
 import Utils from "./utils/Utils";
 
 const HASH = window.location.hash.substring(1);
@@ -14,15 +16,15 @@ const HASH_PARTS = Utils.getURLHashParts(HASH);
 const PROJECT_NAME = HASH_PARTS["project"];
 const IP = window.location.hostname;
 
-/*ReactDOM.render(
+/*
+ReactDOM.render(
   <ChakraProvider resetCSS>
-    <Box w={"100px"} h={"100px"} overflow={"hidden"}>
-      <Stitching rows={4} columns={4} position={1} />
-    </Box>
+    <Decay />
   </ChakraProvider>,
 
   document.getElementById("content")
-);*/
+);
+*/
 
 if (PROJECT_NAME === undefined) {
   ReactDOM.render(

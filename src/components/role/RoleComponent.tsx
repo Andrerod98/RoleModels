@@ -23,7 +23,7 @@ import { CrossDeviceApplication } from "../../CrossDeviceApplication";
 import { CombinedView } from "../../shared-object/combined-views/combined-view";
 import { QRCodeController } from "../../shared-object/qrcode/QRCodeController";
 import { View } from "../../shared-object/views/View";
-import { ViewComponent } from "../../shared-object/views/ViewComponent";
+import { ViewComponent } from "../view/ViewComponent";
 import { Role } from "../../shared-object/roles/Role";
 import { StitchingCombinedView } from "../../shared-object/combined-views/stitching-combined-view/StitchingCombinedView";
 import { Stitching } from "../../Stitching";
@@ -122,7 +122,7 @@ export const RoleComponent: FC<RoleProps> = (props: RoleProps) => {
         <Header
           app={props.app}
           myRole={model.getDeviceRole()}
-          roles={model.getRoles().map((role) => role.getName())}
+          roles={Array.from(model.getRoles()).map((role) => role.getName())}
           onManagerClick={async () => {
             model.promoteToManager();
           }}

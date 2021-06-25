@@ -38,7 +38,7 @@ interface SingleTabProps {
 export const SingleTab = (props: SingleTabProps) => {
   const [curTab, setCurTab] = useState("default");
 
-  const tabs = props.app.getSharedObject().getRoles();
+  const tabs = Array.from(props.app.getSharedObject().getRoles());
 
   const curIndex = tabs.findIndex((tab) => tab.getName() === curTab);
 

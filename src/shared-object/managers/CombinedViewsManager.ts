@@ -8,6 +8,10 @@ import { MultiCombinedView } from "../combined-views/multi-combined-view";
 import EventEmitter from "events";
 import { StitchingCombinedView } from "../combined-views/stitching-combined-view/StitchingCombinedView";
 
+enum CombinedViewsManagerEvents {
+  ChangeState = "changeState",
+}
+
 /* This class is responsible for managing the combined views */
 export class CombinedViewsManager extends EventEmitter {
   private combinedViews: Map<String, CombinedView>;
@@ -25,81 +29,16 @@ export class CombinedViewsManager extends EventEmitter {
     this.lastCommit = 0;
   }
 
+  /* Defines the event listeners needed */
   private setEventListener() {
-    this.combinedViewsSharedMap.on("valueChanged", async (e: any, ...args) => {
+    this.combinedViewsSharedMap.on("valueChanged", async () => {
       this.lastCommit++;
-      console.log("Loading combined view.");
       await this.loadCombinedViews(this.lastCommit);
-
-      this.emit("changeState");
-      /* const combinedViewID = e.key;
-      if (e.previousValue === undefined) {
-        // added
-        const sharedCell = await this.combinedViewsSharedMap
-          .get<IFluidHandle<SharedCell>>(combinedViewID)
-          .get();
-
-        this.addCombinedView(sharedCell);
-        sharedCell.on("valueChanged", () => {
-          this.emit("changeState");
-        });
-
-        // this.roles.set(roleName, new Role(sharedCell, this.factoriesManager));
-        // console.log("Adding " + roleName + " from map");
-      }*/
+      this.emitChange();
     });
   }
 
-  public removeCombinedView(id: string): void {
-    this.combinedViews.delete(id);
-  }
-
-  public addCombinedView(sharedCombinedView: SharedCell): CombinedView {
-    const id = sharedCombinedView.get().id;
-
-    if (this.combinedViews.has(id)) {
-      return;
-    }
-    /* Get Combined View */
-    const combinedView = this.combinedViewsFactory.getCombinedView(
-      sharedCombinedView,
-      this.factoriesManager
-    );
-
-    /* Insert in shared map */
-    // this.combinedViewsSharedMap.set(id, sharedCombinedView.handle);
-
-    this.combinedViews.set(id, combinedView);
-
-    return combinedView;
-  }
-
-  public loadCombinedView(
-    sharedCombinedView: SharedCell
-  ): CombinedView | CombinedView {
-    const combinedView = sharedCombinedView.get();
-    let cv: CombinedView;
-    if (this.combinedViews.has(combinedView.name)) {
-      cv = this.combinedViews.get(combinedView.name);
-      cv.updateObjects();
-    } else {
-      cv = this.combinedViewsFactory.getCombinedView(
-        sharedCombinedView,
-        this.factoriesManager
-      );
-
-      this.combinedViews.set(cv.getId(), cv);
-    }
-    sharedCombinedView.off("valueChanged", () => {
-      this.emit("changeState", "Cell of " + name + " changed.");
-    });
-    sharedCombinedView.on("valueChanged", () => {
-      this.emit("changeState", "Cell of " + name + " changed.");
-    });
-
-    return cv;
-  }
-
+  /* Loads the combined views from the shared combined views map */
   public async loadCombinedViews(commit: number) {
     const promises = [];
     for (const handle of this.combinedViewsSharedMap.values()) {
@@ -113,7 +52,7 @@ export class CombinedViewsManager extends EventEmitter {
     }
     const newCVS = new Map<string, CombinedView>();
     combinedViews.forEach((combinedView) => {
-      if (combinedView !== undefined) {
+      if (combinedView) {
         const cv = this.loadCombinedView(combinedView);
         newCVS.set(cv.getId(), cv);
       }
@@ -123,18 +62,58 @@ export class CombinedViewsManager extends EventEmitter {
     console.log(this.combinedViewsSharedMap.size + " Combined Views Loaded.");
   }
 
-  public has(id: string): boolean {
-    return this.combinedViewsSharedMap.has(id);
+  /* Load a combined view from the shared combined view */
+  public loadCombinedView(sharedCombinedView: SharedCell): CombinedView {
+    const combinedViewValue = sharedCombinedView.get();
+    let combinedView: CombinedView;
+    if (this.combinedViews.has(combinedViewValue.name)) {
+      combinedView = this.combinedViews.get(combinedViewValue.name);
+      combinedView.updateObjects();
+    } else {
+      combinedView = this.combinedViewsFactory.getCombinedView(
+        sharedCombinedView,
+        this.factoriesManager
+      );
+
+      this.combinedViews.set(combinedView.getId(), combinedView);
+    }
+    sharedCombinedView.off("valueChanged", () => {
+      this.emitChange("Cell of " + combinedViewValue.name + " changed.");
+    });
+    sharedCombinedView.on("valueChanged", () => {
+      this.emitChange("Cell of " + combinedViewValue.name + " changed.");
+    });
+
+    return combinedView;
   }
 
+  /* GETTERS */
+
+  /* Returns all the combined views */
+  public getCombinedViews(): IterableIterator<CombinedView> {
+    return this.combinedViews.values();
+  }
+
+  /* Returns all the combined views with ids */
+  public getCombinedViewsByIds(cvids: string[]): CombinedView[] {
+    const result = [];
+    cvids.forEach((id) => {
+      const cv = this.combinedViews.get(id);
+
+      if (cv) result.push(cv);
+    });
+    return result;
+  }
+
+  /* Get a combined view by id */
   public getCombinedView(
-    id: string
+    combinedViewId: string
   ):
     | CombinedView
     | SingleCombinedView
     | MultiCombinedView
     | StitchingCombinedView {
-    const cv = this.combinedViews.get(id);
+    const cv = this.combinedViews.get(combinedViewId);
     console.log(cv);
     if (cv instanceof StitchingCombinedView) return cv as StitchingCombinedView;
     else if (cv instanceof SingleCombinedView) return cv as SingleCombinedView;
@@ -143,17 +122,45 @@ export class CombinedViewsManager extends EventEmitter {
     return cv;
   }
 
-  public getCombinedViews(): CombinedView[] {
-    return Array.from(this.combinedViews.values());
+  /* Checks if the combined view exists */
+  public hasCombinedView(combinedViewId: string): boolean {
+    return this.combinedViewsSharedMap.has(combinedViewId);
   }
 
-  public getCombinedViewsWithIds(cvids: string[]): CombinedView[] {
-    const result = [];
-    cvids.forEach((id) => {
-      const cv = this.combinedViews.get(id);
+  /* Removes a combined view */
+  public removeCombinedView(combinedViewId: string): void {
+    this.combinedViews.delete(combinedViewId);
+    this.combinedViewsSharedMap.delete(combinedViewId);
+  }
 
-      if (cv !== undefined) result.push(cv);
-    });
-    return result;
+  /*
+   * Adds a combined view to the combined views map and combined views shared map
+   */
+  public addCombinedView(sharedCombinedView: SharedCell): CombinedView {
+    const sharedCombinedViewValue = sharedCombinedView.get().id;
+    const id = sharedCombinedViewValue.id;
+    if (this.combinedViewsSharedMap.has(id)) {
+      console.error("The role " + id + " already exists.");
+      return;
+    }
+
+    /* Insert in shared map */
+    this.combinedViewsSharedMap.set(id, sharedCombinedView.handle);
+
+    /* Get Combined View */
+    const combinedView = this.combinedViewsFactory.getCombinedView(
+      sharedCombinedView,
+      this.factoriesManager
+    );
+
+    this.combinedViews.set(id, combinedView);
+
+    return combinedView;
+  }
+
+  /* Callback functions */
+
+  private emitChange(message?: string) {
+    this.emit(CombinedViewsManagerEvents.ChangeState, message);
   }
 }

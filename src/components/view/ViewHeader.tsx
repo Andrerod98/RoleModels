@@ -17,7 +17,7 @@ import {
 import React from "react";
 import { GrUnlink } from "react-icons/gr";
 import { ImQrcode } from "react-icons/im";
-import { StitchingCombinedView } from "../combined-views/stitching-combined-view/StitchingCombinedView";
+import { StitchingCombinedView } from "../../shared-object/combined-views/stitching-combined-view/StitchingCombinedView";
 
 const QRCode = require("qrcode.react");
 

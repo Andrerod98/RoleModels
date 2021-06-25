@@ -39,7 +39,7 @@ export class SingleCombinedView
     protected readonly factoriesManager: FactoriesManager
   ) {
     super(combinedView);
-    this.loadObject();
+    this.initializeObject();
     this.setEventListener();
   }
 
@@ -52,12 +52,12 @@ export class SingleCombinedView
     return this.view;
   }
 
-  private loadObject() {
+  private initializeObject() {
     this.view = View.from(this.getCombinedView().view, this.factoriesManager);
     this.view.on("viewChanged", (root) => {
       console.log("Updating state, snapshot =");
       console.log(root);
-      this.view.updateRoot(root);
+      this.view.setRoot(root);
       this.updateView();
     });
   }

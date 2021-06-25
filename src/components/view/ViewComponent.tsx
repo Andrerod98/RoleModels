@@ -16,9 +16,9 @@ import React from "react";
 import { FC } from "react";
 // import { UIComponentFactory } from "../components/UIComponentFactory";
 import { ImQrcode } from "react-icons/im";
-import { CombinedView } from "../combined-views/combined-view";
-import { Role } from "../roles/Role";
-import { View } from "./View";
+import { CombinedView } from "../../shared-object/combined-views/combined-view";
+import { Role } from "../../shared-object/roles/Role";
+import { View } from "../../shared-object/views/View";
 const QRCode = require("qrcode.react");
 
 interface ViewComponentProps {

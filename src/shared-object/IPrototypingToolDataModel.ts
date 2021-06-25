@@ -17,7 +17,7 @@ export interface IPrototypingToolDataModel extends EventEmitter {
   getRole: (role: string) => Role;
   getMyRole: () => Role;
   getDeviceRole: () => string;
-  getRoles: () => Role[];
+  getRoles: () => IterableIterator<Role>;
   promoteToRole: (role: string, deviceId?: string) => void;
 
   promoteToManager: () => void;
@@ -28,7 +28,7 @@ export interface IPrototypingToolDataModel extends EventEmitter {
   getId: () => string;
 
   /* UI */
-  getCombinedViews: () => CombinedView[];
+  getCombinedViews: () => IterableIterator<CombinedView>;
 
   on(event: "change", listener: () => void): this;
   off(event: "change", listener: () => void): this;

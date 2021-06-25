@@ -99,7 +99,7 @@ export const ManagerComponent: FC<ManagerComponentProps> = (props) => {
         <Header
           app={props.app}
           myRole={model.getDeviceRole()}
-          roles={model.getRoles().map((role) => role.getName())}
+          roles={Array.from(model.getRoles()).map((role) => role.getName())}
           onManagerClick={async () => {
             // props.model.promoteToManager();
           }}
@@ -201,7 +201,7 @@ export const ManagerComponent: FC<ManagerComponentProps> = (props) => {
                         {device.role}
                       </MenuButton>
                       <MenuList key={"menu-list-" + index}>
-                        {model.getRoles().map((role, index2) => (
+                        {Array.from(model.getRoles()).map((role, index2) => (
                           <MenuItem
                             key={"menu-item-" + index2}
                             onClick={(srole) =>
