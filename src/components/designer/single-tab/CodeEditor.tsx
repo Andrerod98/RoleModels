@@ -38,12 +38,13 @@ export const CodeEditor: React.FC<CodeEditorProps> = (
       mode={"json"}
       theme={colorMode === "light" ? "chrome" : "nord_dark"}
       enableSnippets={true}
-      height={"100%"}
+      height={"95%"}
       fontSize={14}
       onChange={props.onChange}
       onCursorChange={props.onFocus}
       value={props.value}
       name={"new_ace"}
+      width={"98%"}
       editorProps={{ $blockScrolling: true }}
       showPrintMargin={true}
       showGutter={true}

@@ -20,12 +20,15 @@ import {
   EditableInput,
   EditablePreview,
   useTab,
+  useDisclosure,
+  Heading,
 } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { CrossDeviceApplication } from "../../../CrossDeviceApplication";
 import { Role } from "../../../shared-object/roles/Role";
 import { View } from "../../../shared-object/views/View";
 import Utils from "../../../utils/Utils";
+import { LayoutModal } from "../../header/LayoutModal";
 import { ComponentsExamples } from "../ComponentsExamples";
 
 import { SingleTabCatalogBar } from "./CatalogBar";
@@ -96,7 +99,7 @@ export const SingleTab = (props: SingleTabProps) => {
   console.log("render");
 
   return (
-    <Box h={"100%"} overflow={"hidden"}>
+    <Box h={"100%"}>
       <Tabs
         size={"sm"}
         variant={"enclosed"}
@@ -109,7 +112,7 @@ export const SingleTab = (props: SingleTabProps) => {
         index={curIndex === -1 ? 0 : curIndex}
       >
         <Box>
-          <TabList pl={5}>
+          <TabList pl={10}>
             {tabs.map((tab, index) => (
               <CustomTab
                 key={"tab-" + index}
@@ -136,7 +139,7 @@ export const SingleTab = (props: SingleTabProps) => {
             </Tab>
           </TabList>
         </Box>
-        <TabPanels h={"100%"}>
+        <TabPanels h={"calc(100vh - 52px)"}>
           {tabs.map((tab, index) => (
             <TabPanel key={"tab-panel-" + index} p={0} h={"100%"}>
               <MemoizedRole role={tab} app={props.app} />
@@ -156,7 +159,11 @@ const CustomTab = (props: any) => {
   const isSelected = !!tabProps["aria-selected"];
 
   return (
-    <Tab {...tabProps} _hover={{ bg: "gray.200" }}>
+    <Tab
+      {...tabProps}
+      _hover={{ bg: "gray.200" }}
+      bg={isSelected ? "gray.100" : "white"}
+    >
       <Box>
         <Flex my={"2px"} mx={"1px"}>
           {isSelected ? (
@@ -208,10 +215,14 @@ export function RoleTab(props: RoleTabProps) {
   );
   const [cursorPosition, setCursorPosition] = useState({ row: 0, column: 0 });
   const [alert, setAlert] = useState(false);
+  const [newViewId, setNewViewId] = useState("");
+  const [selectedNode, setSelectedNode] = useState("");
+
+  const { isOpen, onClose, onOpen } = useDisclosure();
 
   console.log("RENDERED");
 
-  const preview = (newValue?: string) => {
+  const preview = (newValue?: string, nvid?: string) => {
     console.log("Preview");
     //props.project.stringToViews(value)
 
@@ -232,14 +243,19 @@ export function RoleTab(props: RoleTabProps) {
     switch (name) {
       case "view":
         console.log(json);
+        const newView = ComponentsExamples.getView();
         if (Utils.jsonToString(json) === "{}") {
-          json = [ComponentsExamples.getView()];
+          json = [newView];
         } else {
-          json = [...json, ComponentsExamples.getView()];
+          json = [...json, newView];
         }
-        //
+        //Open layout modal
+
         setValue(Utils.jsonToString(json));
         preview(Utils.jsonToString(json));
+        setNewViewId(newView.id);
+        onOpen();
+
         return;
       case "image":
         object = ComponentsExamples.getImage();
@@ -354,11 +370,41 @@ export function RoleTab(props: RoleTabProps) {
     setValue(Utils.jsonToString(props.role.getViews().map((v) => v.toView())));
   };
   return (
-    <Box>
-      <SingleTabCatalogBar onClick={(element) => addUIComponent(element)} />
+    <Box h={"100%"} bg={"gray.100"}>
+      <Flex h={"100%"} bg={"gray.100"}>
+        <SingleTabCatalogBar onClick={(element) => addUIComponent(element)} />
 
-      <Flex h={"100%"}>
-        <Box boxShadow={"xs"} mr={"10px"}>
+        <Box flex={"1"} py={3} overflow={"hidden"} bg={"gray.100"} mb={"30px"}>
+          <Heading
+            as={"h5"}
+            px={5}
+            fontSize={"12px"}
+            textAlign={"left"}
+            mb={"5px"}
+          >
+            PREVIEW
+          </Heading>
+          <Center h={"100%"} bg={"gray.700"} w={"100%"}>
+            <Previewer
+              onChangeView={handleChangeView}
+              onChangeViews={handleChangeViews}
+              layout={props.role.getLayout()}
+              role={props.role}
+              app={props.app}
+              isOpenLayoutModal={isOpen}
+              handleClick={() => {
+                preview();
+              }}
+              setSelected={(newSelected: string) => {
+                console.log("SETTING SELECTED NODE");
+                setSelectedNode(newSelected);
+              }}
+              selectedNode={selectedNode}
+            />
+            {}
+          </Center>
+        </Box>
+        <Box>
           {alert ? (
             <Alert status={"error"}>
               <AlertIcon />
@@ -377,28 +423,37 @@ export function RoleTab(props: RoleTabProps) {
           ) : (
             <></>
           )}
-          <CodeEditor
-            title={"UI"}
-            value={value}
-            onChange={handleChange}
-            onFocus={handleFocus}
-          />
-        </Box>
-
-        <Box flex={"1"} overflow={"auto"}>
-          <Center>
-            <Previewer
-              onChangeView={handleChangeView}
-              onChangeViews={handleChangeViews}
-              views={views}
-              handleClick={() => {
-                preview();
-              }}
+          <Box h={"100%"} py={3} width={"400px"} bg={"gray.100"} mb={"20px"}>
+            <Heading
+              as={"h5"}
+              px={5}
+              fontSize={"12px"}
+              textAlign={"left"}
+              mb={"5px"}
+            >
+              SOURCE
+            </Heading>
+            <CodeEditor
+              title={"UI"}
+              value={value}
+              onChange={handleChange}
+              onFocus={handleFocus}
             />
-            {}
-          </Center>
+          </Box>
         </Box>
       </Flex>
+      <LayoutModal
+        layout={props.role.getLayout()}
+        newViewId={newViewId}
+        isOpen={isOpen}
+        onOpen={onOpen}
+        onClose={onClose}
+        setSelected={(newSelected: string) => {
+          console.log("SELECTED NEW");
+          setSelectedNode(newSelected);
+        }}
+        selectedNode={selectedNode}
+      />
     </Box>
   );
 }

@@ -7,26 +7,26 @@ import { useEffect, useState } from "react";
 
 import { IoRefresh } from "react-icons/io5";
 import { FullScreenWrapper } from "./FullScreenWrapper";
-import { Preview } from "./Preview";
 import React from "react";
 import { View } from "../../../../shared-object/views/View";
+import { Preview } from "./Preview";
+import { LayoutNode } from "../../../../shared-object/roles/Layout";
+import { CrossDeviceApplication } from "../../../../CrossDeviceApplication";
+import { Role } from "../../../../shared-object/roles/Role";
 interface PreviewerProps {
-  views: View[];
+  layout: LayoutNode;
+  app: CrossDeviceApplication;
+  role: Role;
+  isOpenLayoutModal: boolean;
   handleClick: () => void;
   onChangeView: (newView: View) => void;
   onChangeViews: (newViews: View[]) => void;
+  selectedNode: string;
+  setSelected: (newSelected: string) => void;
 }
 
 export const Previewer = (props: PreviewerProps) => {
-  const [items, setItems] = useState(
-    props.views.map((v: View) => ({ id: uuidv4(), view: v }))
-  );
-
-  useEffect(() => {
-    setItems(props.views.map((v: View) => ({ id: uuidv4(), view: v })));
-  }, [props.views]);
-
-  //console.trace("PREVIEWER RENDER");
+  const [items, setItems] = useState([]);
 
   const handleItemDelete = (i: any) => {
     const index = items.findIndex((item: any) => item.id === i.id);
@@ -69,7 +69,7 @@ export const Previewer = (props: PreviewerProps) => {
 
   return (
     <Box w={"100%"} h={"100%"} m={2}>
-      <Box position={"relative"} w={"100%"} h={"100%"} mb={"15px"}>
+      <Box position={"relative"} w={"100%"} h={"100%"} mx={"15px"} my={"15px"}>
         <Flex>
           <IconButton
             aria-label={"Search database"}
@@ -84,7 +84,12 @@ export const Previewer = (props: PreviewerProps) => {
             <Preview
               width={"100%"}
               height={"100%"}
-              items={items}
+              layout={props.layout}
+              selectedNode={props.selectedNode}
+              setSelected={props.setSelected}
+              isOpenLayoutModal={props.isOpenLayoutModal}
+              app={props.app}
+              role={props.role}
               onItemMove={handleItemMove}
               onItemChange={handleItemChange}
               onItemDelete={handleItemDelete}
@@ -92,7 +97,7 @@ export const Previewer = (props: PreviewerProps) => {
           </FullScreenWrapper>
         </Flex>
         <Box
-          w={"920px"}
+          w={"100%"}
           h={"500px"}
           boxShadow={"xs"}
           bg={colorMode === "light" ? "white" : "gray.700"}
@@ -100,9 +105,17 @@ export const Previewer = (props: PreviewerProps) => {
           position={"relative"}
         >
           <Preview
-            width={"920px"}
+            width={"100%"}
             height={"500px"}
-            items={items}
+            layout={props.layout}
+            app={props.app}
+            role={props.role}
+            selectedNode={props.selectedNode}
+            isOpenLayoutModal={props.isOpenLayoutModal}
+            setSelected={(newSelected: string) => {
+              console.log("SELECTED");
+              props.setSelected(newSelected);
+            }}
             onItemMove={handleItemMove}
             onItemChange={handleItemChange}
             onItemDelete={handleItemDelete}

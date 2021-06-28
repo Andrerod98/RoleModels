@@ -121,6 +121,7 @@ export class PrototypingToolDataObject
       views: [],
       combinedViewsIds: [],
       qrIds: [],
+      layout: { name: "div" },
     } as IRole);
 
     const designerRole = SharedCell.create(this.runtime);
@@ -130,6 +131,7 @@ export class PrototypingToolDataObject
       views: [],
       combinedViewsIds: [],
       qrIds: [],
+      layout: { name: "div" },
     } as IRole);
 
     const defaultRole = SharedCell.create(this.runtime);
@@ -139,6 +141,7 @@ export class PrototypingToolDataObject
       views: [],
       combinedViewsIds: [],
       qrIds: [],
+      layout: { name: "div" },
     } as IRole);
 
     rolesMap.set("manager", managerRole.handle);
@@ -532,6 +535,7 @@ export class PrototypingToolDataObject
       views: [],
       combinedViewsIds: [],
       qrIds: [],
+      layout: { name: "div" },
     } as IRole);
 
     this.rolesManager.addRole(sharedRole);

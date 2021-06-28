@@ -4,10 +4,12 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import React from "react";
 import ReactDOM from "react-dom";
+import { LayoutModal } from "./components/header/LayoutModal";
 import { CrossDeviceApplication } from "./CrossDeviceApplication";
 import { ErrorPage } from "./ErrorPage";
 
 import { LandingPage } from "./LandingPage";
+import { LayoutNode } from "./shared-object/roles/Layout";
 
 import Utils from "./utils/Utils";
 
@@ -17,9 +19,14 @@ const PROJECT_NAME = HASH_PARTS["project"];
 const IP = window.location.hostname;
 
 /*
+const layout = new LayoutNode({
+  name: "view",
+  viewId: "view",
+});
+
 ReactDOM.render(
   <ChakraProvider resetCSS>
-    <Decay />
+    <LayoutModal layout={layout} selectedNode={"view"} />
   </ChakraProvider>,
 
   document.getElementById("content")

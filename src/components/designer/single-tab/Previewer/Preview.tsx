@@ -1,4 +1,4 @@
-import { Grid } from "@chakra-ui/react";
+import { Box, Flex, Grid, layout } from "@chakra-ui/react";
 import {
   closestCenter,
   DndContext,
@@ -14,7 +14,12 @@ import {
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
 import React, { useState } from "react";
+import { CrossDeviceApplication } from "../../../../CrossDeviceApplication";
+import { ILayoutNode } from "../../../../shared-object/roles/ILayout";
+import { LayoutNode } from "../../../../shared-object/roles/Layout";
+import { Role } from "../../../../shared-object/roles/Role";
 import { View } from "../../../../shared-object/views/View";
+import { ViewComponent } from "../../../view/ViewComponent";
 import { SortableViewItem } from "./SortableViewItem";
 import { ViewItemOverlay } from "./ViewItemOverlay";
 
@@ -23,101 +28,87 @@ interface ItemView {
   view: View;
 }
 interface PreviewProps {
+  layout: LayoutNode;
   width: string;
   height: string;
-  items: ItemView[];
+  app: CrossDeviceApplication;
+  role: Role;
+  selectedNode: string;
+  isOpenLayoutModal: boolean;
+  setSelected: (newSelected: string) => void;
   onItemChange: (item: ItemView, rows: number, cols: number) => void;
   onItemDelete: (item: ItemView) => void;
   onItemMove: (fromId: number, toId: number) => void;
 }
 export const Preview = (props: PreviewProps) => {
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
+  const generateWidget = (node: ILayoutNode): JSX.Element => {
+    switch (node.name) {
+      case "div":
+        return (
+          <Flex w={"100%"} h={"100%"} mx={"5px"} direction={"column"}>
+            {node.children.map((child) => {
+              return generateWidget(child);
+            })}
+          </Flex>
+        );
+      case "flex":
+        return (
+          <Flex w={"100%"} h={"100%"} grow={1} my={"5px"} direction={"row"}>
+            {node.children.map((child) => {
+              return generateWidget(child);
+            })}
+          </Flex>
+        );
+      case "view":
+        const [view, combinedView] = props.app.getViewOrCombinedView(
+          props.role.getName(),
+          node.viewId
+        );
 
-  function handleDragEnd(event: any) {
-    const { active, over } = event;
-    if (active.id !== over.id) {
-      props.onItemMove(active.id, over.id);
-    }
-    setActiveIndex(-1);
-  }
-
-  function handleDragStart(event: any) {
-    const index = props.items.findIndex((item) => item.id === event.active.id);
-    setActiveIndex(index);
-  }
-
-  const [activeIndex, setActiveIndex] = useState(-1);
-
-  return (
-    <Grid
-      h={props.height}
-      w={props.width}
-      overflow={"hidden"}
-      templateRows={"repeat(12, 1fr)"}
-      templateColumns={"repeat(12, 1fr)"}
-      gap={2}
-    >
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-        onDragStart={handleDragStart}
-        layoutMeasuring={LayoutMeasuringStrategy.Always as any}
-      >
-        <SortableContext items={props.items}>
-          {props.items.map((item: ItemView) => (
-            <SortableViewItem
-              key={"sortable-item" + item.id}
-              id={item.id}
-              view={item.view}
-              onClickRight={() => {
-                props.onItemChange(item, 1, 0);
-              }}
-              onClickBottom={() => {
-                props.onItemChange(item, 0, 1);
-              }}
-              onClickTop={() => {
-                props.onItemChange(item, 0, -1);
-              }}
-              onClickLeft={() => {
-                props.onItemChange(item, -1, 0);
-              }}
-              onClickTopLeft={() => {
-                props.onItemChange(item, -1, -1);
-              }}
-              onClickBottomRight={() => {
-                props.onItemChange(item, 1, 1);
-              }}
-              onClose={() => {
-                props.onItemDelete(item);
-              }}
-              activeIndex={activeIndex}
+        return (
+          <Box
+            w={"100%"}
+            h={"100%"}
+            m={"5px"}
+            position={"relative"}
+            onClick={() => {
+              if (props.isOpenLayoutModal) {
+                console.log("SELECTED");
+                props.setSelected(node.viewId);
+              }
+            }}
+          >
+            <ViewComponent
+              key={props.app.getMyRole().getName() + "_view_" + node.viewId}
+              view={view}
+              combinedView={combinedView}
+              role={props.role}
             />
-          ))}
-        </SortableContext>
-        <DragOverlay>
-          {activeIndex != -1 ? (
-            <Grid
-              h={props.height}
-              w={props.width}
-              overflow={"hidden"}
-              templateRows={"repeat(12, 1fr)"}
-              templateColumns={"repeat(12, 1fr)"}
-              gap={2}
-            >
-              <ViewItemOverlay
-                id={"" + activeIndex}
-                view={props.items[activeIndex].view}
-              />
-            </Grid>
-          ) : null}
-        </DragOverlay>
-      </DndContext>
-    </Grid>
+            <Box
+              _hover={
+                props.isOpenLayoutModal ? { bg: "rgba(0,0,255,0.1)" } : {}
+              }
+              bg={
+                props.selectedNode === node.viewId && props.isOpenLayoutModal
+                  ? "blue.400"
+                  : "transparent"
+              }
+              w={"100%"}
+              h={"100%"}
+              position={"absolute"}
+              top={0}
+              left={0}
+              zIndex={200}
+            />
+          </Box>
+        );
+      default:
+        return <></>;
+    }
+  };
+  return (
+    <Box h={props.height} w={props.width} overflow={"hidden"}>
+      {generateWidget(props.layout)}
+    </Box>
   );
 };

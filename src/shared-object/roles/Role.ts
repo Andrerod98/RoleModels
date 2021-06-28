@@ -2,13 +2,17 @@ import { SharedCell } from "@fluidframework/cell";
 import { FactoriesManager } from "../FactoriesManager";
 import { IView } from "../views/IView";
 import { View } from "../views/View";
+import { ILayoutNode } from "./ILayout";
 import { IRole } from "./IRole";
+import { LayoutNode } from "./Layout";
 
 export class Role {
   private name: string;
   private views: View[];
   private combinedViewsIds: string[];
   private qrsIds: string[];
+  private layout: LayoutNode;
+  private selectedNode: string;
 
   constructor(
     protected readonly sharedRole: SharedCell,
@@ -18,6 +22,7 @@ export class Role {
     this.views = [];
     this.combinedViewsIds = [];
     this.qrsIds = [];
+    this.selectedNode = "";
     this.loadObject();
     this.setEventListener();
   }
@@ -34,6 +39,13 @@ export class Role {
     this.name = role.name;
     this.combinedViewsIds = role.combinedViewsIds;
     this.qrsIds = role.qrIds;
+
+    if (this.layout) this.layout.removeAllListeners();
+
+    this.layout = new LayoutNode(role.layout);
+    this.layout.getRoot().on("change", (l) => {
+      this.updateLayout(this.layout.getSnapshot());
+    });
 
     const tempArray = [];
 
@@ -66,6 +78,10 @@ export class Role {
     return this.name;
   }
 
+  public getLayout() {
+    return this.layout;
+  }
+
   public getViews(): View[] {
     return this.views;
   }
@@ -80,6 +96,10 @@ export class Role {
 
   public getView(viewId: string): View {
     return this.views.find((view) => view.getId() === viewId);
+  }
+
+  public getSelectedLayoutNode() {
+    return this.layout.getChildByID(this.selectedNode);
   }
 
   public hasView(view: View): boolean {
@@ -107,6 +127,7 @@ export class Role {
     const index = this.views.findIndex((view) => view.getId() === viewId);
 
     if (index !== -1) {
+      this.layout.removeView(viewId);
       this.views.splice(index, 1);
       this.updateViews(this.views);
     }
@@ -144,6 +165,13 @@ export class Role {
     });
   }
 
+  public updateLayout(newLayout: ILayoutNode) {
+    this.sharedRole.set({
+      ...this.getObject(),
+      layout: newLayout,
+    });
+  }
+
   public updateView(view: View) {
     const index = this.views.findIndex((v) => v.getId() === view.getId());
 
@@ -171,6 +199,7 @@ export class Role {
       views: this.views.map((view) => view.toView()),
       combinedViewsIds: this.combinedViewsIds,
       qrIds: this.qrsIds,
+      layout: this.layout.getSnapshot(),
     };
   }
 }

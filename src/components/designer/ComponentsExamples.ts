@@ -1,3 +1,4 @@
+import { uuid } from "uuidv4";
 import {
   ImageUI,
   InputUI,
@@ -20,14 +21,12 @@ import { IView } from "../../shared-object/views/IView";
 export class ComponentsExamples {
   static getView(): IView {
     return {
-      id: "view-id",
+      id: uuid(),
       root: {
         id: "button",
         name: "Button",
         children: [],
       },
-      rows: 1,
-      cols: 1,
       combinedViewID: "",
     };
   }

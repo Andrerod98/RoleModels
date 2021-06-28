@@ -6,6 +6,7 @@ import {
   Heading,
   SimpleGrid,
   Spacer,
+  VStack,
 } from "@chakra-ui/react";
 import React from "react";
 import {
@@ -64,19 +65,19 @@ export const SingleTabCatalogBar: React.FC<SingleTabCatalogBarProps> = (
     { title: "Ink canvas", value: "ink", icon: <HiPencilAlt /> },
   ];
   return (
-    <Box px={5} py={3} boxShadow={"xs"} w={"100%"}>
-      <Flex w={"100%"}>
-        <Box w={"30%"} mr={"10px"}>
+    <Box px={5} py={3} h={"100%"} w={"200px"} bg={"gray.100"}>
+      <Box w={"100%"}>
+        <Box>
           <Heading as={"h5"} fontSize={"12px"} textAlign={"left"} mb={"5px"}>
             LAYOUT
           </Heading>
-          <SimpleGrid columns={3} spacing={2}>
+          <VStack spacing={2}>
             {layout.map((c, index) => {
               return (
                 <Button
                   key={"component-" + index}
                   size={"xs"}
-                  isFullWidth={true}
+                  isFullWidth
                   onClick={() => props.onClick(c.value)}
                 >
                   {c.icon}
@@ -85,19 +86,19 @@ export const SingleTabCatalogBar: React.FC<SingleTabCatalogBarProps> = (
                 </Button>
               );
             })}
-          </SimpleGrid>
+          </VStack>
         </Box>
-        <Box w={"70%"} ml={"10px"}>
+        <Box mt={"10px"}>
           <Heading as={"h5"} fontSize={"12px"} textAlign={"left"} mb={"5px"}>
             UI COMPONENTS
           </Heading>
-          <SimpleGrid columns={6} spacing={2}>
+          <VStack spacing={2}>
             {components.map((c, index) => {
               return (
                 <Button
                   key={"component-" + index}
                   size={"xs"}
-                  isFullWidth={true}
+                  isFullWidth
                   onClick={() => props.onClick(c.value)}
                 >
                   {c.icon}
@@ -106,9 +107,9 @@ export const SingleTabCatalogBar: React.FC<SingleTabCatalogBarProps> = (
                 </Button>
               );
             })}
-          </SimpleGrid>
+          </VStack>
         </Box>
-      </Flex>
+      </Box>
     </Box>
   );
 };

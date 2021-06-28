@@ -27,6 +27,7 @@ import Utils from "../../utils/Utils";
 
 interface FocusButtonProps {
   app: CrossDeviceApplication;
+  onViewChange: (nvid: string) => void;
 }
 export const TestInteractionModal: FC<FocusButtonProps> = (
   props: FocusButtonProps
@@ -75,6 +76,7 @@ export const TestInteractionModal: FC<FocusButtonProps> = (
                     e.stopPropagation();
                     props.app.grabView(view.view);
 
+                    props.onViewChange(view.view.id);
                     onClose();
                   }}
                 >
@@ -92,6 +94,7 @@ export const TestInteractionModal: FC<FocusButtonProps> = (
                     e.stopPropagation();
                     props.app.getMyRole().addView(view.view);
                     props.app.mirrorViews(view.view, view.view);
+                    props.onViewChange(view.view.id);
                     onClose();
                   }}
                 >

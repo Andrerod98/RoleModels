@@ -31,6 +31,7 @@ interface HeaderProps {
   onManagerClick: () => void;
   onDesignClick: () => void;
   onLoggingOpen: () => void;
+  onViewChange: (nvid: string) => void;
   app: CrossDeviceApplication;
 }
 
@@ -186,7 +187,12 @@ export const Header: FC<HeaderProps> = (props: HeaderProps) => {
                       props.app.pingAll();
                     }}
                   />
-                  <TestInteractionModal app={props.app} />
+                  <TestInteractionModal
+                    app={props.app}
+                    onViewChange={(nvid: string) => {
+                      props.onViewChange(nvid);
+                    }}
+                  />
                 </Flex>
               </Flex>
             </Flex>
