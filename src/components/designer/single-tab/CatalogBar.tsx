@@ -1,5 +1,10 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
 import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
   Box,
   Button,
   Flex,
@@ -65,51 +70,65 @@ export const SingleTabCatalogBar: React.FC<SingleTabCatalogBarProps> = (
     { title: "Ink canvas", value: "ink", icon: <HiPencilAlt /> },
   ];
   return (
-    <Box px={5} py={3} h={"100%"} w={"200px"} bg={"gray.100"}>
-      <Box w={"100%"}>
-        <Box>
-          <Heading as={"h5"} fontSize={"12px"} textAlign={"left"} mb={"5px"}>
-            LAYOUT
-          </Heading>
-          <VStack spacing={2}>
-            {layout.map((c, index) => {
-              return (
-                <Button
-                  key={"component-" + index}
-                  size={"xs"}
-                  isFullWidth
-                  onClick={() => props.onClick(c.value)}
-                >
-                  {c.icon}
-                  <Box ml={4}>{c.title}</Box>
-                  <Spacer></Spacer>
-                </Button>
-              );
-            })}
-          </VStack>
-        </Box>
-        <Box mt={"10px"}>
-          <Heading as={"h5"} fontSize={"12px"} textAlign={"left"} mb={"5px"}>
-            UI COMPONENTS
-          </Heading>
-          <VStack spacing={2}>
-            {components.map((c, index) => {
-              return (
-                <Button
-                  key={"component-" + index}
-                  size={"xs"}
-                  isFullWidth
-                  onClick={() => props.onClick(c.value)}
-                >
-                  {c.icon}
-                  <Box ml={4}>{c.title}</Box>
-                  <Spacer></Spacer>
-                </Button>
-              );
-            })}
-          </VStack>
-        </Box>
-      </Box>
+    <Box px={"10px"} py={3} h={"100%"} w={"200px"} bg={"gray.100"}>
+      <Accordion defaultIndex={[0]} allowMultiple>
+        <AccordionItem>
+          <AccordionButton>
+            <Heading as={"h5"} fontSize={"12px"} textAlign={"left"} mb={"5px"}>
+              LAYOUT
+            </Heading>
+            <Spacer />
+            <AccordionIcon />
+          </AccordionButton>
+
+          <AccordionPanel pb={4}>
+            <VStack spacing={2}>
+              {layout.map((c, index) => {
+                return (
+                  <Button
+                    key={"component-" + index}
+                    size={"xs"}
+                    isFullWidth
+                    onClick={() => props.onClick(c.value)}
+                  >
+                    {c.icon}
+                    <Box ml={4}>{c.title}</Box>
+                    <Spacer></Spacer>
+                  </Button>
+                );
+              })}
+            </VStack>
+          </AccordionPanel>
+        </AccordionItem>
+        <AccordionItem>
+          <AccordionButton>
+            <Heading as={"h5"} fontSize={"12px"} textAlign={"left"} mb={"5px"}>
+              UI COMPONENTS
+            </Heading>
+            <Spacer />
+            <AccordionIcon />
+          </AccordionButton>
+
+          <AccordionPanel pb={4}>
+            <VStack spacing={2}>
+              {components.map((c, index) => {
+                return (
+                  <Button
+                    key={"component-" + index}
+                    size={"xs"}
+                    isFullWidth
+                    onClick={() => props.onClick(c.value)}
+                  >
+                    {c.icon}
+                    <Box ml={4}>{c.title}</Box>
+                    <Spacer></Spacer>
+                  </Button>
+                );
+              })}
+            </VStack>
+          </AccordionPanel>
+        </AccordionItem>
+      </Accordion>
     </Box>
   );
 };
