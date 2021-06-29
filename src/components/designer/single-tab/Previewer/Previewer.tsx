@@ -69,7 +69,7 @@ export const Previewer = (props: PreviewerProps) => {
 
   return (
     <Box w={"100%"} h={"100%"} m={2}>
-      <Box position={"relative"} w={"100%"} h={"100%"} mx={"15px"} my={"15px"}>
+      <Box position={"relative"} w={"100%"} h={"100%"} px={"15px"} py={"15px"}>
         <Flex>
           <IconButton
             aria-label={"Search database"}

@@ -3,6 +3,7 @@
 /* eslint-disable no-case-declarations */
 /* eslint-disable no-invalid-this */
 /* eslint-disable @typescript-eslint/no-empty-interface */
+import { AddIcon } from "@chakra-ui/icons";
 import {
   Flex,
   Box,
@@ -22,6 +23,8 @@ import {
   useTab,
   useDisclosure,
   Heading,
+  VStack,
+  Button,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { CrossDeviceApplication } from "../../../CrossDeviceApplication";
@@ -99,7 +102,7 @@ export const SingleTab = (props: SingleTabProps) => {
   console.log("render");
 
   return (
-    <Box h={"100%"}>
+    <Box h={"100%"} overflow={"hidden"}>
       <Tabs
         size={"sm"}
         variant={"enclosed"}
@@ -109,7 +112,13 @@ export const SingleTab = (props: SingleTabProps) => {
         onChange={() => {
           console.log("Changed");
         }}
-        index={curIndex === -1 ? 0 : curIndex}
+        index={
+          curIndex === -1
+            ? curTab === "interactions"
+              ? tabs.length + 1
+              : 0
+            : curIndex
+        }
       >
         <Box>
           <TabList pl={10}>
@@ -130,21 +139,37 @@ export const SingleTab = (props: SingleTabProps) => {
             ))}
 
             <Tab
-              bg={"blackAlpha.100"}
+              ml={"5px"}
+              bg={"transparent"}
+              _hover={{ bg: "blackAlpha.100" }}
               onClick={() => {
                 props.app.addRole("new");
               }}
             >
-              Add...
+              <AddIcon />
+            </Tab>
+            <Tab
+              ml={"5px"}
+              colorScheme={"blue"}
+              _hover={{ bg: "blackAlpha.100" }}
+              onClick={() => {
+                setCurTab("interactions");
+              }}
+            >
+              Interactions
             </Tab>
           </TabList>
         </Box>
-        <TabPanels h={"calc(100vh - 52px)"}>
+        <TabPanels h={"calc(100vh - 40px)"}>
           {tabs.map((tab, index) => (
             <TabPanel key={"tab-panel-" + index} p={0} h={"100%"}>
               <MemoizedRole role={tab} app={props.app} />
             </TabPanel>
           ))}
+          <TabPanel key={"tab-panel-add"} p={0} h={"100%"}></TabPanel>
+          <TabPanel key={"tab-panel-interactions"} p={0} h={"100%"}>
+            <InteractionsTab />
+          </TabPanel>
         </TabPanels>
       </Tabs>
     </Box>
@@ -202,6 +227,45 @@ const CustomTab = (props: any) => {
     </Tab>
   );
 };
+
+export function InteractionsTab() {
+  return (
+    <Box h={"100%"} bg={"gray.100"}>
+      <Flex h={"100%"} bg={"gray.100"}>
+        <Box h={"100%"} py={3} width={"70%"} bg={"gray.100"} mb={"20px"}>
+          <Heading
+            as={"h5"}
+            px={5}
+            fontSize={"12px"}
+            textAlign={"left"}
+            mb={"5px"}
+          >
+            INTERACTIONS
+          </Heading>
+          <CodeEditor
+            title={"Interactions"}
+            value={""}
+            onChange={() => {}}
+            onFocus={() => {}}
+          />
+        </Box>
+        <Box h={"100%"} py={3} width={"30%"} bg={"gray.100"} mb={"20px"}>
+          <Heading
+            as={"h5"}
+            px={5}
+            fontSize={"12px"}
+            textAlign={"left"}
+            mb={"5px"}
+          >
+            AVAILABLE COMMANDS
+          </Heading>
+          <Button>Load</Button>
+          <VStack></VStack>
+        </Box>
+      </Flex>
+    </Box>
+  );
+}
 
 interface RoleTabProps {
   role: Role;

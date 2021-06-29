@@ -28,11 +28,18 @@ import {
   Thead,
   Tr,
   Stack,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
 } from "@chakra-ui/react";
 import React, { FC } from "react";
 import { CrossDeviceApplication } from "../../CrossDeviceApplication";
 import { IDevice } from "../../shared-object/devices/IDevice";
 import { Header } from "../header/Header";
+import { LayoutsTable } from "./LayoutsTable";
+import { RolesTable } from "./RolesTable";
 
 const QRCode = require("qrcode.react");
 
@@ -111,6 +118,7 @@ export const ManagerComponent: FC<ManagerComponentProps> = (props) => {
             model.promoteToDesigner();
           }}
           onLoggingOpen={() => {}}
+          onViewChange={() => {}}
         />
         <Stack
           m='40px'
@@ -168,91 +176,22 @@ export const ManagerComponent: FC<ManagerComponentProps> = (props) => {
             <StatNumber>{props.devices.length}</StatNumber>
           </Stat>
         </Stack>
-        <hr></hr>
       </div>
       <div>
-        <Table variant='simple'>
-          <TableCaption>Roles - Devices Mapping</TableCaption>
-          <Thead>
-            <Tr>
-              <Th>Device Id</Th>
-              <Th>Device Type</Th>
-              <Th>Role</Th>
-            </Tr>
-          </Thead>
-
-          <Tbody key={"table-body"}>
-            {props.devices.map((device, index) => {
-              return (
-                <Tr key={"table-tr-" + index}>
-                  <Td fontSize={{ base: "10px", md: "16px", lg: "16px" }}>
-                    {device.id}
-                  </Td>
-                  <Td fontSize={{ base: "10px", md: "16px", lg: "16px" }}>
-                    {device.type}
-                  </Td>
-                  <Td>
-                    <Menu key={"menu-" + index}>
-                      <MenuButton
-                        as={Button}
-                        rightIcon={<ChevronDownIcon />}
-                        fontSize={{ base: "10px", md: "16px", lg: "16px" }}
-                      >
-                        {device.role}
-                      </MenuButton>
-                      <MenuList key={"menu-list-" + index}>
-                        {Array.from(model.getRoles()).map((role, index2) => (
-                          <MenuItem
-                            key={"menu-item-" + index2}
-                            onClick={(srole) =>
-                              model.promoteToRole(role.getName(), device.id)
-                            }
-                          >
-                            {role.getName()}
-                          </MenuItem>
-                        ))}
-                      </MenuList>
-                    </Menu>
-                  </Td>
-                </Tr>
-              );
-            })}
-
-            {/*
-                  <div
-                style={{
-                  position: "absolute",
-                  overflow: "hidden",
-                  top: device.y + "px",
-                  left: device.x + "px",
-                  float: "none",
-                }}
-              >
-                <Card
-                  style={{
-                    width: device.capabilities.width * 0.25 + "px",
-                    height: device.capabilities.height * 0.25 + "px",
-
-                    padding: "0px",
-                  }}
-                ></Card>
-                
-                <p>{role}</p>
-              </div>*/}
-
-            {/* <div>
-          <Row className="justify-content-md-center">
-            <Col className="text-center">{device.id}</Col>
-            <Col className="text-center">{device.role}</Col>
-            <Col className="text-center">
-              width:{device.capabilities.width} , height:
-              {device.capabilities.height}, touch:
-              {device.capabilities.touch.toString()}
-            </Col>
-          </Row>
-           </div>*/}
-          </Tbody>
-        </Table>
+        <Tabs variant='enclosed'>
+          <TabList pl={"20px"}>
+            <Tab>Roles</Tab>
+            <Tab>Configurations</Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel>
+              <RolesTable app={props.app} devices={props.devices} />
+            </TabPanel>
+            <TabPanel>
+              <LayoutsTable app={props.app} devices={props.devices} />
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
       </div>
     </div>
   );
