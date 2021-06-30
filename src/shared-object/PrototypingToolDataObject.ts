@@ -61,6 +61,10 @@ import {
 } from "./components";
 import { ThrowableFactory } from "./components/Throwable";
 import { QRsManager } from "./managers/QRsManager";
+import {
+  ConfigurationsManager,
+  IConfiguration,
+} from "./managers/ConfigurationsManager";
 
 export class PrototypingToolDataObject
   extends DataObject
@@ -81,6 +85,11 @@ export class PrototypingToolDataObject
   /* The Map with the qr codes */
   private qrMap: SharedMap;
   private qrManager: QRsManager;
+
+  /* The Map with the qr codes */
+  private configurationsMap: SharedMap;
+  private currentConfiguration: SharedCell;
+  private configurationsManager: ConfigurationsManager;
 
   /* The Manager responsible for rendering components */
   private factoriesManager: FactoriesManager;
@@ -113,6 +122,12 @@ export class PrototypingToolDataObject
 
     const sharedPing = SharedCounter.create(this.runtime);
 
+    const configurationsMap = SharedMap.create(this.runtime);
+    const currentConfiguration = SharedCell.create(this.runtime);
+    currentConfiguration.set({
+      name: "default",
+      layouts: { default: { name: "div" } },
+    } as IConfiguration);
     /* Creating default roles */
     const managerRole = SharedCell.create(this.runtime);
 
@@ -121,7 +136,6 @@ export class PrototypingToolDataObject
       views: [],
       combinedViewsIds: [],
       qrIds: [],
-      layout: { name: "div" },
     } as IRole);
 
     const designerRole = SharedCell.create(this.runtime);
@@ -131,7 +145,6 @@ export class PrototypingToolDataObject
       views: [],
       combinedViewsIds: [],
       qrIds: [],
-      layout: { name: "div" },
     } as IRole);
 
     const defaultRole = SharedCell.create(this.runtime);
@@ -141,7 +154,6 @@ export class PrototypingToolDataObject
       views: [],
       combinedViewsIds: [],
       qrIds: [],
-      layout: { name: "div" },
     } as IRole);
 
     rolesMap.set("manager", managerRole.handle);
@@ -155,6 +167,8 @@ export class PrototypingToolDataObject
     this.root.set("qrs", qrMap.handle);
     this.root.set("ink", ink.handle);
     this.root.set("ping", sharedPing.handle);
+    this.root.set("configurations", configurationsMap.handle);
+    this.root.set("current-configuration", currentConfiguration.handle);
   }
 
   protected async hasInitialized() {
@@ -175,6 +189,7 @@ export class PrototypingToolDataObject
     await Promise.all([
       this.rolesManager.loadRoles(1),
       this.combinedViewsManager.loadCombinedViews(1),
+      this.configurationsManager.loadObject(),
       this.qrManager.loadQRCodes(),
     ]);
   }
@@ -187,6 +202,8 @@ export class PrototypingToolDataObject
       this.root.get<IFluidHandle<SharedMap>>("qrs").get(),
       this.root.wait<IFluidHandle<IInk>>("ink"),
       this.root.get<IFluidHandle<SharedCounter>>("ping").get(),
+      this.root.get<IFluidHandle<SharedMap>>("configurations").get(),
+      this.root.get<IFluidHandle<SharedCell>>("current-configuration").get(),
     ]);
 
     this.devicesMap = sharedObjects[0];
@@ -194,6 +211,8 @@ export class PrototypingToolDataObject
     this.rolesMap = sharedObjects[2];
     this.qrMap = sharedObjects[3];
     this.pingCounter = sharedObjects[5];
+    this.configurationsMap = sharedObjects[6];
+    this.currentConfiguration = sharedObjects[7];
     this.ink = await sharedObjects[4].get();
   }
 
@@ -213,8 +232,14 @@ export class PrototypingToolDataObject
       this.factoriesManager
     );
 
-    /* Creating combined views Manager...*/
+    /* Creating qr Manager...*/
     this.qrManager = new QRsManager(this.qrMap);
+
+    /* Creating configurations Manager...*/
+    this.configurationsManager = new ConfigurationsManager(
+      this.configurationsMap,
+      this.currentConfiguration
+    );
   }
 
   private registerDefaultFactories() {
@@ -305,6 +330,12 @@ export class PrototypingToolDataObject
       this.emit("change", "Roles manager state changed.");
     });
 
+    this.configurationsManager.on("changeState", () => {
+      this.emit("change", "Configurations manager state changed.");
+    });
+
+    //Remove this event listeners
+
     /* Creating shared cell event listeners*/
     await Promise.all([
       //this.createMapEventListeners("Combined View", this.combinedViewsMap),
@@ -335,6 +366,9 @@ export class PrototypingToolDataObject
     this.deleteMapEventListeners("Combined View", this.combinedViewsMap);
     this.deleteMapEventListeners("roles", this.rolesMap);
     this.deleteMapEventListeners("qrs", this.qrMap);
+    this.deleteMapEventListeners("configurations", this.configurationsMap);
+
+    this.currentConfiguration.removeAllListeners();
     this.pingCounter.removeAllListeners();
     this.runtime.off("connected", () => {
       this.emit("connected");
@@ -535,7 +569,6 @@ export class PrototypingToolDataObject
       views: [],
       combinedViewsIds: [],
       qrIds: [],
-      layout: { name: "div" },
     } as IRole);
 
     this.rolesManager.addRole(sharedRole);
@@ -824,6 +857,40 @@ export class PrototypingToolDataObject
     this.factoriesManager.registerFactory(factory);
   }
 
+  /* ******************************************************** 
+                Configurations Functions
+   ******************************************************** */
+
+  public getConfigurations() {
+    return this.configurationsManager.getConfigurations();
+  }
+
+  public getCurrentConfiguration() {
+    return this.configurationsManager.getCurrentConfiguration();
+  }
+
+  public getCurrentConfigurationShared() {
+    return this.configurationsManager.getCurrentConfigurationShared();
+  }
+  public renameConfiguration(oldValue: string, newValue: string) {
+    this.configurationsManager.renameConfiguration(oldValue, newValue);
+  }
+
+  public getCurrentConfigurationOfRole(role: string) {
+    return this.configurationsManager.getCurrentConfigurationOfRole(role);
+  }
+
+  public saveConfiguration() {
+    this.configurationsManager.saveConfiguration();
+  }
+
+  public loadConfiguration(configName: string) {
+    this.configurationsManager.loadConfiguration(configName);
+  }
+
+  public deleteConfiguration() {
+    this.configurationsManager.getConfigurations();
+  }
   /**
    * Event Listeners
    */

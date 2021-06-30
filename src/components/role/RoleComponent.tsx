@@ -3,33 +3,11 @@ import React, { useState } from "react";
 import { FC } from "react";
 
 import { Header } from "../header/Header";
-import {
-  Box,
-  Center,
-  Flex,
-  Grid,
-  GridItem,
-  Icon,
-  IconButton,
-  Popover,
-  PopoverArrow,
-  PopoverBody,
-  PopoverCloseButton,
-  PopoverContent,
-  PopoverHeader,
-  PopoverTrigger,
-  Portal,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { Box, Flex, useDisclosure } from "@chakra-ui/react";
 import { CrossDeviceApplication } from "../../CrossDeviceApplication";
-import { CombinedView } from "../../shared-object/combined-views/combined-view";
 import { QRCodeController } from "../../shared-object/qrcode/QRCodeController";
-import { View } from "../../shared-object/views/View";
 import { ViewComponent } from "../view/ViewComponent";
 import { Role } from "../../shared-object/roles/Role";
-import { StitchingCombinedView } from "../../shared-object/combined-views/stitching-combined-view/StitchingCombinedView";
-import { Stitching } from "../../Stitching";
-import { ImQrcode } from "react-icons/im";
 import { ILayoutNode } from "../../shared-object/roles/ILayout";
 import { LayoutModal } from "../header/LayoutModal";
 const QRCode = require("qrcode.react");
@@ -43,9 +21,8 @@ export const RoleComponent: FC<RoleProps> = (props: RoleProps) => {
   //const views = props.app.getViewsOrCombinedViews(props.role.getName());
   const qrs = props.app.getSharedObject().getMyQrCodes();
   const layout = props.app
-    .getRole(props.role.getName())
-    .getLayout()
-    .getSnapshot();
+    .getSharedObject()
+    .getCurrentConfigurationOfRole(props.role.getName());
   const [selectedNode, setSelectedNode] = useState("");
   const generateWidget = (node: ILayoutNode): JSX.Element => {
     switch (node.name) {
@@ -111,7 +88,7 @@ export const RoleComponent: FC<RoleProps> = (props: RoleProps) => {
   const [newViewId, setNewViewId] = useState("");
   return (
     <Box h={"100%"} w={"100%"}>
-      {generateWidget(layout)}
+      {generateWidget(layout.getSnapshot())}
 
       {qrs.map((qr: QRCodeController, index: number) => {
         return (
@@ -143,7 +120,7 @@ export const RoleComponent: FC<RoleProps> = (props: RoleProps) => {
         />
       </Box>
       <LayoutModal
-        layout={props.role.getLayout()}
+        layout={layout}
         newViewId={newViewId}
         isOpen={isOpen}
         onOpen={onOpen}

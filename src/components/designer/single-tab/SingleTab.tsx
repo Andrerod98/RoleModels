@@ -282,6 +282,10 @@ export function RoleTab(props: RoleTabProps) {
   const [newViewId, setNewViewId] = useState("");
   const [selectedNode, setSelectedNode] = useState("");
 
+  const layout = props.app
+    .getSharedObject()
+    .getCurrentConfigurationOfRole(props.role.getName());
+
   const { isOpen, onClose, onOpen } = useDisclosure();
 
   console.log("RENDERED");
@@ -452,7 +456,7 @@ export function RoleTab(props: RoleTabProps) {
             <Previewer
               onChangeView={handleChangeView}
               onChangeViews={handleChangeViews}
-              layout={props.role.getLayout()}
+              layout={layout}
               role={props.role}
               app={props.app}
               isOpenLayoutModal={isOpen}
@@ -507,7 +511,7 @@ export function RoleTab(props: RoleTabProps) {
         </Box>
       </Flex>
       <LayoutModal
-        layout={props.role.getLayout()}
+        layout={layout}
         newViewId={newViewId}
         isOpen={isOpen}
         onOpen={onOpen}

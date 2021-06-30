@@ -182,6 +182,14 @@ export const ManagerComponent: FC<ManagerComponentProps> = (props) => {
           <TabList pl={"20px"}>
             <Tab>Roles</Tab>
             <Tab>Configurations</Tab>
+            <Spacer />
+            <Button
+              mr={"40px"}
+              size={"sm"}
+              onClick={() => props.app.getSharedObject().saveConfiguration()}
+            >
+              Save Configuration
+            </Button>
           </TabList>
           <TabPanels>
             <TabPanel>

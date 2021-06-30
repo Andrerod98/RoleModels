@@ -108,7 +108,7 @@ export const Preview = (props: PreviewProps) => {
   };
   return (
     <Box h={props.height} w={props.width} overflow={"hidden"}>
-      {generateWidget(props.layout)}
+      {props.layout ? generateWidget(props.layout) : ""}
     </Box>
   );
 };

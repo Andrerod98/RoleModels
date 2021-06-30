@@ -12,6 +12,9 @@ import {
   Button,
   MenuList,
   MenuItem,
+  Editable,
+  EditableInput,
+  EditablePreview,
 } from "@chakra-ui/react";
 import React from "react";
 import { CrossDeviceApplication } from "../../CrossDeviceApplication";
@@ -24,6 +27,9 @@ interface LayoutTableProps {
 
 export function LayoutsTable(props: LayoutTableProps) {
   const model = props.app.getSharedObject();
+  const configurations = Array.from(model.getConfigurations());
+  const currentConfig = model.getCurrentConfigurationShared();
+
   return (
     <Table variant='simple'>
       <TableCaption>Layout Manager</TableCaption>
@@ -36,35 +42,42 @@ export function LayoutsTable(props: LayoutTableProps) {
       </Thead>
 
       <Tbody key={"table-body"}>
-        {props.devices.map((device, index) => {
+        {configurations.map((config, index) => {
+          console.log({
+            currentConfig: JSON.stringify(currentConfig),
+            config: JSON.stringify(config),
+          });
+
+          const isActive =
+            JSON.stringify(currentConfig) === JSON.stringify(config);
           return (
-            <Tr key={"table-tr-" + index}>
+            <Tr key={"table-tr-" + index} bg={isActive ? "green.200" : "white"}>
               <Td fontSize={{ base: "10px", md: "16px", lg: "16px" }}>
-                {device.id}
+                <Editable
+                  defaultValue={config.name}
+                  onSubmit={(nextValue: string) => {
+                    model.renameConfiguration(config.name, nextValue);
+                  }}
+                >
+                  <EditablePreview />
+                  <EditableInput />
+                </Editable>
               </Td>
 
               <Td>
-                <Menu key={"menu-" + index}>
-                  <MenuButton
+                {isActive ? (
+                  "Active"
+                ) : (
+                  <Button
                     as={Button}
-                    rightIcon={<ChevronDownIcon />}
                     fontSize={{ base: "10px", md: "16px", lg: "16px" }}
+                    onClick={() => {
+                      model.loadConfiguration(config.name);
+                    }}
                   >
-                    {device.role}
-                  </MenuButton>
-                  <MenuList key={"menu-list-" + index}>
-                    {Array.from(model.getRoles()).map((role, index2) => (
-                      <MenuItem
-                        key={"menu-item-" + index2}
-                        onClick={(srole) =>
-                          model.promoteToRole(role.getName(), device.id)
-                        }
-                      >
-                        {role.getName()}
-                      </MenuItem>
-                    ))}
-                  </MenuList>
-                </Menu>
+                    Load
+                  </Button>
+                )}
               </Td>
             </Tr>
           );
