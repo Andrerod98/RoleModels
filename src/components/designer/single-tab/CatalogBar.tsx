@@ -7,9 +7,7 @@ import {
   AccordionPanel,
   Box,
   Button,
-  Flex,
   Heading,
-  SimpleGrid,
   Spacer,
   VStack,
 } from "@chakra-ui/react";

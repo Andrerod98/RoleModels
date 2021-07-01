@@ -10,8 +10,6 @@ export class View extends EventEmitter {
   protected root: UIComponentController;
   constructor(
     protected id: string,
-    protected rows: number,
-    protected columns: number,
     protected combinedViewID: string = "",
     private readonly factoriesManager: FactoriesManager,
     root: IUIComponent
@@ -23,14 +21,6 @@ export class View extends EventEmitter {
   /* GETTERS */
   public getId() {
     return this.id;
-  }
-
-  public getRows() {
-    return this.rows;
-  }
-
-  public getColumns() {
-    return this.columns;
   }
 
   public getRoot() {
@@ -53,14 +43,6 @@ export class View extends EventEmitter {
     this.combinedViewID = combinedViewId;
   }
 
-  public setRows(rows: number) {
-    this.rows = rows;
-  }
-
-  public setColumns(columns: number) {
-    this.columns = columns;
-  }
-
   public setRoot(root: IUIComponent) {
     this.root = this.factoriesManager.getUIComponent(root);
     this.root.on("componentChanged", () => {
@@ -69,10 +51,13 @@ export class View extends EventEmitter {
     });
   }
 
+  public deleteEventListeners() {
+    this.root.deleteEventListeners();
+    this.removeAllListeners();
+  }
+
   public update(object: IView) {
     this.id = object.id;
-    this.rows = object.rows;
-    this.columns = object.cols;
     this.combinedViewID = object.combinedViewID;
 
     this.setRoot(object.root);
@@ -83,8 +68,6 @@ export class View extends EventEmitter {
   public toView(): IView {
     return {
       id: this.id,
-      rows: this.rows,
-      cols: this.columns,
       combinedViewID: this.combinedViewID,
       root: this.root.getSnapshot(),
     };
@@ -93,8 +76,6 @@ export class View extends EventEmitter {
   static from(object: IView, factoriesManager: FactoriesManager) {
     const view = new View(
       object.id,
-      object.rows,
-      object.cols,
       object.combinedViewID,
       factoriesManager,
       object.root

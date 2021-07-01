@@ -1,31 +1,22 @@
 import {
   Box,
-  Center,
-  Flex,
   Grid,
   GridItem,
   Icon,
   IconButton,
-  Modal,
-  ModalContent,
-  ModalOverlay,
-  useDisclosure,
 } from "@chakra-ui/react";
-import React, { FC, useEffect, useState } from "react";
-import { AiOutlineExpand } from "react-icons/ai";
+import React, {  } from "react";
 import {
   BiDockTop,
   BiDockLeft,
   BiDockRight,
   BiDockBottom,
-  BiSquareRounded,
   BiRectangle,
   BiArrowToTop,
   BiArrowToLeft,
   BiArrowToRight,
   BiArrowToBottom,
 } from "react-icons/bi";
-import { ILayoutNode } from "../../shared-object/roles/ILayout";
 import { uuid } from "uuidv4";
 import { LayoutNode } from "../../shared-object/roles/Layout";
 interface LayoutModalProps {

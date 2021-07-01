@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-empty-interface */
 import { Box, Spacer, IconButton, Flex, useColorMode } from "@chakra-ui/react";
-import { v4 as uuidv4 } from "uuid";
 import { arrayMove } from "@dnd-kit/sortable";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { IoRefresh } from "react-icons/io5";
 import { FullScreenWrapper } from "./FullScreenWrapper";
@@ -113,7 +112,6 @@ export const Previewer = (props: PreviewerProps) => {
             selectedNode={props.selectedNode}
             isOpenLayoutModal={props.isOpenLayoutModal}
             setSelected={(newSelected: string) => {
-              console.log("SELECTED");
               props.setSelected(newSelected);
             }}
             onItemMove={handleItemMove}

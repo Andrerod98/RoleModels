@@ -16,8 +16,6 @@ export function Stitching({
   const columns = combinedView.getColumns();
   const position = combinedView.getPosition(role);
 
-  console.log(combinedView.getPositions());
-
   function calculatePosition(
     position: number,
     nRows: number,
@@ -39,7 +37,6 @@ export function Stitching({
     return [0, 0, 0, 0];
   }
   const [cs, rws, wPerc, hPerc] = calculatePosition(position, rows, columns);
-  console.log({ w: wPerc, h: hPerc });
   return (
     <Box
       transform={"translate(-" + 100 * cs + "%,-" + 100 * rws + "%)"}

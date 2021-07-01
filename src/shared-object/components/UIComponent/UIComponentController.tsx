@@ -62,7 +62,6 @@ export class UIComponentController extends EventEmitter {
   }
 
   getRoot(): UIComponentController {
-    console.log(this.parent);
     if (this.parent == null) {
       return this;
     } else {
@@ -98,6 +97,13 @@ export class UIComponentController extends EventEmitter {
     return null;
   }
 
+  public deleteEventListeners() {
+    this.removeAllListeners();
+    for (const child of this.children) {
+      child.deleteEventListeners();
+    }
+  }
+
   getChildren() {
     return this.children;
   }
@@ -110,7 +116,6 @@ export class UIComponentController extends EventEmitter {
       this.addChild(child);
     });
 
-    console.log({ text: "Emitting change", root: this.getRoot() });
     this.getRoot().emit("componentChanged");
     //TODO: Send change to root
   }

@@ -17,25 +17,29 @@ config.set(
   "https://cdn.jsdelivr.net/npm/ace-builds@1.4.8/src-noconflict/"
 );
 
-config.setModuleUrl(
-  "ace/mode/kson_worker",
-  "https://cdn.jsdelivr.net/npm/ace-builds@1.4.8/src-noconflict/worker-json.js"
-);
-
 interface CodeEditorProps {
   title: string;
   value: string;
   onChange: (value: string, event?: any) => void;
-  onFocus: (value: any, event?: any) => void;
+  onFocus?: (value: any, event?: any) => void;
+  mode: string;
 }
 
 export const CodeEditor: React.FC<CodeEditorProps> = (
   props: CodeEditorProps
 ) => {
   const { colorMode } = useColorMode();
+
+  config.setModuleUrl(
+    "ace/mode/kson_worker",
+    "https://cdn.jsdelivr.net/npm/ace-builds@1.4.8/src-noconflict/worker-" +
+      props.mode +
+      ".js"
+  );
+
   return (
     <AceEditor
-      mode={"json"}
+      mode={props.mode}
       theme={colorMode === "light" ? "chrome" : "nord_dark"}
       enableSnippets={true}
       height={"95%"}

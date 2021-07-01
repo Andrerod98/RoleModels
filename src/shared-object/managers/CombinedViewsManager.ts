@@ -114,7 +114,6 @@ export class CombinedViewsManager extends EventEmitter {
     | MultiCombinedView
     | StitchingCombinedView {
     const cv = this.combinedViews.get(combinedViewId);
-    console.log(cv);
     if (cv instanceof StitchingCombinedView) return cv as StitchingCombinedView;
     else if (cv instanceof SingleCombinedView) return cv as SingleCombinedView;
     else if (cv instanceof MultiCombinedView) return cv as MultiCombinedView;

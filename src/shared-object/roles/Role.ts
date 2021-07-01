@@ -9,7 +9,6 @@ export class Role {
   private views: View[];
   private combinedViewsIds: string[];
   private qrsIds: string[];
-  private selectedNode: string;
 
   constructor(
     protected readonly sharedRole: SharedCell,
@@ -19,7 +18,6 @@ export class Role {
     this.views = [];
     this.combinedViewsIds = [];
     this.qrsIds = [];
-    this.selectedNode = "";
     this.loadObject();
     this.setEventListener();
   }
@@ -167,6 +165,11 @@ export class Role {
     this.updateQrs(this.qrsIds);
   }
 
+  public deleteAllViewsListeners() {
+    this.views.forEach((view) => {
+      view.deleteEventListeners();
+    });
+  }
   public toRole(): IRole {
     return {
       name: this.name,

@@ -38,7 +38,6 @@ export class ConfigurationsManager extends EventEmitter {
     });
 
     this.configurationsSharedMap.on("valueChanged", () => {
-      console.log("SHARED MAP HAS CHANGED!");
       this.emitChange();
     });
   }
@@ -58,11 +57,7 @@ export class ConfigurationsManager extends EventEmitter {
       const layoutValue = currentConfigValue.layouts[key];
       this.current.layouts[key] = new LayoutNode(layoutValue);
       this.current.layouts[key].getRoot().on("change", (l) => {
-        console.log("changed before");
-        console.log(this.configurationsSharedMap.get(currentConfigValue.name));
         this.updateCurrent(key, this.current.layouts[key].getSnapshot());
-        console.log("changed after");
-        console.log(this.configurationsSharedMap.get(currentConfigValue.name));
       });
     }
   }
@@ -106,12 +101,9 @@ export class ConfigurationsManager extends EventEmitter {
 
   public loadConfiguration(configurationName: string): void {
     const config = this.configurationsSharedMap.get(configurationName);
-    console.log("Loading");
-    console.log(this.configurationsSharedMap.get(configurationName));
     if (config) {
       this.currentConfiguration.set({ ...config });
     }
-    console.log(this.configurationsSharedMap.get(configurationName));
   }
 
   public saveConfiguration() {
@@ -120,8 +112,6 @@ export class ConfigurationsManager extends EventEmitter {
       ...this.currentConfiguration.get(),
       name: name,
     });
-    console.log("SAVING");
-    console.log(this.currentConfiguration.get());
     this.configurationsSharedMap.set(name, {
       name,
       ...this.currentConfiguration.get().layouts,

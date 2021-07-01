@@ -47,6 +47,7 @@ export const MainComponent: FC<MainComponentProps> = (
     });
 
     onChange();
+
     return () => {
       model.off("change", onChange);
       model.deleteAllEventListeners();

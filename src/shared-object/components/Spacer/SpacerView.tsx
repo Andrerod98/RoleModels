@@ -1,9 +1,7 @@
-import { UIComponentView } from "../UIComponent/UIComponentView";
 import React from "react";
 import { Spacer } from "@chakra-ui/react";
+import { SpacerController } from "./SpacerController";
 
-export class SpacerView extends UIComponentView {
-  render() {
-    return <Spacer />;
-  }
+export function SpacerView({ controller }: { controller: SpacerController }) {
+  return <Spacer />;
 }

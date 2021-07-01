@@ -142,6 +142,13 @@ export class RolesManager extends EventEmitter {
     return role;
   }
 
+  public deleteRolesEventListener(){
+    const values = this.roles.values();
+    for(const v of values){
+      v.deleteAllViewsListeners();
+    }
+  }
+
   /*
    * Removes a role to the roles map and roles shared map
    */

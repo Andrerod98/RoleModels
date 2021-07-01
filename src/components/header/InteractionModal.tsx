@@ -256,7 +256,6 @@ export const TestInteractionModal: FC<FocusButtonProps> = (
                           const view = props.app
                             .getSharedObject()
                             .getView(value);
-                          console.log({ view: view, from: from });
                           setView({
                             view: view,
                             combinedView: undefined,
@@ -270,7 +269,6 @@ export const TestInteractionModal: FC<FocusButtonProps> = (
                           const subStr = data.substr(14).split("#from=");
                           const value = subStr[0];
                           const from = subStr[1];
-                          console.log(from);
                           props.app
                             .getSharedObject()
                             .getMyRole()

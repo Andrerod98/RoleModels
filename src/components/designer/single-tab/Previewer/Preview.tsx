@@ -1,27 +1,11 @@
-import { Box, Flex, Grid, layout } from "@chakra-ui/react";
-import {
-  closestCenter,
-  DndContext,
-  DragOverlay,
-  KeyboardSensor,
-  LayoutMeasuringStrategy,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
-import {
-  SortableContext,
-  sortableKeyboardCoordinates,
-} from "@dnd-kit/sortable";
-import React, { useState } from "react";
+import { Box, Flex } from "@chakra-ui/react";
+import React from "react";
 import { CrossDeviceApplication } from "../../../../CrossDeviceApplication";
 import { ILayoutNode } from "../../../../shared-object/roles/ILayout";
 import { LayoutNode } from "../../../../shared-object/roles/Layout";
 import { Role } from "../../../../shared-object/roles/Role";
 import { View } from "../../../../shared-object/views/View";
 import { ViewComponent } from "../../../view/ViewComponent";
-import { SortableViewItem } from "./SortableViewItem";
-import { ViewItemOverlay } from "./ViewItemOverlay";
 
 interface ItemView {
   id: string;
@@ -73,7 +57,6 @@ export const Preview = (props: PreviewProps) => {
             position={"relative"}
             onClick={() => {
               if (props.isOpenLayoutModal) {
-                console.log("SELECTED");
                 props.setSelected(node.viewId);
               }
             }}

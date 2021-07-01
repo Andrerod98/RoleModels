@@ -26,7 +26,7 @@ import {
   VStack,
   Button,
 } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { CrossDeviceApplication } from "../../../CrossDeviceApplication";
 import { Role } from "../../../shared-object/roles/Role";
 import { View } from "../../../shared-object/views/View";
@@ -53,7 +53,6 @@ export const SingleTab = (props: SingleTabProps) => {
   }*/
 
   const loadRole = (role: string) => {
-    console.log("role " + role + " loading");
     setCurTab(role);
 
     const r = props.app.getRole(curTab);
@@ -78,18 +77,15 @@ export const SingleTab = (props: SingleTabProps) => {
     setAlert(false);*/
   };
   const handleTabClick = (role: string) => {
-    console.log("Tab click");
     loadRole(role);
   };
 
   const handleTabClose = (role: string) => {
-    console.log("Tab close");
     props.app.getSharedObject().removeRole(role);
     loadRole("default");
   };
 
   const handleTabSubmit = async (role: string, e: any) => {
-    console.log("Tab is changing");
     const nextValue = e;
     if (nextValue === "") {
       return;
@@ -99,8 +95,6 @@ export const SingleTab = (props: SingleTabProps) => {
     loadRole(nextValue);
   };
 
-  console.log("render");
-
   return (
     <Box h={"100%"} overflow={"hidden"}>
       <Tabs
@@ -109,9 +103,7 @@ export const SingleTab = (props: SingleTabProps) => {
         h={"100%"}
         mt={"5px"}
         isManual
-        onChange={() => {
-          console.log("Changed");
-        }}
+        onChange={() => {}}
         index={
           curIndex === -1
             ? curTab === "interactions"
@@ -168,7 +160,7 @@ export const SingleTab = (props: SingleTabProps) => {
           ))}
           <TabPanel key={"tab-panel-add"} p={0} h={"100%"}></TabPanel>
           <TabPanel key={"tab-panel-interactions"} p={0} h={"100%"}>
-            <InteractionsTab />
+            <InteractionsTab application={props.app} />
           </TabPanel>
         </TabPanels>
       </Tabs>
@@ -228,7 +220,16 @@ const CustomTab = (props: any) => {
   );
 };
 
-export function InteractionsTab() {
+export function InteractionsTab(props: {
+  application: CrossDeviceApplication;
+}) {
+  const [value, setValue] = useState(
+    props.application.getSharedObject().getInteractions()
+  );
+
+  const handleLoad = () => {
+    props.application.getSharedObject().setInteractions(value);
+  };
   return (
     <Box h={"100%"} bg={"gray.100"}>
       <Flex h={"100%"} bg={"gray.100"}>
@@ -243,10 +244,12 @@ export function InteractionsTab() {
             INTERACTIONS
           </Heading>
           <CodeEditor
+            mode={"javascript"}
             title={"Interactions"}
-            value={""}
-            onChange={() => {}}
-            onFocus={() => {}}
+            value={value}
+            onChange={(value: string) => {
+              setValue(value);
+            }}
           />
         </Box>
         <Box h={"100%"} py={3} width={"30%"} bg={"gray.100"} mb={"20px"}>
@@ -259,7 +262,7 @@ export function InteractionsTab() {
           >
             AVAILABLE COMMANDS
           </Heading>
-          <Button>Load</Button>
+          <Button onClick={handleLoad}>Load</Button>
           <VStack></VStack>
         </Box>
       </Flex>
@@ -288,10 +291,7 @@ export function RoleTab(props: RoleTabProps) {
 
   const { isOpen, onClose, onOpen } = useDisclosure();
 
-  console.log("RENDERED");
-
   const preview = (newValue?: string, nvid?: string) => {
-    console.log("Preview");
     //props.project.stringToViews(value)
 
     props.role.updateIViews(
@@ -310,7 +310,6 @@ export function RoleTab(props: RoleTabProps) {
     }
     switch (name) {
       case "view":
-        console.log(json);
         const newView = ComponentsExamples.getView();
         if (Utils.jsonToString(json) === "{}") {
           json = [newView];
@@ -386,7 +385,6 @@ export function RoleTab(props: RoleTabProps) {
   };
 
   const addUIComponentToEditor = (str: string) => {
-    console.log("add ui component");
     const oldValue = value;
     const rows = oldValue.split("\n");
     const row = cursorPosition.row;
@@ -396,7 +394,6 @@ export function RoleTab(props: RoleTabProps) {
     previous = previous.trim();
     if (previous.endsWith("}")) previous += ",";
 
-    console.log(previous);
     rows[row] = previous + str + line.substring(column);
     const newValue = rows.join("\n");
 
@@ -408,31 +405,23 @@ export function RoleTab(props: RoleTabProps) {
 
       preview(Utils.jsonToString(newFormattedValue));
     }
-
-    // console.log(cursorStart);
-    // this.setState({ value: newValue });
   };
 
   const handleFocus = (value: any) => {
-    console.log("handle focus");
     setCursorPosition(value.cursor);
   };
 
   const handleChange = (value: any, event?: any) => {
-    console.log("handle change");
     setValue(value);
     setCursorPosition(event.end);
   };
 
   const handleChangeView = (newView: View) => {
-    console.log("view change");
     props.role.updateView(newView);
     setValue(Utils.jsonToString(props.role.getViews().map((v) => v.toView())));
   };
 
   const handleChangeViews = (newViews: View[]) => {
-    console.log("change views");
-
     props.role.updateViews(newViews);
 
     setValue(Utils.jsonToString(props.role.getViews().map((v) => v.toView())));
@@ -464,7 +453,6 @@ export function RoleTab(props: RoleTabProps) {
                 preview();
               }}
               setSelected={(newSelected: string) => {
-                console.log("SETTING SELECTED NODE");
                 setSelectedNode(newSelected);
               }}
               selectedNode={selectedNode}
@@ -503,6 +491,7 @@ export function RoleTab(props: RoleTabProps) {
             </Heading>
             <CodeEditor
               title={"UI"}
+              mode={"json"}
               value={value}
               onChange={handleChange}
               onFocus={handleFocus}
@@ -517,7 +506,6 @@ export function RoleTab(props: RoleTabProps) {
         onOpen={onOpen}
         onClose={onClose}
         setSelected={(newSelected: string) => {
-          console.log("SELECTED NEW");
           setSelectedNode(newSelected);
         }}
         selectedNode={selectedNode}

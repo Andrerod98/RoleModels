@@ -65,6 +65,7 @@ import {
   ConfigurationsManager,
   IConfiguration,
 } from "./managers/ConfigurationsManager";
+import { InteractionsManager } from "./managers/InteractionsManager";
 
 export class PrototypingToolDataObject
   extends DataObject
@@ -86,10 +87,13 @@ export class PrototypingToolDataObject
   private qrMap: SharedMap;
   private qrManager: QRsManager;
 
-  /* The Map with the qr codes */
+  /* The Map with the configurations */
   private configurationsMap: SharedMap;
   private currentConfiguration: SharedCell;
   private configurationsManager: ConfigurationsManager;
+
+  private interactions: SharedCell;
+  private interactionsManager: InteractionsManager;
 
   /* The Manager responsible for rendering components */
   private factoriesManager: FactoriesManager;
@@ -160,6 +164,8 @@ export class PrototypingToolDataObject
     rolesMap.set("designer", designerRole.handle);
     rolesMap.set("default", defaultRole.handle);
 
+    const interactions = SharedCell.create(this.runtime);
+
     /* Setting shared objects in the root Map...*/
     this.root.set("devices", devicesMap.handle);
     this.root.set("roles", rolesMap.handle);
@@ -169,6 +175,7 @@ export class PrototypingToolDataObject
     this.root.set("ping", sharedPing.handle);
     this.root.set("configurations", configurationsMap.handle);
     this.root.set("current-configuration", currentConfiguration.handle);
+    this.root.set("interactions", interactions.handle);
   }
 
   protected async hasInitialized() {
@@ -192,6 +199,8 @@ export class PrototypingToolDataObject
       this.configurationsManager.loadObject(),
       this.qrManager.loadQRCodes(),
     ]);
+
+    this.runInteractions();
   }
 
   private async loadSharedObjects() {
@@ -204,6 +213,7 @@ export class PrototypingToolDataObject
       this.root.get<IFluidHandle<SharedCounter>>("ping").get(),
       this.root.get<IFluidHandle<SharedMap>>("configurations").get(),
       this.root.get<IFluidHandle<SharedCell>>("current-configuration").get(),
+      this.root.get<IFluidHandle<SharedCell>>("interactions").get(),
     ]);
 
     this.devicesMap = sharedObjects[0];
@@ -213,6 +223,7 @@ export class PrototypingToolDataObject
     this.pingCounter = sharedObjects[5];
     this.configurationsMap = sharedObjects[6];
     this.currentConfiguration = sharedObjects[7];
+    this.interactions = sharedObjects[8];
     this.ink = await sharedObjects[4].get();
   }
 
@@ -240,6 +251,8 @@ export class PrototypingToolDataObject
       this.configurationsMap,
       this.currentConfiguration
     );
+
+    this.interactionsManager = new InteractionsManager(this, this.interactions);
   }
 
   private registerDefaultFactories() {
@@ -334,6 +347,10 @@ export class PrototypingToolDataObject
       this.emit("change", "Configurations manager state changed.");
     });
 
+    this.interactionsManager.on("changeState", () => {
+      this.emit("change", "Interactions manager state changed.");
+    });
+
     //Remove this event listeners
 
     /* Creating shared cell event listeners*/
@@ -373,6 +390,10 @@ export class PrototypingToolDataObject
     this.runtime.off("connected", () => {
       this.emit("connected");
     });
+
+    this.interactions.removeAllListeners();
+
+    this.rolesManager.deleteRolesEventListener();
     this.removeAllListeners();
   }
 
@@ -890,6 +911,18 @@ export class PrototypingToolDataObject
 
   public deleteConfiguration() {
     this.configurationsManager.getConfigurations();
+  }
+
+  public getInteractions() {
+    return this.interactionsManager.getInteractions();
+  }
+
+  public setInteractions(inter: string) {
+    this.interactionsManager.setInteractions(inter);
+  }
+
+  public runInteractions() {
+    this.interactionsManager.runInteractions();
   }
   /**
    * Event Listeners

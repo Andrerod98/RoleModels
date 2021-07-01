@@ -58,12 +58,10 @@ export class StitchingCombinedView extends SingleCombinedView {
   stitchRight(role: string, sourceRole: string) {
     const cell = this.combinedView.get();
     let positions = cell.positions;
-    console.log({ text: "Previous", positions });
     if (positions[sourceRole] === undefined) {
       positions[sourceRole] = 0;
     }
     positions[role] = positions[sourceRole] + 1;
-    console.log({ text: "After", positions });
     this.combinedView.set({
       ...cell,
       rows: cell.rows + 1,
@@ -162,7 +160,7 @@ export class StitchingCombinedView extends SingleCombinedView {
   }
 
   public calculateGridItemWidth(): number {
-    const viewWidth = this.view.getRows();
+    const viewWidth = 1;
     const nRows = this.getCombinedView().rows;
     // const nItems = Object.keys(this.getCombinedView().positions).length;
 
@@ -171,7 +169,7 @@ export class StitchingCombinedView extends SingleCombinedView {
   }
 
   public calculateGridItemHeight() {
-    const viewHeight = this.view.getColumns();
+    const viewHeight = 1;
     const nColumns = this.getCombinedView().columns;
     // const nItems = Object.keys(this.getCombinedView().positions).length;
     if (nColumns === 0) return 0;

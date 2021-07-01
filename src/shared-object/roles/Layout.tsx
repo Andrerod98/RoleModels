@@ -1,7 +1,4 @@
-import { Box, Flex } from "@chakra-ui/react";
 import EventEmitter from "events";
-import React from "react";
-import { ViewComponent } from "../../components/view/ViewComponent";
 import { ILayoutNode } from "./ILayout";
 
 export class LayoutNode extends EventEmitter {
@@ -78,10 +75,6 @@ export class LayoutNode extends EventEmitter {
       model.children.forEach((child) => this.addChild(child));
     }
 
-    console.log({ text: "Full tree:", mod: this.getRoot().getSnapshot() });
-
-    console.log({ text: "New model:", mod: model });
-
     this.getRoot().emit("change", this);
   }
 
@@ -100,7 +93,6 @@ export class LayoutNode extends EventEmitter {
     // if the parent is a div then add flex with view
 
     if (!this.parent) {
-      console.log("parent=" + "undefined");
       const newValue = {
         name: "flex",
         viewId: "",
@@ -115,7 +107,6 @@ export class LayoutNode extends EventEmitter {
       this.update(newValue);
       // Update parent with new value
     } else {
-      console.log("parent=" + this.parent.name);
       if (this.parent!.getSnapshot().name === "div") {
         const newValue = {
           name: "flex",
@@ -128,7 +119,6 @@ export class LayoutNode extends EventEmitter {
             },
           ],
         } as ILayoutNode;
-        console.log("Aqui");
         this.update(newValue);
         // Update parent with new value
       } else if (this.parent!.getSnapshot().name === "flex") {
@@ -143,7 +133,6 @@ export class LayoutNode extends EventEmitter {
           ...this.parent.toLayout(),
           children: [...children],
         } as ILayoutNode;
-        console.log("Aqui2");
         this.parent.update(newValue);
         // Update parent with new value
       }
@@ -155,7 +144,6 @@ export class LayoutNode extends EventEmitter {
     // if the parent is a div then add flex with view
 
     if (!this.parent) {
-      console.log("parent=" + "undefined");
       const newValue = {
         name: "flex",
         viewId: "",
@@ -170,7 +158,6 @@ export class LayoutNode extends EventEmitter {
       this.update(newValue);
       // Update parent with new value
     } else {
-      console.log("parent=" + this.parent.name);
       if (this.parent!.getSnapshot().name === "div") {
         const newValue = {
           name: "flex",
@@ -183,7 +170,6 @@ export class LayoutNode extends EventEmitter {
             },
           ],
         } as ILayoutNode;
-        console.log("Aqui");
         this.update(newValue);
         // Update parent with new value
       } else if (this.parent!.getSnapshot().name === "flex") {
@@ -199,7 +185,6 @@ export class LayoutNode extends EventEmitter {
             },
           ],
         } as ILayoutNode;
-        console.log("Aqui2");
         this.parent.update(newValue);
         // Update parent with new value
       }
@@ -210,7 +195,6 @@ export class LayoutNode extends EventEmitter {
     // if the parent is a flex then add view to parent right next to it
     // if the parent is a div then add flex with view
     if (!this.parent) {
-      console.log("parent=" + "undefined");
       const newValue = {
         name: "flex",
         viewId: "",
@@ -225,7 +209,6 @@ export class LayoutNode extends EventEmitter {
       this.update(newValue);
       // Update parent with new value
     } else {
-      console.log("parent=" + this.parent.name);
       if (this.parent!.getSnapshot().name === "div") {
         const newValue = {
           name: "flex",
@@ -238,7 +221,6 @@ export class LayoutNode extends EventEmitter {
             this.toLayout(),
           ],
         } as ILayoutNode;
-        console.log("Aqui");
         this.update(newValue);
         // Update parent with new value
       } else if (this.parent!.getSnapshot().name === "flex") {
@@ -253,7 +235,6 @@ export class LayoutNode extends EventEmitter {
           ...this.parent.toLayout(),
           children: [...children],
         } as ILayoutNode;
-        console.log("Aqui2");
         this.parent.update(newValue);
         // Update parent with new value
       }
@@ -264,7 +245,6 @@ export class LayoutNode extends EventEmitter {
     // if the parent is a flex then add view to parent right next to it
     // if the parent is a div then add flex with view
     if (!this.parent) {
-      console.log("parent=" + "undefined");
       const newValue = {
         name: "flex",
         viewId: "",
@@ -279,7 +259,6 @@ export class LayoutNode extends EventEmitter {
       this.update(newValue);
       // Update parent with new value
     } else {
-      console.log("parent=" + this.parent.name);
       if (this.parent!.getSnapshot().name === "div") {
         const newValue = {
           name: "flex",
@@ -292,7 +271,6 @@ export class LayoutNode extends EventEmitter {
             this.toLayout(),
           ],
         } as ILayoutNode;
-        console.log("Aqui");
         this.update(newValue);
         // Update parent with new value
       } else if (this.parent!.getSnapshot().name === "flex") {
@@ -308,7 +286,6 @@ export class LayoutNode extends EventEmitter {
             ...children,
           ],
         } as ILayoutNode;
-        console.log("Aqui2");
         this.parent.update(newValue);
         // Update parent with new value
       }
@@ -324,7 +301,6 @@ export class LayoutNode extends EventEmitter {
   }
   public splitExtremeTop(viewId: string) {
     if (!this.parent) {
-      console.log("parent=undefined");
       const newValue = {
         name: "div",
         viewId: "",
@@ -339,7 +315,6 @@ export class LayoutNode extends EventEmitter {
       this.update(newValue);
       // Update parent with new value
     } else {
-      console.log("parent=" + this.parent.name);
       if (this.parent!.getSnapshot().name === "flex") {
         const newValue = {
           name: "div",
@@ -372,7 +347,6 @@ export class LayoutNode extends EventEmitter {
   }
   public splitTop(viewId: string) {
     if (!this.parent) {
-      console.log("parent=undefined");
       const newValue = {
         name: "div",
         viewId: "",
@@ -387,7 +361,6 @@ export class LayoutNode extends EventEmitter {
       this.update(newValue);
       // Update parent with new value
     } else {
-      console.log("parent=" + this.parent.name);
       if (this.parent!.getSnapshot().name === "flex") {
         const newValue = {
           name: "div",
@@ -420,7 +393,6 @@ export class LayoutNode extends EventEmitter {
   }
   public splitBottom(viewId: string) {
     if (!this.parent) {
-      console.log("parent=undefined");
       const newValue = {
         name: "div",
         viewId: "",
@@ -435,7 +407,6 @@ export class LayoutNode extends EventEmitter {
       this.update(newValue);
       // Update parent with new value
     } else {
-      console.log("parent=" + this.parent.name);
       if (this.parent!.getSnapshot().name === "flex") {
         const newValue = {
           name: "div",
@@ -469,7 +440,6 @@ export class LayoutNode extends EventEmitter {
 
   public splitExtremeBottom(viewId: string) {
     if (!this.parent) {
-      console.log("parent=undefined");
       const newValue = {
         name: "div",
         viewId: "",
@@ -484,7 +454,6 @@ export class LayoutNode extends EventEmitter {
       this.update(newValue);
       // Update parent with new value
     } else {
-      console.log("parent=" + this.parent.name);
       if (this.parent!.getSnapshot().name === "flex") {
         const newValue = {
           name: "div",

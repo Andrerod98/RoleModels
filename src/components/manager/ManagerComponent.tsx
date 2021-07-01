@@ -7,26 +7,14 @@
  * Licensed under the MIT License.
  */
 
-import { ChevronDownIcon } from "@chakra-ui/icons";
 import {
   Button,
   Link,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   Spacer,
   Stat,
   StatLabel,
   StatNumber,
-  Table,
   Text,
-  TableCaption,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
   Stack,
   Tab,
   TabList,

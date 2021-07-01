@@ -1,4 +1,3 @@
-import { ChevronDownIcon } from "@chakra-ui/icons";
 import {
   Table,
   TableCaption,
@@ -7,11 +6,7 @@ import {
   Th,
   Tbody,
   Td,
-  Menu,
-  MenuButton,
   Button,
-  MenuList,
-  MenuItem,
   Editable,
   EditableInput,
   EditablePreview,
@@ -35,7 +30,7 @@ export function LayoutsTable(props: LayoutTableProps) {
       <TableCaption>Layout Manager</TableCaption>
       <Thead>
         <Tr>
-          <Th>Layout Id</Th>
+          <Th>Configuration Name</Th>
 
           <Th>Load</Th>
         </Tr>
@@ -43,11 +38,6 @@ export function LayoutsTable(props: LayoutTableProps) {
 
       <Tbody key={"table-body"}>
         {configurations.map((config, index) => {
-          console.log({
-            currentConfig: JSON.stringify(currentConfig),
-            config: JSON.stringify(config),
-          });
-
           const isActive =
             JSON.stringify(currentConfig) === JSON.stringify(config);
           return (

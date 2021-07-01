@@ -17,8 +17,8 @@ export function ViewItemOverlay({
 }) {
   return (
     <GridItem
-      rowSpan={view.getColumns()}
-      colSpan={view.getRows()}
+      rowSpan={1}
+      colSpan={1}
       bg={"papayawhip"}
       opacity={0.7}
       {...props}

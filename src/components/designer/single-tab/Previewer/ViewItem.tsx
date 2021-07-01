@@ -17,7 +17,7 @@ export interface ViewItemProps {
   view: View;
   listeners: any;
   attributes: any;
-  style:any;
+  style: any;
   insertPosition: number;
   onClickRight: () => void;
   onClickLeft: () => void;
@@ -31,8 +31,8 @@ export const ViewItem = forwardRef((props: ViewItemProps, ref: any) => {
   const [isOver, setOver] = useState(false);
   return (
     <GridItem
-      rowSpan={props.view.getColumns()}
-      colSpan={props.view.getRows()}
+      rowSpan={1}
+      colSpan={1}
       onMouseOver={() => setOver(true)}
       onMouseLeave={() => setOver(false)}
       bg={"papayawhip"}

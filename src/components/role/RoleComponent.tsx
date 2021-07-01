@@ -10,7 +10,6 @@ import { ViewComponent } from "../view/ViewComponent";
 import { Role } from "../../shared-object/roles/Role";
 import { ILayoutNode } from "../../shared-object/roles/ILayout";
 import { LayoutModal } from "../header/LayoutModal";
-const QRCode = require("qrcode.react");
 interface RoleProps {
   readonly app: CrossDeviceApplication;
   readonly role: Role;
@@ -126,7 +125,6 @@ export const RoleComponent: FC<RoleProps> = (props: RoleProps) => {
         onOpen={onOpen}
         onClose={onClose}
         setSelected={(newSelected: string) => {
-          console.log("SELECTED NEW");
           setSelectedNode(newSelected);
         }}
         selectedNode={selectedNode}

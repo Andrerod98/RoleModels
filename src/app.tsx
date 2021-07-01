@@ -4,12 +4,10 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import React from "react";
 import ReactDOM from "react-dom";
-import { LayoutModal } from "./components/header/LayoutModal";
 import { CrossDeviceApplication } from "./CrossDeviceApplication";
 import { ErrorPage } from "./ErrorPage";
 
 import { LandingPage } from "./LandingPage";
-import { LayoutNode } from "./shared-object/roles/Layout";
 
 import Utils from "./utils/Utils";
 

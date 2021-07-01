@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import "./styles/App.css";
 
-import { Box, ChakraProvider } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { CrossDeviceApplication } from "../../CrossDeviceApplication";
 import { LoggingWindow } from "../../LoggingWindow";
