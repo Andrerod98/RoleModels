@@ -4,10 +4,10 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import React from "react";
 import ReactDOM from "react-dom";
-import { CrossDeviceApplication } from "./CrossDeviceApplication";
-import { ErrorPage } from "./ErrorPage";
+import { CrossDeviceApplication } from "./shared-application/CrossDeviceApplication";
+import { ErrorPage } from "./pages/error-page/ErrorPage";
 
-import { LandingPage } from "./LandingPage";
+import { LandingPage } from "./pages/landing-page/LandingPage";
 
 import Utils from "./utils/Utils";
 

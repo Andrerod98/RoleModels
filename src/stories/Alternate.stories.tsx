@@ -1,10 +1,10 @@
 import React from "react";
 import { Story, Meta } from "@storybook/react";
 
-import { PrototypingToolInstantiationFactory } from "../shared-object/PrototypingToolDataObject";
 import { FluidLoader } from "../utils/fluidRendering/fluidLoader";
-import { MainComponent } from "../components/MainComponent";
-import { PrototypingToolContainerFactory } from "../shared-object";
+import { CrossDeviceApplicationView } from "../shared-application/CrossDeviceApplicationView";
+import { PrototypingToolContainerFactory } from "../shared-application";
+import { PrototypingToolInstantiationFactory } from "../shared-application/shared-object/PrototypingToolDataObject";
 
 export default {
   title: "CombinedViews/Alternate",
@@ -15,7 +15,7 @@ export const Demo: Story<any> = (args) => (
   <FluidLoader
     factory={PrototypingToolContainerFactory}
     title={PrototypingToolInstantiationFactory.type}
-    view={MainComponent}
+    view={CrossDeviceApplicationView}
     viewType={"react"}
   ></FluidLoader>
 );
