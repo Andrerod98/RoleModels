@@ -1,28 +1,56 @@
 import { Box } from "@chakra-ui/react";
-import React, { useState } from "react";
-import { CrossDeviceApplication } from "../shared-application/CrossDeviceApplication";
+import React, { useContext } from "react";
 import { LoggingWindow } from "../components/LoggingWindow";
 import { Role } from "../shared-application/roles/Role";
 import { Header } from "../components/header";
+import { LayoutModal } from "../components/LayoutModal";
+import { CrossAppState, CrossAppContext } from "../context/AppContext";
 
-interface ManagerComponentProps {
-  readonly app: CrossDeviceApplication;
+interface PageLayoutProps {
   readonly children: JSX.Element;
 }
 
-export function PageLayout(props: ManagerComponentProps) {
-  const model = props.app.getSharedObject();
-  const [loggingOpen, setLoggingOpen] = useState(false);
+export function PageLayout(props: PageLayoutProps) {
+  const {
+    app,
+    role,
+    isLayoutOpen,
+    setLayoutOpen,
+    isLoggingOpen,
+    setLoggingOpen,
+    selectedNode,
+    setSelectedNode,
+    newViewId,
+    setNewViewId,
+  } = useContext<CrossAppState>(CrossAppContext);
+  const model = app.getSharedObject();
+
+  const handleLayoutOpen = () => {
+    setLayoutOpen(true);
+  };
+
+  const handleLayoutClose = () => {
+    setLayoutOpen(false);
+  };
+
+  const handleLoggingOpen = () => {
+    setLoggingOpen(!isLoggingOpen);
+  };
 
   const handleLoggingClose = () => {
     setLoggingOpen(false);
   };
+
+  const layout = app
+    .getSharedObject()
+    .getCurrentConfigurationOfRole(role.getName());
+
   return (
     <Box position={"relative"} h={"100%"}>
       {props.children}
       <Box zIndex={1000} position={"absolute"} top={0} left={0} h={"100%"}>
         <Header
-          app={props.app}
+          app={app}
           myRole={model.getDeviceRole()}
           roles={Array.from(model.getRoles()).map((role: Role) =>
             role.getName()
@@ -32,24 +60,23 @@ export function PageLayout(props: ManagerComponentProps) {
             // setUI(props.model.getCombinedUI());
           }}
           onViewChange={(newViewId: string) => {
-            console.log(newViewId);
-            //TODO
+            setNewViewId(newViewId);
           }}
-          onLoggingOpen={() => {}}
+          onLoggingOpen={handleLoggingOpen}
         />
       </Box>
       <LayoutModal
         layout={layout}
         newViewId={newViewId}
-        isOpen={isOpen}
-        onOpen={onOpen}
-        onClose={onClose}
+        isOpen={isLayoutOpen}
+        onOpen={handleLayoutOpen}
+        onClose={handleLayoutClose}
         setSelected={(newSelected: string) => {
           setSelectedNode(newSelected);
         }}
         selectedNode={selectedNode}
       />
-      <LoggingWindow isOpen={loggingOpen} onClose={handleLoggingClose} />
+      <LoggingWindow isOpen={isLoggingOpen} onClose={handleLoggingClose} />
     </Box>
   );
 }

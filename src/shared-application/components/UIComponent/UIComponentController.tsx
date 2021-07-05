@@ -109,6 +109,9 @@ export class UIComponentController extends EventEmitter {
   }
 
   update(model: any) {
+    console.log("Updating component with model");
+    console.log(model);
+
     this.model = model;
     this.children = [];
 
@@ -116,7 +119,10 @@ export class UIComponentController extends EventEmitter {
       this.addChild(child);
     });
 
-    this.getRoot().emit("componentChanged");
+    console.log("Snapshot");
+    console.log(this.getSnapshot());
+
+    this.getRoot().emit("componentChanged", this.getSnapshot());
     //TODO: Send change to root
   }
 

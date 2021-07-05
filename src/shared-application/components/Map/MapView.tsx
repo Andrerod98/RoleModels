@@ -5,7 +5,7 @@ import { Box } from "@chakra-ui/react";
 import { MapController } from "./MapController";
 
 export function MapView({ controller }: { controller: MapController }) {
-  const { children, ...component } = this.props.controller.get() as MapUI;
+  const { children, ...component } = controller.get() as MapUI;
 
   return (
     <Box {...component}>

@@ -29,9 +29,13 @@ export function InkCanvasView({
     controller.setInkCanvas(canvas);
     if (thickness) controller.setStroke(thickness);
     if (color) {
-      //console.log(color);
       controller.setColor(color);
     }
+
+    return function cleanup() {
+      controller.removeAllListeners();
+      controller.removeEventListeners();
+    };
     //controller.sizeCanvas(100, 100);
 
     /*window.addEventListener("resize", () => {

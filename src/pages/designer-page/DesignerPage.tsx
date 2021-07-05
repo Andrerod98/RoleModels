@@ -5,20 +5,19 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
 import { AddIcon } from "@chakra-ui/icons";
 import { Box, TabPanel, Tabs, TabPanels, TabList, Tab } from "@chakra-ui/react";
-import React, { useState } from "react";
-import { CrossDeviceApplication } from "../../shared-application/CrossDeviceApplication";
+import React, { useContext, useState } from "react";
+import { CrossAppState, CrossAppContext } from "../../context/AppContext";
 import { EditableTab } from "./components/EditableTab";
 
 import { InteractionsTab } from "./InteractionsTab";
 import { RoleTab } from "./RoleTab";
-interface SingleTabProps {
-  app: CrossDeviceApplication;
-}
+interface SingleTabProps {}
 
 export const DesignerPage = (props: SingleTabProps) => {
+  const { app } = useContext<CrossAppState>(CrossAppContext);
   const [curTab, setCurTab] = useState("default");
 
-  const tabs = Array.from(props.app.getSharedObject().getRoles());
+  const tabs = Array.from(app.getSharedObject().getRoles());
 
   const curIndex = tabs.findIndex((tab) => tab.getName() === curTab);
 
@@ -29,11 +28,11 @@ export const DesignerPage = (props: SingleTabProps) => {
   const loadRole = (role: string) => {
     setCurTab(role);
 
-    const r = props.app.getRole(curTab);
+    const r = app.getRole(curTab);
 
     if (r === undefined) {
       console.warn("The layout manager of " + role + " was not found.");
-      console.table(Array.from(props.app.getSharedObject().getRoles()));
+      console.table(Array.from(app.getSharedObject().getRoles()));
       return;
     }
 
@@ -55,7 +54,7 @@ export const DesignerPage = (props: SingleTabProps) => {
   };
 
   const handleTabClose = (role: string) => {
-    props.app.getSharedObject().removeRole(role);
+    app.getSharedObject().removeRole(role);
     loadRole("default");
   };
 
@@ -65,7 +64,7 @@ export const DesignerPage = (props: SingleTabProps) => {
       return;
     }
 
-    await props.app.getSharedObject().renameRole(role, nextValue);
+    await app.getSharedObject().renameRole(role, nextValue);
     loadRole(nextValue);
   };
 
@@ -109,14 +108,13 @@ export const DesignerPage = (props: SingleTabProps) => {
               bg={"transparent"}
               _hover={{ bg: "blackAlpha.100" }}
               onClick={() => {
-                props.app.addRole("new");
+                app.addRole("new");
               }}
             >
               <AddIcon />
             </Tab>
             <Tab
               ml={"5px"}
-              colorScheme={"blue"}
               _hover={{ bg: "blackAlpha.100" }}
               onClick={() => {
                 setCurTab("interactions");
@@ -129,12 +127,12 @@ export const DesignerPage = (props: SingleTabProps) => {
         <TabPanels h={"calc(100vh - 40px)"}>
           {tabs.map((tab, index) => (
             <TabPanel key={"tab-panel-" + index} p={0} h={"100%"}>
-              <MemoizedRole role={tab} app={props.app} />
+              <MemoizedRole role={tab} />
             </TabPanel>
           ))}
           <TabPanel key={"tab-panel-add"} p={0} h={"100%"}></TabPanel>
           <TabPanel key={"tab-panel-interactions"} p={0} h={"100%"}>
-            <InteractionsTab application={props.app} />
+            <InteractionsTab application={app} />
           </TabPanel>
         </TabPanels>
       </Tabs>

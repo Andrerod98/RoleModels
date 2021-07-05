@@ -12,7 +12,8 @@ import {
   PopoverTrigger,
   Portal,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useMemo, useState } from "react";
+import { useEffect } from "react";
 import { FC } from "react";
 // import { UIComponentFactory } from "../components/UIComponentFactory";
 import { ImQrcode } from "react-icons/im";
@@ -38,9 +39,13 @@ export const ViewComponent: FC<ViewComponentProps> = (
     qrUrl = "view/" + props.view.getId() + "#from=" + props.role.getName();
   }
 
+  console.log(props.view.getRoot().getSnapshot());
+
   return (
     <Box w={"100%"} h={"100%"} bg={"white"} position={"relative"}>
-      {props.view.getRoot().generateWidget()}
+      {useMemo(() => {
+        return props.view.getRoot().generateWidget();
+      }, [JSON.stringify(props.view.getRoot().getSnapshot())])}
       <Box position={"absolute"} top={"0px"} right={"0px"}>
         <Popover>
           <PopoverTrigger>

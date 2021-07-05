@@ -7,22 +7,23 @@ import {
   ModalOverlay,
   useDisclosure,
 } from "@chakra-ui/react";
-import React, { FC, useState } from "react";
+import React, { FC, useContext, useState } from "react";
 import { AiOutlineExpand } from "react-icons/ai";
-import { CrossDeviceApplication } from "../shared-application/CrossDeviceApplication";
+import { CrossAppState, CrossAppContext } from "../context/AppContext";
 
 import { CrossDeviceInteractionChooser } from "./CrossDeviceInteractionChooser";
 import { CustomQRReader } from "./CustomQRReader";
 
 interface CrossDeviceInteractionModalProps {
-  app: CrossDeviceApplication;
   onViewChange: (nvid: string) => void;
 }
 export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
   (props: CrossDeviceInteractionModalProps) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const { app, setLayoutOpen, setNewViewId } =
+      useContext<CrossAppState>(CrossAppContext);
 
-    const [{ view, combinedView, qr, from }, setState] = useState({
+    const [{ view }, setState] = useState({
       view: undefined,
       combinedView: undefined,
       qr: undefined,
@@ -43,11 +44,11 @@ export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
       };
       if (view != "") {
         console.log(from);
-        state.view = props.app.getRole(from).getView(view);
+        state.view = app.getRole(from).getView(view);
       } else if (combinedView != "") {
-        state.combinedView = props.app.getCombinedViewWithId(combinedView);
+        state.combinedView = app.getCombinedViewWithId(combinedView);
       } else if (qr != "") {
-        state.qr = props.app.getQRCode(qr);
+        state.qr = app.getQRCode(qr);
       }
 
       setState(state);
@@ -57,7 +58,9 @@ export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
       e: React.MouseEvent<HTMLButtonElement, MouseEvent>
     ) => {
       e.stopPropagation();
-      props.app.grabView(view);
+      app.grabView(view);
+      setNewViewId(view.id);
+      setLayoutOpen(true);
       props.onViewChange(view.id);
       onClose();
     };
@@ -66,21 +69,22 @@ export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
       e: React.MouseEvent<HTMLButtonElement, MouseEvent>
     ) => {
       e.stopPropagation();
-      props.app.getMyRole().addView(view);
-      props.app.mirrorViews(view, view);
+      app.getMyRole().addView(view);
+      app.mirrorViews(view, view);
+      setNewViewId(view.id);
+      setLayoutOpen(true);
       props.onViewChange(view.id);
       onClose();
     };
 
     const handleStitch = (
-      e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-      side: string
+      e: React.MouseEvent<HTMLButtonElement, MouseEvent>
     ) => {
       e.stopPropagation();
-      props.app.getMyRole().addView(view.view);
-      const stitchingCV = props.app.stitchViews(view.view, view.view);
+      app.getMyRole().addView(view.view);
+      const stitchingCV = app.stitchViews(view.view, view.view);
 
-      stitchingCV.stitchBottom(props.app.getMyRole().getName(), view.from);
+      stitchingCV.stitchBottom(app.getMyRole().getName(), view.from);
       onClose();
     };
 

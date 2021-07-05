@@ -24,7 +24,7 @@ interface RolesTableProps {
 }
 
 export function RolesTable(props: RolesTableProps) {
-  const model = props.app.getSharedObject();
+  const sharedObject = props.app.getSharedObject();
   return (
     <Table variant='simple'>
       <TableCaption>Roles - Devices Mapping</TableCaption>
@@ -56,16 +56,21 @@ export function RolesTable(props: RolesTableProps) {
                     {device.role}
                   </MenuButton>
                   <MenuList key={"menu-list-" + index}>
-                    {Array.from(model.getRoles()).map((role: Role, index2) => (
-                      <MenuItem
-                        key={"menu-item-" + index2}
-                        onClick={(srole) =>
-                          model.promoteToRole(role.getName(), device.id)
-                        }
-                      >
-                        {role.getName()}
-                      </MenuItem>
-                    ))}
+                    {Array.from(sharedObject.getRoles()).map(
+                      (role: Role, index2) => (
+                        <MenuItem
+                          key={"menu-item-" + index2}
+                          onClick={() =>
+                            sharedObject.promoteToRole(
+                              role.getName(),
+                              device.id
+                            )
+                          }
+                        >
+                          {role.getName()}
+                        </MenuItem>
+                      )
+                    )}
                   </MenuList>
                 </Menu>
               </Td>

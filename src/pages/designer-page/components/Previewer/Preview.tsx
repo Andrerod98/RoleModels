@@ -2,9 +2,7 @@ import { Box, Flex } from "@chakra-ui/react";
 import React from "react";
 import { CrossDeviceApplication } from "../../../../shared-application/CrossDeviceApplication";
 import { ILayoutNode } from "../../../../shared-application/roles/ILayout";
-import { LayoutNode } from "../../../../shared-application/roles/Layout";
 import { Role } from "../../../../shared-application/roles/Role";
-import { View } from "../../../../shared-application/views/View";
 import { ViewComponent } from "../../../../shared-application/views/ViewComponent";
 
 interface PreviewProps {
@@ -55,8 +53,13 @@ export const Preview = (props: PreviewProps) => {
           node.viewId
         );
 
+        if (!view && !combinedView) {
+          return <></>;
+        }
+
         return (
           <Box
+            key={props.app.getMyRole().getName() + "_box_" + node.viewId}
             w={"100%"}
             h={"100%"}
             maxW={"100%"}

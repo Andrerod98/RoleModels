@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
+import { CloseIcon } from "@chakra-ui/icons";
 import {
   IconButton,
   Box,
   Text,
   Badge,
-  CloseButton,
   Flex,
   Table,
   Tbody,
@@ -61,7 +61,7 @@ export const LoggingWindow = (props: LogginWindowProps) => {
         top={"3"}
         size={"xs"}
         aria-label={"Search database"}
-        icon={<CloseButton />}
+        icon={<CloseIcon />}
         onClick={() => {
           props.onClose();
         }}

@@ -43,10 +43,20 @@ export class Role {
         view.update(v);
         tempArray.push(view);
       } else {
-        tempArray.push(View.from(v, this.factoriesManager));
+        const newView = View.from(v, this.factoriesManager);
+        tempArray.push(newView);
       }
     });
     this.views = tempArray;
+    for (const v of this.views) {
+      v.removeAllListeners();
+      v.on("viewChanged", (root) => {
+        if (root) {
+          v.setRoot(root);
+          this.updateView(v);
+        }
+      });
+    }
   }
 
   public onChange(listener: () => void) {
@@ -150,6 +160,9 @@ export class Role {
     if (index == -1) {
       return;
     }
+
+    console.log("Updating view with value");
+    console.log(view);
 
     this.views[index] = view;
     this.updateViews(this.views);

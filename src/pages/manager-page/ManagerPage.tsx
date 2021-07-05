@@ -23,50 +23,17 @@ import {
   Tabs,
   Box,
 } from "@chakra-ui/react";
-import React, { FC } from "react";
-import { CrossDeviceApplication } from "../../shared-application/CrossDeviceApplication";
-import { IDevice } from "../../shared-application/devices/IDevice";
+import React, { useContext } from "react";
+import { CrossAppContext, CrossAppState } from "../../context/AppContext";
 import { LayoutsTable } from "./components/LayoutsTable";
 import { RolesTable } from "./components/RolesTable";
 
 const QRCode = require("qrcode.react");
 
-interface DevicesIndicatorProps {
-  // device: IDevice;
-  deviceCount: number;
-}
+interface ManagerPageProps {}
 
-export const DevicesIndicator: FC<DevicesIndicatorProps> = (props) => (
-  <div className='deviceName'>
-    <span className='deviceCount'>
-      Connected: {props.deviceCount}
-      {props.deviceCount > 1 ? " devices" : " device"}
-    </span>
-  </div>
-);
-
-interface ManagerComponentProps {
-  devices: IDevice[];
-  readonly app: CrossDeviceApplication;
-}
-
-/*
-const DeviceRoleItem = (props: { roles: IRole[] }) => (
-  <Dropdown>
-    <Dropdown.Toggle variant="success" id="dropdown-basic">
-      Select a role
-    </Dropdown.Toggle>
-
-    <Dropdown.Menu>
-      {props.roles.map((role) => (
-        <Dropdown.Item>{role.name}</Dropdown.Item>
-      ))}
-    </Dropdown.Menu>
-  </Dropdown>
-);
-*/
-export const ManagerPage: FC<ManagerComponentProps> = (props) => {
-  const model = props.app.getSharedObject();
+export function ManagerPage(props: ManagerPageProps) {
+  const { devices, app } = useContext<CrossAppState>(CrossAppContext);
   return (
     <Box>
       <Stack
@@ -77,44 +44,21 @@ export const ManagerPage: FC<ManagerComponentProps> = (props) => {
         justify={["center", "space-between", "flex-end", "flex-end"]}
         direction={["column", "column", "row", "row"]}
       >
-        <QRCode
-          key='qr'
-          value={
-            "https://" +
-            props.app.getServerUrl() +
-            ":8080#project=" +
-            model.getId()
-          }
-        />
+        <QRCode key='qr' value={app.getFullHost()} />
 
         <Link
           target={"_blank"}
-          href={
-            "https://" +
-            props.app.getServerUrl() +
-            ":8080#project=" +
-            model.getId()
-          }
+          href={app.getFullHost()}
           rel='noreferrer'
           isExternal
         >
           <Text fontSize={{ base: "10px", md: "16px", lg: "24px" }}>
-            https://{props.app.getServerUrl()}:8080#project=
-            {model.getId()}
+            {app.getFullHost()}
           </Text>
         </Link>
         <Button
           onClick={() => {
-            const element = document.createElement("a");
-            element.setAttribute("href", "../../../host.crt");
-            element.setAttribute("download", "host.crt");
-
-            element.style.display = "none";
-            document.body.appendChild(element);
-
-            element.click();
-
-            document.body.removeChild(element);
+            app.downloadCertificate();
           }}
         >
           Download Certificate
@@ -122,7 +66,7 @@ export const ManagerPage: FC<ManagerComponentProps> = (props) => {
         <Spacer />
         <Stat key='stat'>
           <StatLabel>Connected Devices</StatLabel>
-          <StatNumber>{props.devices.length}</StatNumber>
+          <StatNumber>{devices.length}</StatNumber>
         </Stat>
       </Stack>
 
@@ -134,20 +78,20 @@ export const ManagerPage: FC<ManagerComponentProps> = (props) => {
           <Button
             mr={"40px"}
             size={"sm"}
-            onClick={() => props.app.getSharedObject().saveConfiguration()}
+            onClick={() => app.getSharedObject().saveConfiguration()}
           >
             Save Configuration
           </Button>
         </TabList>
         <TabPanels>
           <TabPanel>
-            <RolesTable app={props.app} devices={props.devices} />
+            <RolesTable app={app} devices={devices} />
           </TabPanel>
           <TabPanel>
-            <LayoutsTable app={props.app} devices={props.devices} />
+            <LayoutsTable app={app} />
           </TabPanel>
         </TabPanels>
       </Tabs>
     </Box>
   );
-};
+}

@@ -12,9 +12,17 @@ import "ace-builds/src-noconflict/snippets/json";
 import "ace-builds/src-noconflict/ext-language_tools";
 import Beautify from "ace-builds/src-noconflict/ext-beautify";
 import { config } from "ace-builds";
+import { useEffect } from "react";
 config.set(
   "basePath",
   "https://cdn.jsdelivr.net/npm/ace-builds@1.4.8/src-noconflict/"
+);
+
+config.setModuleUrl(
+  "ace/mode/kson_worker",
+  "https://cdn.jsdelivr.net/npm/ace-builds@1.4.8/src-noconflict/worker-" +
+    "json" +
+    ".js"
 );
 
 interface CodeEditorProps {
@@ -30,12 +38,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = (
 ) => {
   const { colorMode } = useColorMode();
 
-  config.setModuleUrl(
-    "ace/mode/kson_worker",
-    "https://cdn.jsdelivr.net/npm/ace-builds@1.4.8/src-noconflict/worker-" +
-      props.mode +
-      ".js"
-  );
+  useEffect(() => {}, [props.mode]);
 
   return (
     <AceEditor

@@ -50,7 +50,13 @@ export class LayoutNode extends EventEmitter {
 
   removeChild(viewId: string) {
     const index = this.children.findIndex((c) => c.getViewId() === viewId);
-    this.children.splice(index, 1);
+    if (index == -1) {
+      this.children.forEach((child) => {
+        child.removeChild(viewId);
+      });
+    } else {
+      this.children.splice(index, 1);
+    }
   }
 
   public removeView(viewId: string) {

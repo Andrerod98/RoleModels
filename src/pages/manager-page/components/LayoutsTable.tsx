@@ -13,18 +13,16 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import { CrossDeviceApplication } from "../../../shared-application/CrossDeviceApplication";
-import { IDevice } from "../../../shared-application/devices/IDevice";
 import { IConfiguration } from "../../../shared-application/managers/ConfigurationsManager";
 
 interface LayoutTableProps {
-  devices: IDevice[];
   readonly app: CrossDeviceApplication;
 }
 
 export function LayoutsTable(props: LayoutTableProps) {
-  const model = props.app.getSharedObject();
-  const configurations = Array.from(model.getConfigurations());
-  const currentConfig = model.getCurrentConfigurationShared();
+  const sharedObject = props.app.getSharedObject();
+  const configurations = Array.from(sharedObject.getConfigurations());
+  const currentConfig = sharedObject.getCurrentConfigurationShared();
 
   return (
     <Table variant='simple'>
@@ -47,7 +45,7 @@ export function LayoutsTable(props: LayoutTableProps) {
                 <Editable
                   defaultValue={config.name}
                   onSubmit={(nextValue: string) => {
-                    model.renameConfiguration(config.name, nextValue);
+                    sharedObject.renameConfiguration(config.name, nextValue);
                   }}
                 >
                   <EditablePreview />
@@ -63,7 +61,7 @@ export function LayoutsTable(props: LayoutTableProps) {
                     as={Button}
                     fontSize={{ base: "10px", md: "16px", lg: "16px" }}
                     onClick={() => {
-                      model.loadConfiguration(config.name);
+                      sharedObject.loadConfiguration(config.name);
                     }}
                   >
                     Load

@@ -1,27 +1,19 @@
-/* eslint-disable no-unused-vars */
-import React, { useState } from "react";
-import { FC } from "react";
+import React, { useContext, useMemo } from "react";
 
-import { Box, Flex, useDisclosure } from "@chakra-ui/react";
-import { CrossDeviceApplication } from "../../shared-application/CrossDeviceApplication";
+import { Box, Flex } from "@chakra-ui/react";
 import { QRCodeController } from "../../shared-application/qrcode/QRCodeController";
 import { ViewComponent } from "../../shared-application/views/ViewComponent";
-import { Role } from "../../shared-application/roles/Role";
 import { ILayoutNode } from "../../shared-application/roles/ILayout";
-import { LayoutModal } from "../../components/LayoutModal";
-interface RoleProps {
-  readonly app: CrossDeviceApplication;
-  readonly role: Role;
-}
+import { CrossAppState, CrossAppContext } from "../../context/AppContext";
+interface RoleProps {}
 
-export const RolePage: FC<RoleProps> = (props: RoleProps) => {
-  const model = props.app.getSharedObject();
+export function RolePage(props: RoleProps) {
+  const { app, role, layout, selectedNode, setSelectedNode, isLayoutOpen } =
+    useContext<CrossAppState>(CrossAppContext);
+  const model = app.getSharedObject();
   //const views = props.app.getViewsOrCombinedViews(props.role.getName());
-  const qrs = props.app.getSharedObject().getMyQrCodes();
-  const layout = props.app
-    .getSharedObject()
-    .getCurrentConfigurationOfRole(props.role.getName());
-  const [selectedNode, setSelectedNode] = useState("");
+  const qrs = app.getSharedObject().getMyQrCodes();
+
   const generateWidget = (node: ILayoutNode): JSX.Element => {
     switch (node.name) {
       case "div":
@@ -54,10 +46,14 @@ export const RolePage: FC<RoleProps> = (props: RoleProps) => {
           </Flex>
         );
       case "view":
-        const [view, combinedView] = props.app.getViewOrCombinedView(
-          props.role.getName(),
+        const [view, combinedView] = app.getViewOrCombinedView(
+          role.getName(),
           node.viewId
         );
+
+        if (!view && !combinedView) {
+          return <></>;
+        }
 
         return (
           <Box
@@ -74,8 +70,9 @@ export const RolePage: FC<RoleProps> = (props: RoleProps) => {
               key={model.getDeviceRole() + "_view_" + node.viewId}
               view={view}
               combinedView={combinedView}
-              role={props.role}
+              role={role}
             />
+            );
             <Box
               _hover={{ bg: "rgba(17, 99, 245,0.4)" }}
               bg={
@@ -83,7 +80,7 @@ export const RolePage: FC<RoleProps> = (props: RoleProps) => {
                   ? "rgba(17, 99, 245,0.4)"
                   : "transparent"
               }
-              display={isOpen ? "block" : "none"}
+              display={isLayoutOpen ? "block" : "none"}
               w={"100%"}
               h={"100%"}
               position={"absolute"}
@@ -98,8 +95,6 @@ export const RolePage: FC<RoleProps> = (props: RoleProps) => {
     }
   };
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [newViewId, setNewViewId] = useState("");
   return (
     <Box h={"100%"} w={"100%"}>
       {generateWidget(layout.getSnapshot())}
@@ -113,4 +108,4 @@ export const RolePage: FC<RoleProps> = (props: RoleProps) => {
       })}
     </Box>
   );
-};
+}

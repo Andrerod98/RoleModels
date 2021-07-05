@@ -44,7 +44,7 @@ export class ConfigurationsManager extends EventEmitter {
 
   public loadObject() {
     const currentConfigValue = this.currentConfiguration.get();
-    console.log(this.currentConfiguration.get());
+
     const currentConfigKeys = Object.keys(currentConfigValue.layouts);
 
     const currentKeys = Object.keys(this.current.layouts);
@@ -59,10 +59,8 @@ export class ConfigurationsManager extends EventEmitter {
       this.current.layouts[key] = new LayoutNode(layoutValue);
       this.current.layouts[key].getRoot().on("change", (l) => {
         this.updateCurrent(key, this.current.layouts[key].getSnapshot());
-        console.log(this.currentConfiguration.get());
       });
     }
-    console.log(this.currentConfiguration.get());
   }
   /* GETTERS */
 
@@ -83,6 +81,18 @@ export class ConfigurationsManager extends EventEmitter {
     });
     this.configurationsSharedMap.delete(oldValue);
     this.emitChange();
+  }
+
+  public removeViewFromRole(role: string, viewId: string) {
+    const configValue = this.currentConfiguration.get();
+    this.current.layouts[role].removeChild(viewId);
+    console.log("Removing layout");
+    console.log(this.current.layouts[role]);
+    const layouts = { ...configValue.layouts };
+    layouts[role] = this.current.layouts[role].getSnapshot();
+    console.log("Removing");
+    console.log({ ...configValue, layouts: layouts });
+    this.currentConfiguration.set({ ...configValue, layouts: layouts });
   }
 
   /* Returns all the combined views */
@@ -111,15 +121,11 @@ export class ConfigurationsManager extends EventEmitter {
 
   public saveConfiguration() {
     const name = uuid();
-    console.log("ONCE");
-    console.log(this.currentConfiguration.get());
     this.currentConfiguration.set({
       ...this.currentConfiguration.get(),
       name: name,
     });
 
-    console.log("Two");
-    console.log(this.currentConfiguration.get());
     this.configurationsSharedMap.set(name, {
       name,
       layouts: { ...this.currentConfiguration.get().layouts },

@@ -190,7 +190,6 @@ export function Header(props: HeaderProps) {
                   }}
                 />
                 <CrossDeviceInteractionModal
-                  app={props.app}
                   onViewChange={(nvid: string) => {
                     props.onViewChange(nvid);
                   }}

@@ -550,7 +550,13 @@ export class PrototypingToolDataObject
   };
 
   public grabView = (view: View): void => {
+    console.log("Grabbed");
     this.getViewOwners(view.getId()).forEach((role) => {
+      console.log("FOUND OWNER");
+      this.configurationsManager.removeViewFromRole(
+        role.getName(),
+        view.getId()
+      );
       this.rolesManager.getRole(role.getName()).removeView(view.getId());
     });
     this.rolesManager.getRole(this.getMyRole().getName()).addView(view);

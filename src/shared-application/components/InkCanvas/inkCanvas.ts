@@ -135,6 +135,7 @@ export class InkCanvas {
     private readonly canvas: HTMLCanvasElement,
     private readonly model: IInk
   ) {
+    console.log("Creating a new ink canvas!");
     this.model.on("clear", this.redraw.bind(this));
     this.model.on("stylus", this.handleStylus.bind(this));
     this.canvas.style.touchAction = "none";
@@ -161,6 +162,32 @@ export class InkCanvas {
     };
 
     this.sizeCanvasBackingStore();
+  }
+
+  public getCanvasHTMLElement() {
+    return this.canvas;
+  }
+
+  public getEventListeners() {
+    return this.model.getGCData();
+  }
+
+  public removeEventListeners() {
+    this.model.off("clear", this.redraw.bind(this));
+    this.model.off("stylus", this.handleStylus.bind(this));
+
+    this.canvas.removeEventListener(
+      "pointerdown",
+      this.handlePointerDown.bind(this)
+    );
+    this.canvas.removeEventListener(
+      "pointermove",
+      this.handlePointerMove.bind(this)
+    );
+    this.canvas.removeEventListener(
+      "pointerup",
+      this.handlePointerUp.bind(this)
+    );
   }
 
   public setPenColor(color: IColor) {

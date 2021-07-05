@@ -9,9 +9,9 @@ import {
   Heading,
   useDisclosure,
 } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { LayoutModal } from "../../components/LayoutModal";
-import { CrossDeviceApplication } from "../../shared-application/CrossDeviceApplication";
+import { CrossAppState, CrossAppContext } from "../../context/AppContext";
 import { ILayoutNode } from "../../shared-application/roles/ILayout";
 import { Role } from "../../shared-application/roles/Role";
 import { View } from "../../shared-application/views/View";
@@ -23,22 +23,23 @@ import { ComponentsExamples } from "./ComponentsExamples";
 
 interface RoleTabProps {
   role: Role;
-  app: CrossDeviceApplication;
 }
 
 export function RoleTab(props: RoleTabProps) {
+  const { app } = useContext<CrossAppState>(CrossAppContext);
   const views = props.role.getViews();
-  const [value, setValue] = useState(
-    Utils.jsonToString(views.map((v) => v.toView()))
-  );
-  const [cursorPosition, setCursorPosition] = useState({ row: 0, column: 0 });
+  const layout = app
+    .getSharedObject()
+    .getCurrentConfigurationOfRole(props.role.getName());
+
+  const [codeState, setCodeState] = useState({
+    value: Utils.jsonToString(views.map((v) => v.toView())),
+    position: { row: 0, column: 0 },
+  });
+
   const [alert, setAlert] = useState(false);
   const [newViewId, setNewViewId] = useState("");
   const [selectedNode, setSelectedNode] = useState("");
-
-  const layout = props.app
-    .getSharedObject()
-    .getCurrentConfigurationOfRole(props.role.getName());
 
   const [layoutSnapshot, setLayoutSnapshot] = useState(
     layout
@@ -52,16 +53,20 @@ export function RoleTab(props: RoleTabProps) {
     //props.project.stringToViews(value)
 
     props.role.updateIViews(
-      Utils.stringToJson(newValue === undefined ? value : newValue)
+      Utils.stringToJson(newValue === undefined ? codeState.value : newValue)
     );
-    setValue(newValue === undefined ? value : newValue);
+    setCodeState(
+      newValue === undefined
+        ? { ...codeState, value: codeState.value }
+        : { ...codeState, value: newValue }
+    );
     setLayoutSnapshot({ ...layout.getSnapshot() });
   };
 
   const addUIComponent = (name: string) => {
     setAlert(false);
     let object;
-    let json = Utils.stringToJson(value);
+    let json = Utils.stringToJson(codeState.value);
     if (json === undefined) {
       setAlert(true);
       return;
@@ -76,7 +81,7 @@ export function RoleTab(props: RoleTabProps) {
         }
         //Open layout modal
 
-        setValue(Utils.jsonToString(json));
+        setCodeState({ ...codeState, value: Utils.jsonToString(json) });
         preview(Utils.jsonToString(json));
         setNewViewId(newView.id);
         onOpen();
@@ -143,10 +148,10 @@ export function RoleTab(props: RoleTabProps) {
   };
 
   const addUIComponentToEditor = (str: string) => {
-    const oldValue = value;
+    const oldValue = codeState.value;
     const rows = oldValue.split("\n");
-    const row = cursorPosition.row;
-    const column = cursorPosition.column;
+    const row = codeState.position.row;
+    const column = codeState.position.column;
     const line = rows[row];
     let previous = line.substring(0, column);
     previous = previous.trim();
@@ -159,30 +164,38 @@ export function RoleTab(props: RoleTabProps) {
     if (newFormattedValue === undefined) {
       setAlert(true);
     } else {
-      setValue(Utils.jsonToString(newFormattedValue));
+      setCodeState({
+        ...codeState,
+        value: Utils.jsonToString(newFormattedValue),
+      });
 
       preview(Utils.jsonToString(newFormattedValue));
     }
   };
 
   const handleFocus = (value: any) => {
-    setCursorPosition(value.cursor);
+    setCodeState({ ...codeState, position: value.cursor });
   };
 
   const handleChange = (value: any, event?: any) => {
-    setValue(value);
-    setCursorPosition(event.end);
+    setCodeState({ value: value, position: event.end });
   };
 
   const handleChangeView = (newView: View) => {
     props.role.updateView(newView);
-    setValue(Utils.jsonToString(props.role.getViews().map((v) => v.toView())));
+    setCodeState({
+      ...codeState,
+      value: Utils.jsonToString(props.role.getViews().map((v) => v.toView())),
+    });
   };
 
   const handleChangeViews = (newViews: View[]) => {
     props.role.updateViews(newViews);
 
-    setValue(Utils.jsonToString(props.role.getViews().map((v) => v.toView())));
+    setCodeState({
+      ...codeState,
+      value: Utils.jsonToString(props.role.getViews().map((v) => v.toView())),
+    });
   };
   return (
     <Box h={"100%"} bg={"gray.100"}>
@@ -205,7 +218,7 @@ export function RoleTab(props: RoleTabProps) {
               onChangeViews={handleChangeViews}
               layout={layoutSnapshot}
               role={props.role}
-              app={props.app}
+              app={app}
               isOpenLayoutModal={isOpen}
               handleClick={() => {
                 preview();
@@ -250,7 +263,7 @@ export function RoleTab(props: RoleTabProps) {
             <CodeEditor
               title={"UI"}
               mode={"json"}
-              value={value}
+              value={codeState.value}
               onChange={handleChange}
               onFocus={handleFocus}
             />

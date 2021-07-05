@@ -37,6 +37,19 @@ export class CrossDeviceApplication {
     return this.isFirst;
   }
 
+  public downloadCertificate() {
+    const element = document.createElement("a");
+    element.setAttribute("href", "../../../host.crt");
+    element.setAttribute("download", "host.crt");
+
+    element.style.display = "none";
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+  }
+
   public defineInteractions(listener: () => void) {
     this.setInteractions = listener;
   }
@@ -183,7 +196,7 @@ export class CrossDeviceApplication {
     const view = this.getRole(role).getView(viewID);
     if (view === undefined) {
       console.error("The view does not exist in role " + role);
-      return undefined;
+      return [undefined, undefined];
     }
 
     if (view.isCombined()) {

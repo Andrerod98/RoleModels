@@ -136,6 +136,10 @@ export function LayoutModal(props: LayoutModalProps) {
                 viewId: props.newViewId,
               });
               props.setSelected(props.newViewId);
+              console.log("ADDING TO CENTER");
+              console.log(props.layout);
+              console.log(props.newViewId);
+              console.log("Finish");
               props.onClose();
             }}
             icon={<Icon fontSize={"30px"} as={BiRectangle} />}
