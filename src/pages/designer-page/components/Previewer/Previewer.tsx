@@ -16,8 +16,6 @@ interface PreviewerProps {
   role: Role;
   isOpenLayoutModal: boolean;
   handleClick: () => void;
-  onChangeView: (newView: View) => void;
-  onChangeViews: (newViews: View[]) => void;
   selectedNode: string;
   setSelected: (newSelected: string) => void;
 }

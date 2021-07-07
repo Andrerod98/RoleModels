@@ -52,7 +52,7 @@ export function create(
   // Bind routes
   const routes = createRoutes(config, mongoManager, storage);
 
-  app.use(cors());
+  app.use(cors({ origin: "*" }));
   app.use(routes.storage);
   app.use(routes.ordering);
 

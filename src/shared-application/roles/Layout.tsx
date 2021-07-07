@@ -112,7 +112,7 @@ export class LayoutNode extends EventEmitter {
       if (this.children.length === 0) {
         this.parent.removeChild(this.getId());
       } else {
-        this.getRoot().emit("change", this);
+        this.getRoot().emit("change", this.getRoot());
       }
     }
   }
@@ -192,7 +192,7 @@ export class LayoutNode extends EventEmitter {
       model.children.forEach((child) => this.addChild(child));
     }
 
-    this.getRoot().emit("change", this);
+    this.getRoot().emit("change", this.getRoot());
   }
 
   /*getSnapshot(): ILayoutNode {

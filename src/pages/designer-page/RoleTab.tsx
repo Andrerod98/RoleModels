@@ -28,7 +28,7 @@ interface RoleTabProps {
 
 export function RoleTab(props: RoleTabProps) {
   const { app } = useContext<CrossAppState>(CrossAppContext);
-  const views = props.role.getViews();
+  const views = app.getSharedObject().getViewsFrom(props.role.getName());
   const layout = app
     .getSharedObject()
     .getCurrentConfigurationOfRole(props.role.getName());
@@ -52,15 +52,20 @@ export function RoleTab(props: RoleTabProps) {
 
   const preview = (newValue?: string, nvid?: string) => {
     //props.project.stringToViews(value)
-
-    props.role.updateIViews(
-      Utils.stringToJson(newValue === undefined ? codeState.value : newValue)
+    const iviews = Utils.stringToJson(
+      newValue === undefined ? codeState.value : newValue
     );
+    props.role.updateIViews(iviews);
+    app.getSharedObject().updateIViews(iviews);
+
+    console.log(app.getSharedObject().getViewsFrom(props.role.getName()));
+
     setCodeState(
       newValue === undefined
         ? { ...codeState, value: codeState.value }
         : { ...codeState, value: newValue }
     );
+
     setLayoutSnapshot({ ...layout.toLayout() });
   };
 
@@ -183,19 +188,31 @@ export function RoleTab(props: RoleTabProps) {
   };
 
   const handleChangeView = (newView: View) => {
-    props.role.updateView(newView);
+    app
+      .getSharedObject()
+      .updateViewOrCombinedView(props.role.getName(), newView);
     setCodeState({
       ...codeState,
-      value: Utils.jsonToString(props.role.getViews().map((v) => v.toView())),
+      value: Utils.jsonToString(
+        app
+          .getSharedObject()
+          .getViewsFrom(props.role.getName())
+          .map((v) => v.toView())
+      ),
     });
   };
 
   const handleChangeViews = (newViews: View[]) => {
-    props.role.updateViews(newViews);
-
+    props.role.updateViews(newViews.map((nv) => nv.getId()));
+    app.getSharedObject().updateViews(newViews);
     setCodeState({
       ...codeState,
-      value: Utils.jsonToString(props.role.getViews().map((v) => v.toView())),
+      value: Utils.jsonToString(
+        app
+          .getSharedObject()
+          .getViewsFrom(props.role.getName())
+          .map((v) => v.toView())
+      ),
     });
   };
   return (
@@ -215,9 +232,16 @@ export function RoleTab(props: RoleTabProps) {
           </Heading>
           <Center h={"100%"} bg={"gray.700"} w={"100%"}>
             <Previewer
-              onChangeView={handleChangeView}
-              onChangeViews={handleChangeViews}
-              layout={layoutSnapshot}
+              layout={
+                layout
+                  ? layout.getRoot().toLayout()
+                  : ({
+                      id: uuid(),
+                      name: "div",
+                      viewId: "",
+                      children: [],
+                    } as ILayoutNode)
+              }
               role={props.role}
               app={app}
               isOpenLayoutModal={isOpen}
@@ -272,7 +296,7 @@ export function RoleTab(props: RoleTabProps) {
         </Box>
       </Flex>
       <LayoutModal
-        layout={layout}
+        layout={layout ? layout.getRoot() : layout}
         newViewId={newViewId}
         isOpen={isOpen}
         onOpen={onOpen}

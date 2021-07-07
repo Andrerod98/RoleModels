@@ -1,4 +1,4 @@
-import EventEmitter from "events";
+import { SharedCell } from "@fluidframework/cell";
 import { IUIComponent, UIComponentController } from "../components/UIComponent";
 import { FactoriesManager } from "../managers/FactoriesManager";
 import { IView } from "./IView";
@@ -6,19 +6,47 @@ import { IView } from "./IView";
 enum ViewEvents {
   Changed = "viewChanged",
 }
-export class View extends EventEmitter {
+export class View {
   protected root: UIComponentController;
+  private id: string;
+  private combinedViewID: string;
   constructor(
-    protected id: string,
-    protected combinedViewID: string = "",
-    private readonly factoriesManager: FactoriesManager,
-    root: IUIComponent
+    protected readonly sharedView: SharedCell,
+    private readonly factoriesManager: FactoriesManager
   ) {
-    super();
-    this.setRoot(root);
+    this.loadObject();
+    this.setEventListener();
+  }
+
+  private setEventListener() {
+    this.sharedView.on("valueChanged", (e: any) => {
+      console.log("View " + e.name + " changed so loading object.");
+      this.loadObject();
+    });
+
+    this.sharedView.on("viewChanged", (root: IUIComponent) => {
+      this.setRoot(root);
+      this.updateObject(this.toView());
+    });
+  }
+
+  private loadObject() {
+    const view = this.sharedView.get() as IView;
+    this.id = view.id;
+    this.combinedViewID = view.combinedViewID;
+    this.setRoot(view.root);
   }
 
   /* GETTERS */
+
+  public getSharedObject(): SharedCell {
+    return this.sharedView;
+  }
+
+  public getObject(): IView {
+    return this.sharedView.get();
+  }
+
   public getId() {
     return this.id;
   }
@@ -52,7 +80,11 @@ export class View extends EventEmitter {
 
   public deleteEventListeners() {
     this.root.deleteEventListeners();
-    this.removeAllListeners();
+    //this.removeAllListeners();
+  }
+
+  public updateObject(object: IView) {
+    this.sharedView.set(object);
   }
 
   public update(object: IView) {
@@ -72,13 +104,8 @@ export class View extends EventEmitter {
     };
   }
 
-  static from(object: IView, factoriesManager: FactoriesManager) {
-    const view = new View(
-      object.id,
-      object.combinedViewID,
-      factoriesManager,
-      object.root
-    );
+  static from(sharedView: SharedCell, factoriesManager: FactoriesManager) {
+    const view = new View(sharedView, factoriesManager);
 
     return view;
   }
@@ -86,6 +113,6 @@ export class View extends EventEmitter {
   /* Callback functions */
 
   private emitChange(data?: any) {
-    this.emit(ViewEvents.Changed, data);
+    this.sharedView.emit(ViewEvents.Changed, data);
   }
 }

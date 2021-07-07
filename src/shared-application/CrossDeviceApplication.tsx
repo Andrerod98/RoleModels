@@ -193,7 +193,7 @@ export class CrossDeviceApplication {
     role: string,
     viewID: string
   ): [View, CombinedView] {
-    const view = this.getRole(role).getView(viewID);
+    const view = this.sharedObject.getView(viewID);
     if (view === undefined) {
       console.error("The view does not exist in role " + role);
       return [undefined, undefined];
@@ -213,8 +213,8 @@ export class CrossDeviceApplication {
     const views = this.getRole(role).getViews();
     let result = [];
 
-    views.forEach((view, index) => {
-      result.push(this.getViewOrCombinedView(role, view.getId()));
+    views.forEach((viewId, index) => {
+      result.push(this.getViewOrCombinedView(role, viewId));
     });
 
     return result;

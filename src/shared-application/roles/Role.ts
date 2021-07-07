@@ -6,7 +6,7 @@ import { IRole } from "./IRole";
 
 export class Role {
   private name: string;
-  private views: View[];
+  private viewsIds: string[];
   private combinedViewsIds: string[];
   private qrsIds: string[];
 
@@ -15,7 +15,7 @@ export class Role {
     protected readonly factoriesManager: FactoriesManager
   ) {
     this.name = "";
-    this.views = [];
+    this.viewsIds = [];
     this.combinedViewsIds = [];
     this.qrsIds = [];
     this.loadObject();
@@ -34,11 +34,12 @@ export class Role {
     this.name = role.name;
     this.combinedViewsIds = role.combinedViewsIds;
     this.qrsIds = role.qrIds;
+    this.viewsIds = role.viewsIds;
 
-    const tempArray = [];
+    /*const tempArray = [];
 
     role.views.forEach((v) => {
-      const view = this.views.find((v2) => v2.getId() === v.id);
+      const view = this.viewsIds.find((v2) => v2.getId() === v.id);
       if (view) {
         view.update(v);
         tempArray.push(view);
@@ -47,8 +48,8 @@ export class Role {
         tempArray.push(newView);
       }
     });
-    this.views = tempArray;
-    for (const v of this.views) {
+    this.viewsIds = tempArray;
+    for (const v of this.viewsIds) {
       v.removeAllListeners();
       v.on("viewChanged", (root) => {
         if (root) {
@@ -56,7 +57,7 @@ export class Role {
           this.updateView(v);
         }
       });
-    }
+    }*/
   }
 
   public onChange(listener: () => void) {
@@ -76,8 +77,8 @@ export class Role {
     return this.name;
   }
 
-  public getViews(): View[] {
-    return this.views;
+  public getViews(): string[] {
+    return this.viewsIds;
   }
 
   public getCombinedViewsIds(): string[] {
@@ -88,37 +89,35 @@ export class Role {
     return this.qrsIds;
   }
 
-  public getView(viewId: string): View {
-    return this.views.find((view) => view.getId() === viewId);
-  }
-
   public hasView(view: View): boolean {
-    return this.views.includes(view);
+    return this.viewsIds.includes(view.getId());
   }
 
   public hasViewWithId(id: string): boolean {
-    return this.views.some((role) => role.getId() == id);
+    return this.viewsIds.some((viewId) => viewId == id);
   }
 
+  /*
   public hasViewWithCombinedView(cvid: string): boolean {
-    return this.views.some((role) => role.getCombinedViewID() == cvid);
+    return this.viewsIds.some((role) => role.getCombinedViewID() == cvid);
   }
 
   public getViewWithCombinedView(cvid: string): View {
-    return this.views.find((role) => role.getCombinedViewID() == cvid);
+    return this.viewsIds.find((role) => role.getCombinedViewID() == cvid);
   }
+*/
 
   public addView(view: View): void {
-    this.views.push(view);
-    this.updateViews(this.views);
+    this.viewsIds.push(view.getId());
+    this.updateViews(this.viewsIds);
   }
 
   public removeView(viewId: string): void {
-    const index = this.views.findIndex((view) => view.getId() === viewId);
+    const index = this.viewsIds.findIndex((view) => view === viewId);
 
     if (index !== -1) {
-      this.views.splice(index, 1);
-      this.updateViews(this.views);
+      this.viewsIds.splice(index, 1);
+      //this.updateViews(this.viewsIds);
     }
   }
 
@@ -126,17 +125,17 @@ export class Role {
     this.sharedRole.set({ ...this.getObject(), name: newName });
   }
 
-  public updateViews(newViews: View[]) {
+  public updateViews(newViews: string[]) {
     this.sharedRole.set({
       ...this.getObject(),
-      views: newViews.map((v) => v.toView()),
+      viewsIds: newViews,
     });
   }
 
   public updateIViews(newViews: IView[]) {
     this.sharedRole.set({
       ...this.getObject(),
-      views: newViews,
+      viewsIds: newViews.map((v) => v.id),
     });
   }
 
@@ -154,17 +153,16 @@ export class Role {
     });
   }
 
-  public updateView(view: View) {
-    const index = this.views.findIndex((v) => v.getId() === view.getId());
+  /*public updateView(view: View) {
+    const index = this.viewsIds.findIndex((v) => v.getId() === view.getId());
 
     if (index == -1) {
       return;
     }
 
-
-    this.views[index] = view;
-    this.updateViews(this.views);
-  }
+    this.viewsIds[index] = view;
+    this.updateViews(this.viewsIds);
+  }*/
 
   public addCombinedView(cvid: string) {
     this.combinedViewsIds.push(cvid);
@@ -176,15 +174,15 @@ export class Role {
     this.updateQrs(this.qrsIds);
   }
 
-  public deleteAllViewsListeners() {
-    this.views.forEach((view) => {
+  /* public deleteAllViewsListeners() {
+    this.viewsIds.forEach((view) => {
       view.deleteEventListeners();
     });
-  }
+  }*/
   public toRole(): IRole {
     return {
       name: this.name,
-      views: this.views.map((view) => view.toView()),
+      viewsIds: this.viewsIds,
       combinedViewsIds: this.combinedViewsIds,
       qrIds: this.qrsIds,
     };

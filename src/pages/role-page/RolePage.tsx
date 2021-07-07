@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from "react";
+import React, { useContext } from "react";
 
 import { Box, Flex } from "@chakra-ui/react";
 import { QRCodeController } from "../../shared-application/qrcode/QRCodeController";

@@ -12,8 +12,7 @@ import {
   PopoverTrigger,
   Portal,
 } from "@chakra-ui/react";
-import React, { useMemo, useState } from "react";
-import { useEffect } from "react";
+import React, { useMemo } from "react";
 import { FC } from "react";
 // import { UIComponentFactory } from "../components/UIComponentFactory";
 import { ImQrcode } from "react-icons/im";

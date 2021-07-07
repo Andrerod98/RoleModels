@@ -117,7 +117,7 @@ export class ViewsManager extends EventEmitter {
    * Adds a combined view to the combined views map and combined views shared map
    */
   public addView(sharedView: SharedCell): View {
-    const sharedViewValue = sharedView.get().id;
+    const sharedViewValue = sharedView.get();
     const id = sharedViewValue.id;
     if (this.viewsSharedMap.has(id)) {
       console.error("The view " + id + " already exists.");

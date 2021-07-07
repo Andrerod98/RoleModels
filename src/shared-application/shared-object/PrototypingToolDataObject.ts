@@ -65,6 +65,7 @@ import { IView } from "../views/IView";
 import { View } from "../views/View";
 import { ButtonFactory } from "../components/Button";
 import { uuid } from "uuidv4";
+import { ViewsManager } from "../managers/ViewsManager";
 // import { SharedCounter } from "@fluidframework/counter";
 
 export class PrototypingToolDataObject
@@ -82,6 +83,10 @@ export class PrototypingToolDataObject
   /* The Map with the roles */
   private rolesMap: SharedMap; // <role name, IView>
   private rolesManager: RolesManager;
+
+  /* The Map with the views */
+  private viewsMap: SharedMap; // <view id, IView>
+  private viewsManager: ViewsManager;
 
   /* The Map with the qr codes */
   private qrMap: SharedMap;
@@ -120,6 +125,8 @@ export class PrototypingToolDataObject
 
     const rolesMap = SharedMap.create(this.runtime);
 
+    const viewsMap = SharedMap.create(this.runtime);
+
     const qrMap = SharedMap.create(this.runtime);
 
     const ink = Ink.create(this.runtime);
@@ -137,7 +144,7 @@ export class PrototypingToolDataObject
 
     managerRole.set({
       name: "manager",
-      views: [],
+      viewsIds: [],
       combinedViewsIds: [],
       qrIds: [],
     } as IRole);
@@ -146,7 +153,7 @@ export class PrototypingToolDataObject
 
     designerRole.set({
       name: "designer",
-      views: [],
+      viewsIds: [],
       combinedViewsIds: [],
       qrIds: [],
     } as IRole);
@@ -155,7 +162,7 @@ export class PrototypingToolDataObject
 
     defaultRole.set({
       name: "default",
-      views: [],
+      viewsIds: [],
       combinedViewsIds: [],
       qrIds: [],
     } as IRole);
@@ -169,6 +176,7 @@ export class PrototypingToolDataObject
     /* Setting shared objects in the root Map...*/
     this.root.set("devices", devicesMap.handle);
     this.root.set("roles", rolesMap.handle);
+    this.root.set("views", viewsMap.handle);
     this.root.set("combined-views", combinedViewsMap.handle);
     this.root.set("qrs", qrMap.handle);
     this.root.set("ink", ink.handle);
@@ -197,6 +205,7 @@ export class PrototypingToolDataObject
       this.rolesManager.loadRoles(1),
       this.combinedViewsManager.loadCombinedViews(1),
       this.configurationsManager.loadObject(),
+      this.viewsManager.loadViews(1),
       this.qrManager.loadQRCodes(),
     ]);
 
@@ -214,6 +223,7 @@ export class PrototypingToolDataObject
       this.root.get<IFluidHandle<SharedMap>>("configurations").get(),
       this.root.get<IFluidHandle<SharedCell>>("current-configuration").get(),
       this.root.get<IFluidHandle<SharedCell>>("interactions").get(),
+      this.root.get<IFluidHandle<SharedMap>>("views").get(),
     ]);
 
     this.devicesMap = sharedObjects[0];
@@ -224,6 +234,7 @@ export class PrototypingToolDataObject
     this.configurationsMap = sharedObjects[6];
     this.currentConfiguration = sharedObjects[7];
     this.interactions = sharedObjects[8];
+    this.viewsMap = sharedObjects[9];
     this.ink = await sharedObjects[4].get();
   }
 
@@ -236,6 +247,9 @@ export class PrototypingToolDataObject
 
     /* Creating Roles manager...*/
     this.rolesManager = new RolesManager(this.rolesMap, this.factoriesManager);
+
+    /* Creating Roles manager...*/
+    this.viewsManager = new ViewsManager(this.viewsMap, this.factoriesManager);
 
     /* Creating combined views Manager...*/
     this.combinedViewsManager = new CombinedViewsManager(
@@ -348,6 +362,10 @@ export class PrototypingToolDataObject
       this.emit("change", "Roles manager state changed.");
     });
 
+    this.viewsManager.on("changeState", () => {
+      this.emit("change", "Views manager state changed.");
+    });
+
     this.configurationsManager.on("changeState", () => {
       this.emit("change", "Configurations manager state changed.");
     });
@@ -387,6 +405,7 @@ export class PrototypingToolDataObject
 
     this.deleteMapEventListeners("Combined View", this.combinedViewsMap);
     this.deleteMapEventListeners("roles", this.rolesMap);
+    this.deleteMapEventListeners("views", this.viewsMap);
     this.deleteMapEventListeners("qrs", this.qrMap);
     this.deleteMapEventListeners("configurations", this.configurationsMap);
 
@@ -528,9 +547,13 @@ export class PrototypingToolDataObject
                 Role Management Functions
    ******************************************************** */
   public getMyViews = (): View[] => {
-    return this.getMyRole()
-      .getViews()
-      .filter((view) => !view.isCombined());
+    const viewsIds = this.getMyRole().getViews();
+    return this.viewsManager.getViewsByIds(viewsIds);
+  };
+
+  public getViewsFrom = (role: string): View[] => {
+    const viewsIds = this.getRole(role).getViews();
+    return this.viewsManager.getViewsByIds(viewsIds);
   };
 
   public getViewOwners = (viewId: string): Role[] => {
@@ -549,7 +572,7 @@ export class PrototypingToolDataObject
     const roles = this.rolesManager.getRoles();
     for (const role of roles) {
       if (role.hasViewWithId(viewId)) {
-        return role.getView(viewId);
+        return this.viewsManager.getView(viewId);
       }
     }
 
@@ -557,9 +580,7 @@ export class PrototypingToolDataObject
   };
 
   public grabView = (view: View): void => {
- 
     this.getViewOwners(view.getId()).forEach((role) => {
-
       this.configurationsManager.removeViewFromRole(
         role.getName(),
         view.getId()
@@ -598,7 +619,7 @@ export class PrototypingToolDataObject
     });
     sharedRole.set({
       name: role,
-      views: [],
+      viewsIds: [],
       combinedViewsIds: [],
       qrIds: [],
     } as IRole);
@@ -726,10 +747,10 @@ export class PrototypingToolDataObject
     const roles = this.getRoles();
     for (const role of roles) {
       if (role.hasViewWithId(view1.getId())) {
-        role.updateView(view1);
+        //role.updateView(view1);
         role.addCombinedView(combinedView.getId());
       } else if (role.hasViewWithId(view2.getId())) {
-        role.updateView(view2);
+        //role.updateView(view2);
         role.addCombinedView(combinedView.getId());
       }
     }
@@ -746,7 +767,7 @@ export class PrototypingToolDataObject
   }
 
   public getViewOrCombinedView(role: string, id: string): View {
-    const view = this.rolesManager.getRole(role).getView(id);
+    const view = this.viewsManager.getView(id);
     if (view === undefined) return undefined;
 
     if (view.isCombined()) {
@@ -779,8 +800,31 @@ export class PrototypingToolDataObject
         (cv as MultiCombinedView).updateView(view.toView(), role);
       }
     } else {
-      this.rolesManager.getRole(role).updateView(view);
+      this.viewsManager.getView(view.getId()).update(view.toView());
     }
+  }
+
+  public updateViews(views: View[]) {
+    views.forEach((v) => {
+      const view = this.viewsManager.getView(v.getId());
+      if (view) view.update(v.toView());
+    });
+  }
+
+  public updateIViews(views: IView[]) {
+    views.forEach((v) => {
+      if (this.viewsMap.has(v.id)) {
+        this.viewsManager.getView(v.id).updateObject(v);
+      } else {
+        const sharedView = SharedCell.create(this.runtime);
+        sharedView.set(v);
+        sharedView.on("valueChanged", () => {
+          this.emit("change");
+        });
+
+        this.viewsManager.addView(sharedView);
+      }
+    });
   }
 
   public stitchViews = (
@@ -817,10 +861,10 @@ export class PrototypingToolDataObject
     // Add views and combined views to the roles
     for (const role of roles) {
       if (role.hasViewWithId(view1.getId())) {
-        role.updateView(view1);
+        //role.updateView(view1);
         role.addCombinedView(combinedView.getId());
       } else if (role.hasViewWithId(view2.getId())) {
-        role.updateView(view2);
+        //role.updateView(view2);
         role.addCombinedView(combinedView.getId());
       }
     }
@@ -842,7 +886,7 @@ export class PrototypingToolDataObject
   };
 
   public uncombineViews = (combinedView: CombinedView): void => {
-    for (const role of this.getRoles()) {
+    /*for (const role of this.getRoles()) {
       if (role.hasViewWithCombinedView(combinedView.getId())) {
         const view = role.getViewWithCombinedView(combinedView.getId());
 
@@ -850,7 +894,7 @@ export class PrototypingToolDataObject
 
         role.updateView(view);
       }
-    }
+    }*/
     this.combinedViewsMap.delete(combinedView.getId());
     this.combinedViewsManager.removeCombinedView(combinedView.getId());
   };
@@ -858,8 +902,8 @@ export class PrototypingToolDataObject
   public combineViews = (view1: View, view2: View): MultiCombinedView => {
     const id = view1.getId() + "-" + view2.getId();
     const roles = [];
-    const view1New = View.from(view1.toView(), this.factoriesManager);
-    const view2New = View.from(view2.toView(), this.factoriesManager);
+    const view1New = View.from(view1.getSharedObject(), this.factoriesManager);
+    const view2New = View.from(view2.getSharedObject(), this.factoriesManager);
     view1New.setCombinedViewID(id);
     view2New.setCombinedViewID(id);
 

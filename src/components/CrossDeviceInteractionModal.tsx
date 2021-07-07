@@ -20,7 +20,7 @@ interface CrossDeviceInteractionModalProps {
 export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
   (props: CrossDeviceInteractionModalProps) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const { app, setLayoutOpen, setNewViewId, selectedNode, setSelectedNode } =
+    const { app, setLayoutOpen, setNewViewId } =
       useContext<CrossAppState>(CrossAppContext);
 
     const [{ view }, setState] = useState({
@@ -43,7 +43,7 @@ export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
         from: from,
       };
       if (view != "") {
-        state.view = app.getRole(from).getView(view);
+        state.view = app.getSharedObject().getView(view);
       } else if (combinedView != "") {
         state.combinedView = app.getCombinedViewWithId(combinedView);
       } else if (qr != "") {
