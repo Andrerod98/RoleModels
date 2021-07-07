@@ -39,8 +39,6 @@ export const ViewComponent: FC<ViewComponentProps> = (
     qrUrl = "view/" + props.view.getId() + "#from=" + props.role.getName();
   }
 
-  console.log(props.view.getRoot().getSnapshot());
-
   return (
     <Box w={"100%"} h={"100%"} bg={"white"} position={"relative"}>
       {useMemo(() => {

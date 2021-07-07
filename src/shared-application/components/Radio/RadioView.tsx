@@ -3,7 +3,7 @@ import { RadioController } from ".";
 import { RadioUI } from "./RadioModel";
 
 export function RadioView({ controller }: { controller: RadioController }) {
-  const component = this.props.controller.get() as RadioUI;
+  const component = controller.get() as RadioUI;
 
   return (
     <form key={"form_" + component.id}>
@@ -22,9 +22,9 @@ export function RadioView({ controller }: { controller: RadioController }) {
                 type: "radio",
                 name: component.id,
                 value: value,
-                size: this.props.controller.getWidth(),
+                size: controller.getWidth(),
 
-                ...this.props.controller.getListeners(),
+                ...controller.getListeners(),
               }
             )}
           </label>

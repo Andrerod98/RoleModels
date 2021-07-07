@@ -109,20 +109,14 @@ export class UIComponentController extends EventEmitter {
   }
 
   update(model: any) {
-    console.log("Updating component with model");
-    console.log(model);
-
-    this.model = model;
+    this.model = { ...model };
     this.children = [];
 
     model.children.forEach((child) => {
       this.addChild(child);
     });
 
-    console.log("Snapshot");
-    console.log(this.getSnapshot());
-
-    this.getRoot().emit("componentChanged", this.getSnapshot());
+    this.getRoot().emit("componentChanged", this.getRoot().getSnapshot());
     //TODO: Send change to root
   }
 

@@ -12,6 +12,7 @@ import {
   BiArrowToBottom,
 } from "react-icons/bi";
 import { uuid } from "uuidv4";
+import { ILayoutNode } from "../shared-application/roles/ILayout";
 import { LayoutNode } from "../shared-application/roles/Layout";
 interface LayoutModalProps {
   layout: LayoutNode;
@@ -23,6 +24,7 @@ interface LayoutModalProps {
   newViewId: string;
 }
 export function LayoutModal(props: LayoutModalProps) {
+  console.log(props.layout);
   return (
     <Box
       m={0}
@@ -60,8 +62,9 @@ export function LayoutModal(props: LayoutModalProps) {
             isDisabled={props.selectedNode === ""}
             onClick={() => {
               props.layout
-                .getChildByID(props.selectedNode)
-                .splitExtremeTop(props.newViewId);
+                .getChildByViewId(props.selectedNode)
+                .splitTop(props.newViewId, true);
+
               props.setSelected(props.newViewId);
               props.onClose();
             }}
@@ -80,8 +83,9 @@ export function LayoutModal(props: LayoutModalProps) {
             isDisabled={props.selectedNode === ""}
             onClick={() => {
               props.layout
-                .getChildByID(props.selectedNode)
-                .splitTop(props.newViewId);
+                .getChildByViewId(props.selectedNode)
+                .splitTop(props.newViewId, false);
+
               props.setSelected(props.newViewId);
               props.onClose();
             }}
@@ -98,8 +102,9 @@ export function LayoutModal(props: LayoutModalProps) {
             isDisabled={props.selectedNode === ""}
             onClick={() => {
               props.layout
-                .getChildByID(props.selectedNode)
-                .splitExtremeLeft(props.newViewId);
+                .getChildByViewId(props.selectedNode)
+                .splitLeft(props.newViewId, true);
+
               props.setSelected(props.newViewId);
               props.onClose();
             }}
@@ -115,8 +120,9 @@ export function LayoutModal(props: LayoutModalProps) {
             isDisabled={props.selectedNode === ""}
             onClick={() => {
               props.layout
-                .getChildByID(props.selectedNode)
-                .splitLeft(props.newViewId);
+                .getChildByViewId(props.selectedNode)
+                .splitLeft(props.newViewId, false);
+
               props.setSelected(props.newViewId);
               props.onClose();
             }}
@@ -132,14 +138,13 @@ export function LayoutModal(props: LayoutModalProps) {
             isDisabled={props.selectedNode !== ""}
             onClick={() => {
               props.layout.update({
+                id: uuid(),
                 name: "view",
                 viewId: props.newViewId,
-              });
+              } as ILayoutNode);
+
               props.setSelected(props.newViewId);
-              console.log("ADDING TO CENTER");
-              console.log(props.layout);
-              console.log(props.newViewId);
-              console.log("Finish");
+
               props.onClose();
             }}
             icon={<Icon fontSize={"30px"} as={BiRectangle} />}
@@ -154,8 +159,9 @@ export function LayoutModal(props: LayoutModalProps) {
             isDisabled={props.selectedNode === ""}
             onClick={() => {
               props.layout
-                .getChildByID(props.selectedNode)
-                .splitRight(props.newViewId);
+                .getChildByViewId(props.selectedNode)
+                .splitRight(props.newViewId, false);
+
               props.setSelected(props.newViewId);
               props.onClose();
             }}
@@ -172,8 +178,9 @@ export function LayoutModal(props: LayoutModalProps) {
             onClick={() => {
               const id = uuid();
               props.layout
-                .getChildByID(props.selectedNode)
-                .splitExtremeRight(id);
+                .getChildByViewId(props.selectedNode)
+                .splitRight(id, true);
+
               props.setSelected(id);
               props.onClose();
             }}
@@ -190,8 +197,9 @@ export function LayoutModal(props: LayoutModalProps) {
             isDisabled={props.selectedNode === ""}
             onClick={() => {
               props.layout
-                .getChildByID(props.selectedNode)
-                .splitBottom(props.newViewId);
+                .getChildByViewId(props.selectedNode)
+                .splitBottom(props.newViewId, false);
+
               props.setSelected(props.newViewId);
               props.onClose();
             }}
@@ -209,8 +217,9 @@ export function LayoutModal(props: LayoutModalProps) {
             isDisabled={props.selectedNode === ""}
             onClick={() => {
               props.layout
-                .getChildByID(props.selectedNode)
-                .splitExtremeBottom(props.newViewId);
+                .getChildByViewId(props.selectedNode)
+                .splitBottom(props.newViewId, true);
+
               props.setSelected(props.newViewId);
               props.onClose();
             }}

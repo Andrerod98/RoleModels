@@ -1,4 +1,5 @@
 import EventEmitter from "events";
+import { uuid } from "uuidv4";
 import { ILayoutNode } from "./ILayout";
 
 export class LayoutNode extends EventEmitter {
@@ -6,11 +7,14 @@ export class LayoutNode extends EventEmitter {
   children: LayoutNode[];
   name: "view" | "flex" | "div";
   viewId: string;
+  id: string;
 
   constructor(model: ILayoutNode, parent?: LayoutNode) {
     super();
     this.parent = parent;
     this.children = [];
+
+    this.id = model.id;
     this.name = model.name;
     this.viewId = model.viewId;
 
@@ -19,38 +23,139 @@ export class LayoutNode extends EventEmitter {
     }
   }
 
+  getId() {
+    return this.id;
+  }
+
+  getName() {
+    return this.name;
+  }
+
   getViewId() {
     return this.viewId;
   }
 
+  getRoot(): LayoutNode {
+    if (this.parent == null) {
+      return this;
+    } else {
+      return this.parent.getRoot();
+    }
+  }
+
   getChildByID(id: string): LayoutNode {
-    return this.searchInNode(this, id);
+    return this.searchInNode(this, id, false);
+  }
+
+  getChildByViewId(viewId: string): LayoutNode {
+    return this.searchInNode(this, viewId, true);
   }
 
   public searchInNode(
     element: LayoutNode,
-    matchingID: string
+    matchingID: string,
+    isView: boolean
   ): LayoutNode | null {
-    if (element.getSnapshot().viewId == matchingID) {
+    if (
+      (!isView && element.getId() == matchingID) ||
+      (isView && element.getViewId() == matchingID)
+    ) {
       return element;
     } else if (element.children != null) {
       let i;
       let result = null;
       for (i = 0; result == null && i < element.children.length; i++) {
-        result = this.searchInNode(element.children[i], matchingID);
+        result = this.searchInNode(element.children[i], matchingID, isView);
       }
       return result;
     }
     return null;
   }
 
-  addChild(model: ILayoutNode) {
-    this.children.push(new LayoutNode(model, this));
+  addChild(model: ILayoutNode, index?: number) {
+    if (index !== undefined) {
+      this.children.splice(index, 0, new LayoutNode(model, this));
+    } else {
+      this.children.push(new LayoutNode(model, this));
+    }
   }
 
-  removeChild(viewId: string) {
+  removeChild(childId: string) {
+    console.log("Removing child with id" + childId);
+    if (this.id === childId) {
+      console.log("Is the node");
+      if (this.parent) {
+        console.log("Has parent");
+        this.parent.removeChild(childId);
+      } else {
+        this.update({
+          id: this.getId(),
+          viewId: "",
+          name: "div",
+          children: [],
+        });
+      }
+      return;
+    }
+    const index = this.children.findIndex((c) => c.getId() === childId);
+    if (index == -1) {
+      console.log("Not found");
+      this.children.forEach((child) => {
+        child.removeChild(childId);
+      });
+    } else {
+      console.log("Removing children with index:" + index);
+
+      this.children[index].setParent(undefined);
+      this.children.splice(index, 1);
+      console.log(this.children);
+      if (this.children.length === 0) {
+        this.parent.removeChild(this.getId());
+      } else {
+        this.getRoot().emit("change", this);
+      }
+    }
+  }
+
+  /*removeChild(viewId: string) {
     const index = this.children.findIndex((c) => c.getViewId() === viewId);
     if (index == -1) {
+      this.children.forEach((child) => {
+        child.removeChild(viewId);
+      });
+    } else {
+      this.children.splice(index, 1);
+    }
+  }*/
+
+  /*
+  removeChild(viewId: string){
+    const index = this.children.findIndex((c) => c.getViewId() === viewId);
+    if(index != -1){
+      this.children.splice(index, 1);
+      if (this.children.length === 0) {
+        this.parent.removeChild(this.);
+      }
+    } 
+
+
+        
+      
+      
+  }
+
+  removeView(viewId: string) {
+    if (this.getViewId() === viewId) {
+      if (this.children.length === 0) {
+        this.parent.removeChild(viewId);
+      } else {
+        const index = this.children.findIndex((c) => c.getViewId() === viewId);
+        this.children.splice(index, 1);
+      }
+    }
+
+    const child = this.getChildByID(viewId);
+    if (child) {
       this.children.forEach((child) => {
         child.removeChild(viewId);
       });
@@ -69,13 +174,19 @@ export class LayoutNode extends EventEmitter {
       }
     }
     this.getRoot().emit("change");
+  }*/
+
+  public setParent(node: LayoutNode) {
+    this.parent = node;
   }
 
   public update(model: ILayoutNode) {
-    this.children = [];
-
-    this.viewId = model.viewId;
+    this.id = model.id;
     this.name = model.name;
+    this.viewId = model.viewId;
+
+    this.children.forEach((child) => child.setParent(undefined));
+    this.children.length = 0;
 
     if (model.children) {
       model.children.forEach((child) => this.addChild(child));
@@ -84,7 +195,7 @@ export class LayoutNode extends EventEmitter {
     this.getRoot().emit("change", this);
   }
 
-  getSnapshot(): ILayoutNode {
+  /*getSnapshot(): ILayoutNode {
     let snapshot = { name: this.name, viewId: this.viewId, children: [] };
 
     this.children.forEach((child) => {
@@ -92,111 +203,159 @@ export class LayoutNode extends EventEmitter {
     });
 
     return snapshot;
+  }*/
+
+  public getChildren() {
+    return this.children;
   }
 
-  public splitRight(viewId: string) {
-    // if the parent is a flex then add view to parent right next to it
-    // if the parent is a div then add flex with view
-
-    if (!this.parent) {
-      const newValue = {
-        name: "flex",
+  public groupWith(name: string, newView: ILayoutNode, isFirst: boolean) {
+    if (isFirst) {
+      this.update({
+        id: uuid(),
+        name: name,
         viewId: "",
-        children: [
-          this.toLayout(),
-          {
-            name: "view",
-            viewId: viewId,
-          },
-        ],
-      } as ILayoutNode;
-      this.update(newValue);
-      // Update parent with new value
+        children: [newView, this.toLayout()],
+      } as ILayoutNode);
     } else {
-      if (this.parent!.getSnapshot().name === "div") {
-        const newValue = {
-          name: "flex",
-          viewId: "",
-          children: [
-            this.toLayout(),
-            {
-              name: "view",
-              viewId: viewId,
-            },
-          ],
-        } as ILayoutNode;
-        this.update(newValue);
-        // Update parent with new value
-      } else if (this.parent!.getSnapshot().name === "flex") {
-        const children = this.parent.toLayout().children;
-        const index = children.findIndex((l) => l.viewId === this.viewId);
-        children.splice(index + 1, 0, {
-          name: "view",
-          viewId: viewId,
-        });
-
-        const newValue = {
-          ...this.parent.toLayout(),
-          children: [...children],
-        } as ILayoutNode;
-        this.parent.update(newValue);
-        // Update parent with new value
-      }
+      this.update({
+        id: uuid(),
+        name: name,
+        viewId: "",
+        children: [this.toLayout(), newView],
+      } as ILayoutNode);
     }
   }
 
-  public splitExtremeRight(viewId: string) {
+  public splitRight(viewId: string, isExtreme: boolean) {
     // if the parent is a flex then add view to parent right next to it
     // if the parent is a div then add flex with view
+    const newView = {
+      id: uuid(),
+      name: "view",
+      viewId: viewId,
+    } as ILayoutNode;
 
-    if (!this.parent) {
-      const newValue = {
-        name: "flex",
-        viewId: "",
-        children: [
-          this.toLayout(),
-          {
-            name: "view",
-            viewId: viewId,
-          },
-        ],
-      } as ILayoutNode;
-      this.update(newValue);
-      // Update parent with new value
-    } else {
-      if (this.parent!.getSnapshot().name === "div") {
-        const newValue = {
-          name: "flex",
-          viewId: "",
-          children: [
-            this.toLayout(),
-            {
-              name: "view",
-              viewId: viewId,
-            },
-          ],
-        } as ILayoutNode;
-        this.update(newValue);
-        // Update parent with new value
-      } else if (this.parent!.getSnapshot().name === "flex") {
-        const children = this.parent.toLayout().children;
-
-        const newValue = {
-          ...this.parent.toLayout(),
-          children: [
-            ...children,
-            {
-              name: "view",
-              viewId: viewId,
-            },
-          ],
-        } as ILayoutNode;
-        this.parent.update(newValue);
-        // Update parent with new value
+    if (this.parent) {
+      switch (this.parent.getName()) {
+        case "div":
+          this.groupWith("flex", newView, false);
+          break;
+        case "flex":
+          if (isExtreme) {
+            this.parent.addChild(newView);
+          } else {
+            const index = this.parent
+              .getChildren()
+              .findIndex((l) => l.getId() === this.getId());
+            this.parent.addChild(newView, index + 1);
+          }
+          break;
+        default:
+          break;
       }
+    } else {
+      this.groupWith("flex", newView, false);
     }
   }
 
+  public splitLeft(viewId: string, isExtreme: boolean) {
+    const newView = {
+      id: uuid(),
+      name: "view",
+      viewId: viewId,
+    } as ILayoutNode;
+
+    if (this.parent) {
+      switch (this.parent.getName()) {
+        case "div":
+          this.groupWith("flex", newView, true);
+          break;
+        case "flex":
+          if (isExtreme) {
+            this.parent.addChild(newView, 0);
+          } else {
+            const index = this.parent
+              .getChildren()
+              .findIndex((l) => l.getId() === this.getId());
+
+            this.parent.addChild(newView, index);
+          }
+
+          break;
+        default:
+          break;
+      }
+    } else {
+      this.groupWith("flex", newView, true);
+    }
+  }
+
+  public splitTop(viewId: string, isExtreme: boolean) {
+    const newView = {
+      id: uuid(),
+      name: "view",
+      viewId: viewId,
+    } as ILayoutNode;
+
+    if (this.parent) {
+      switch (this.parent.getName()) {
+        case "flex":
+          this.groupWith("div", newView, true);
+          break;
+        case "div":
+          if (isExtreme) {
+            this.parent.addChild(newView, 0);
+          } else {
+            const index = this.parent
+              .getChildren()
+              .findIndex((l) => l.getId() === this.getId());
+
+            this.parent.addChild(newView, index);
+          }
+
+          break;
+        default:
+          break;
+      }
+    } else {
+      this.groupWith("div", newView, true);
+    }
+  }
+
+  public splitBottom(viewId: string, isExtreme: boolean) {
+    const newView = {
+      id: uuid(),
+      name: "view",
+      viewId: viewId,
+    } as ILayoutNode;
+
+    if (this.parent) {
+      switch (this.parent.getName()) {
+        case "flex":
+          this.groupWith("div", newView, false);
+          break;
+        case "div":
+          if (isExtreme) {
+            this.parent.addChild(newView);
+          } else {
+            const index = this.parent
+              .getChildren()
+              .findIndex((l) => l.getId() === this.getId());
+
+            this.parent.addChild(newView, index + 1);
+          }
+
+          break;
+        default:
+          break;
+      }
+    } else {
+      this.groupWith("div", newView, false);
+    }
+  }
+
+  /*
   public splitLeft(viewId: string) {
     // if the parent is a flex then add view to parent right next to it
     // if the parent is a div then add flex with view
@@ -298,13 +457,7 @@ export class LayoutNode extends EventEmitter {
     }
   }
 
-  getRoot(): LayoutNode {
-    if (this.parent == null) {
-      return this;
-    } else {
-      return this.parent.getRoot();
-    }
-  }
+  
   public splitExtremeTop(viewId: string) {
     if (!this.parent) {
       const newValue = {
@@ -490,12 +643,13 @@ export class LayoutNode extends EventEmitter {
       }
     }
   }
-
+*/
   public toLayout(): ILayoutNode {
     return {
+      id: this.id,
       name: this.name,
       viewId: this.viewId,
-      children: this.children,
+      children: this.children.map((child) => child.toLayout()),
     };
   }
 }

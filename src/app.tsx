@@ -18,13 +18,16 @@ const IP = window.location.hostname;
 
 /*
 const layout = new LayoutNode({
+  id: uuid(),
   name: "view",
   viewId: "view",
 });
 
+const selectedNode = "view";
+
 ReactDOM.render(
   <ChakraProvider resetCSS>
-    <LayoutModal layout={layout} selectedNode={"view"} />
+    <AppTest layout={layout} />
   </ChakraProvider>,
 
   document.getElementById("content")

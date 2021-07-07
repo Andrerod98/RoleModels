@@ -161,8 +161,6 @@ export class Role {
       return;
     }
 
-    console.log("Updating view with value");
-    console.log(view);
 
     this.views[index] = view;
     this.updateViews(this.views);

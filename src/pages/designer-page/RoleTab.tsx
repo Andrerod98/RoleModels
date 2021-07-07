@@ -10,6 +10,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import React, { useContext, useState } from "react";
+import { uuid } from "uuidv4";
 import { LayoutModal } from "../../components/LayoutModal";
 import { CrossAppState, CrossAppContext } from "../../context/AppContext";
 import { ILayoutNode } from "../../shared-application/roles/ILayout";
@@ -43,8 +44,8 @@ export function RoleTab(props: RoleTabProps) {
 
   const [layoutSnapshot, setLayoutSnapshot] = useState(
     layout
-      ? layout.getSnapshot()
-      : ({ name: "div", viewId: "", children: [] } as ILayoutNode)
+      ? layout.toLayout()
+      : ({ id: uuid(), name: "div", viewId: "", children: [] } as ILayoutNode)
   );
 
   const { isOpen, onClose, onOpen } = useDisclosure();
@@ -60,7 +61,7 @@ export function RoleTab(props: RoleTabProps) {
         ? { ...codeState, value: codeState.value }
         : { ...codeState, value: newValue }
     );
-    setLayoutSnapshot({ ...layout.getSnapshot() });
+    setLayoutSnapshot({ ...layout.toLayout() });
   };
 
   const addUIComponent = (name: string) => {

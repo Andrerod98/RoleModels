@@ -63,6 +63,8 @@ import { IRole } from "../roles/IRole";
 import { Role } from "../roles/Role";
 import { IView } from "../views/IView";
 import { View } from "../views/View";
+import { ButtonFactory } from "../components/Button";
+import { uuid } from "uuidv4";
 // import { SharedCounter } from "@fluidframework/counter";
 
 export class PrototypingToolDataObject
@@ -128,7 +130,7 @@ export class PrototypingToolDataObject
     const currentConfiguration = SharedCell.create(this.runtime);
     currentConfiguration.set({
       name: "default",
-      layouts: { default: { name: "div" } },
+      layouts: { default: { id: uuid(), name: "div" } },
     } as IConfiguration);
     /* Creating default roles */
     const managerRole = SharedCell.create(this.runtime);
@@ -309,6 +311,10 @@ export class PrototypingToolDataObject
     this.factoriesManager.registerFactory(
       new ThrowableFactory("throwable", this.factoriesManager)
     );
+
+    this.factoriesManager.registerFactory(
+      new ButtonFactory("button", this.factoriesManager)
+    );
     this.factoriesManager.registerFactory(
       new InkCanvasFactory("ink", this.ink, this.factoriesManager)
     );
@@ -338,6 +344,7 @@ export class PrototypingToolDataObject
     });
 
     this.rolesManager.on("changeState", () => {
+      this.runInteractions();
       this.emit("change", "Roles manager state changed.");
     });
 
@@ -550,9 +557,9 @@ export class PrototypingToolDataObject
   };
 
   public grabView = (view: View): void => {
-    console.log("Grabbed");
+ 
     this.getViewOwners(view.getId()).forEach((role) => {
-      console.log("FOUND OWNER");
+
       this.configurationsManager.removeViewFromRole(
         role.getName(),
         view.getId()
@@ -597,7 +604,11 @@ export class PrototypingToolDataObject
     } as IRole);
 
     this.rolesManager.addRole(sharedRole);
-    this.configurationsManager.updateCurrent(role, { name: "div", viewId: "" });
+    this.configurationsManager.updateCurrent(role, {
+      id: uuid(),
+      name: "div",
+      viewId: "",
+    });
 
     await this.rolesMap.wait<IFluidHandle<SharedCell>>(role);
     return this.rolesManager.getRole(role);
@@ -743,6 +754,17 @@ export class PrototypingToolDataObject
         this.getCombinedViewWithId(view.getCombinedViewID()),
         role
       );
+    }
+
+    return view;
+  }
+
+  public getViewOrCombinedViewFromAllRoles(id: string): View {
+    const roles = this.rolesManager.getRoles();
+    let view = undefined;
+    for (const role of roles) {
+      view = this.getViewOrCombinedView(role.getName(), id);
+      if (view) return view;
     }
 
     return view;

@@ -44,12 +44,8 @@ export class View extends EventEmitter {
   }
 
   public setRoot(root: IUIComponent) {
-    console.log("SETTING ROOT");
-    console.log(root);
     this.root = this.factoriesManager.getUIComponent(root);
     this.root.on("componentChanged", (snapshot) => {
-      console.log("Component has changed");
-      console.log(snapshot);
       this.emitChange(snapshot);
     });
   }
@@ -60,8 +56,6 @@ export class View extends EventEmitter {
   }
 
   public update(object: IView) {
-    console.log("UPDATING VIEW");
-    console.log(object);
     this.id = object.id;
     this.combinedViewID = object.combinedViewID;
 

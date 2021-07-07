@@ -97,7 +97,7 @@ export function RolePage(props: RoleProps) {
 
   return (
     <Box h={"100%"} w={"100%"}>
-      {generateWidget(layout.getSnapshot())}
+      {generateWidget(layout.toLayout())}
 
       {qrs.map((qr: QRCodeController, index: number) => {
         return (

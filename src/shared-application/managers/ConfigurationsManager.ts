@@ -45,6 +45,9 @@ export class ConfigurationsManager extends EventEmitter {
   public loadObject() {
     const currentConfigValue = this.currentConfiguration.get();
 
+    console.trace("loading object");
+    console.log(currentConfigValue);
+
     const currentConfigKeys = Object.keys(currentConfigValue.layouts);
 
     const currentKeys = Object.keys(this.current.layouts);
@@ -58,7 +61,10 @@ export class ConfigurationsManager extends EventEmitter {
       const layoutValue = currentConfigValue.layouts[key];
       this.current.layouts[key] = new LayoutNode(layoutValue);
       this.current.layouts[key].getRoot().on("change", (l) => {
-        this.updateCurrent(key, this.current.layouts[key].getSnapshot());
+        console.trace("Updating" + key + " layout with:");
+        console.log(l);
+        console.log(l.toLayout());
+        this.updateCurrent(key, l.toLayout());
       });
     }
   }
@@ -66,7 +72,13 @@ export class ConfigurationsManager extends EventEmitter {
 
   public updateCurrent(role: string, value: ILayoutNode) {
     const configValue = this.currentConfiguration.get();
+    console.log("Updating layout of" + role + " with the value ");
+    console.log(value);
     configValue.layouts[role] = value;
+
+    console.log("Setting ");
+    console.log(configValue);
+
     this.currentConfiguration.set(configValue);
   }
 
@@ -85,14 +97,15 @@ export class ConfigurationsManager extends EventEmitter {
 
   public removeViewFromRole(role: string, viewId: string) {
     const configValue = this.currentConfiguration.get();
-    this.current.layouts[role].removeChild(viewId);
-    console.log("Removing layout");
-    console.log(this.current.layouts[role]);
-    const layouts = { ...configValue.layouts };
-    layouts[role] = this.current.layouts[role].getSnapshot();
-    console.log("Removing");
-    console.log({ ...configValue, layouts: layouts });
-    this.currentConfiguration.set({ ...configValue, layouts: layouts });
+    const node = this.current.layouts[role].getChildByViewId(viewId);
+    if (node) {
+      console.log("Removing child with id" + node.getViewId());
+      node.removeChild(node.getId());
+
+      //const layouts = { ...configValue.layouts };
+      // layouts[role] = node.toLayout();
+      //this.currentConfiguration.set({ ...configValue, layouts: layouts });
+    }
   }
 
   /* Returns all the combined views */
@@ -115,6 +128,9 @@ export class ConfigurationsManager extends EventEmitter {
   public loadConfiguration(configurationName: string): void {
     const config = this.configurationsSharedMap.get(configurationName);
     if (config) {
+      const keys = Object.keys(config.layouts);
+      for (const key of keys) {
+      }
       this.currentConfiguration.set({ ...config });
     }
   }
@@ -130,6 +146,9 @@ export class ConfigurationsManager extends EventEmitter {
       name,
       layouts: { ...this.currentConfiguration.get().layouts },
     });
+
+    console.log("Saving layout:");
+    console.log({ ...this.currentConfiguration.get().layouts });
   }
 
   /* Callback functions */

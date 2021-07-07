@@ -31,22 +31,32 @@ export const CrossAppProvider = ({
   children: JSX.Element;
 }) => {
   const model = app.getSharedObject();
-  const generateState = () => {
-    return {
-      devices: Array.from(model.getDevices()),
-      role: model.getMyRole(),
-      views: model.getMyRole().getViews(),
-      layout: model.getCurrentConfigurationOfRole(model.getMyRole().getName()),
-    };
-  };
-  const [state, setState] = useState(generateState());
   const [selectedNode, setSelectedNode] = useState("");
   const [isLoggingOpen, setLoggingOpen] = useState(false);
   const [isLayoutOpen, setLayoutOpen] = useState(false);
   const [newViewId, setNewViewId] = useState("");
+  const generateState = () => {
+    const layoutNode = model.getCurrentConfigurationOfRole(
+      model.getMyRole().getName()
+    );
+    if (
+      layoutNode &&
+      selectedNode != "" &&
+      !layoutNode.getChildByViewId(selectedNode)
+    ) {
+      setSelectedNode("");
+    }
+    return {
+      devices: Array.from(model.getDevices()),
+      role: model.getMyRole(),
+      views: model.getMyRole().getViews(),
+      layout: layoutNode,
+    };
+  };
+  const [state, setState] = useState(generateState());
+
   useEffect(() => {
     const onChange = () => {
-      console.log("The state has changed...");
       setState(generateState());
     };
     model.on("change", (type) => {

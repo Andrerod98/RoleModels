@@ -57,6 +57,7 @@ export function PageLayout(props: PageLayoutProps) {
           )}
           onRoleClick={(role: string) => {
             model.promoteToRole(role);
+            setSelectedNode("");
             // setUI(props.model.getCombinedUI());
           }}
           onViewChange={(newViewId: string) => {

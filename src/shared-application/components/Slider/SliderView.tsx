@@ -16,7 +16,10 @@ export function SliderView({ controller }: { controller: SliderController }) {
       key={"slider_" + component.id}
       aria-label={"slider-ex-1"}
       value={value}
-      onChange={(val) => controller.update({ ...component, value: val })}
+      onChange={(val) => {
+        controller.emit("change", val);
+        controller.update({ ...component, value: val });
+      }}
       {...component}
     >
       <SliderTrack>
