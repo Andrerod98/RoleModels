@@ -8,8 +8,8 @@ import { Box, TabPanel, Tabs, TabPanels, TabList, Tab } from "@chakra-ui/react";
 import React, { useContext, useState } from "react";
 import { CrossAppState, CrossAppContext } from "../../context/AppContext";
 import { EditableTab } from "./components/EditableTab";
-
 import { InteractionsTab } from "./InteractionsTab";
+
 import { RoleTab } from "./RoleTab";
 interface SingleTabProps {}
 
@@ -132,7 +132,7 @@ export const DesignerPage = (props: SingleTabProps) => {
           ))}
           <TabPanel key={"tab-panel-add"} p={0} h={"100%"}></TabPanel>
           <TabPanel key={"tab-panel-interactions"} p={0} h={"100%"}>
-            <InteractionsTab application={app} />
+            <InteractionsTab />
           </TabPanel>
         </TabPanels>
       </Tabs>

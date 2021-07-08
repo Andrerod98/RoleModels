@@ -3,6 +3,8 @@ import { SharedCell } from "@fluidframework/cell";
 import { FactoriesManager } from "./FactoriesManager";
 import EventEmitter from "events";
 import { View } from "../views/View";
+import { InteractionsManager } from "./InteractionsManager";
+import { PrototypingToolDataObject } from "../shared-object/PrototypingToolDataObject";
 
 enum ViewsManagerEvents {
   ChangeState = "changeState",
@@ -16,7 +18,9 @@ export class ViewsManager extends EventEmitter {
 
   public constructor(
     private readonly viewsSharedMap: SharedMap,
-    private readonly factoriesManager: FactoriesManager
+    private readonly factoriesManager: FactoriesManager,
+    private readonly interactionsManager: InteractionsManager,
+    private readonly app: PrototypingToolDataObject
   ) {
     super();
     this.views = new Map<String, View>();
@@ -65,7 +69,11 @@ export class ViewsManager extends EventEmitter {
       view = this.views.get(viewValue.id);
       view.update(viewValue);
     } else {
-      view = View.from(sharedView, this.factoriesManager);
+      view = View.from(
+        sharedView,
+        this.factoriesManager,
+        this.interactionsManager
+      );
 
       this.views.set(view.getId(), view);
     }
@@ -75,6 +83,36 @@ export class ViewsManager extends EventEmitter {
     sharedView.on("valueChanged", () => {
       this.emitChange("Cell of " + viewValue.name + " changed.");
     });
+
+    sharedView.off(
+      "componentEvent",
+      (eventName: string, componentId: string) => {
+        const interaction = this.interactionsManager.getInteraction(
+          sharedView.get().id + "/" + componentId + "/" + eventName
+        );
+        if (interaction && interaction.active) {
+          const app = this.app;
+          const view = this.getView(sharedView.get().id);
+          const component = view.getRoot().getChildByID(componentId);
+          eval(interaction.code);
+        }
+      }
+    );
+
+    sharedView.on(
+      "componentEvent",
+      (eventName: string, componentId: string, ...args) => {
+        const interaction = this.interactionsManager.getInteraction(
+          sharedView.get().id + "/" + componentId + "/" + eventName
+        );
+        if (interaction && interaction.active) {
+          const app = this.app;
+          const view = this.getView(sharedView.get().id);
+          const component = view!.getRoot().getChildByID(componentId);
+          eval(interaction.code);
+        }
+      }
+    );
 
     return view;
   }
@@ -128,7 +166,11 @@ export class ViewsManager extends EventEmitter {
     this.viewsSharedMap.set(id, sharedView.handle);
 
     /* Get Combined View */
-    const view = View.from(sharedView, this.factoriesManager);
+    const view = View.from(
+      sharedView,
+      this.factoriesManager,
+      this.interactionsManager
+    );
 
     this.views.set(id, view);
 

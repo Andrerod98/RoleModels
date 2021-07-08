@@ -50,6 +50,7 @@ export const CrossAppProvider = ({
       devices: Array.from(model.getDevices()),
       role: model.getMyRole(),
       views: model.getMyRole().getViews(),
+
       layout: layoutNode,
     };
   };

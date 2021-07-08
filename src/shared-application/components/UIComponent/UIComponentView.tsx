@@ -20,7 +20,7 @@ export function UIComponentView(props: UIComponentProps) {
       },
       ...controller.getListeners(),
       onClick: () => {
-        controller.emit("click");
+        controller.emitEvent("onClick");
       },
     },
 

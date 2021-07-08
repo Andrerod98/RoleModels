@@ -54,7 +54,10 @@ import {
 } from "../managers/ConfigurationsManager";
 import { DevicesManager } from "../managers/DevicesManager";
 import { FactoriesManager } from "../managers/FactoriesManager";
-import { InteractionsManager } from "../managers/InteractionsManager";
+import {
+  IInteraction,
+  InteractionsManager,
+} from "../managers/InteractionsManager";
 import { QRsManager } from "../managers/QRsManager";
 import { RolesManager } from "../managers/RolesManager";
 import { IQRCode } from "../qrcode/IQRCode";
@@ -97,7 +100,7 @@ export class PrototypingToolDataObject
   private currentConfiguration: SharedCell;
   private configurationsManager: ConfigurationsManager;
 
-  private interactions: SharedCell;
+  private interactionsMap: SharedMap;
   private interactionsManager: InteractionsManager;
 
   /* The Manager responsible for rendering components */
@@ -128,6 +131,8 @@ export class PrototypingToolDataObject
     const viewsMap = SharedMap.create(this.runtime);
 
     const qrMap = SharedMap.create(this.runtime);
+
+    const interactionsMap = SharedMap.create(this.runtime);
 
     const ink = Ink.create(this.runtime);
 
@@ -171,8 +176,6 @@ export class PrototypingToolDataObject
     rolesMap.set("designer", designerRole.handle);
     rolesMap.set("default", defaultRole.handle);
 
-    const interactions = SharedCell.create(this.runtime);
-
     /* Setting shared objects in the root Map...*/
     this.root.set("devices", devicesMap.handle);
     this.root.set("roles", rolesMap.handle);
@@ -183,7 +186,7 @@ export class PrototypingToolDataObject
     this.root.set("ping", sharedPing.handle);
     this.root.set("configurations", configurationsMap.handle);
     this.root.set("current-configuration", currentConfiguration.handle);
-    this.root.set("interactions", interactions.handle);
+    this.root.set("interactions", interactionsMap.handle);
   }
 
   protected async hasInitialized() {
@@ -208,8 +211,6 @@ export class PrototypingToolDataObject
       this.viewsManager.loadViews(1),
       this.qrManager.loadQRCodes(),
     ]);
-
-    this.runInteractions();
   }
 
   private async loadSharedObjects() {
@@ -222,7 +223,7 @@ export class PrototypingToolDataObject
       this.root.get<IFluidHandle<SharedCounter>>("ping").get(),
       this.root.get<IFluidHandle<SharedMap>>("configurations").get(),
       this.root.get<IFluidHandle<SharedCell>>("current-configuration").get(),
-      this.root.get<IFluidHandle<SharedCell>>("interactions").get(),
+      this.root.get<IFluidHandle<SharedMap>>("interactions").get(),
       this.root.get<IFluidHandle<SharedMap>>("views").get(),
     ]);
 
@@ -233,7 +234,7 @@ export class PrototypingToolDataObject
     this.pingCounter = sharedObjects[5];
     this.configurationsMap = sharedObjects[6];
     this.currentConfiguration = sharedObjects[7];
-    this.interactions = sharedObjects[8];
+    this.interactionsMap = sharedObjects[8];
     this.viewsMap = sharedObjects[9];
     this.ink = await sharedObjects[4].get();
   }
@@ -248,8 +249,15 @@ export class PrototypingToolDataObject
     /* Creating Roles manager...*/
     this.rolesManager = new RolesManager(this.rolesMap, this.factoriesManager);
 
+    this.interactionsManager = new InteractionsManager(this.interactionsMap);
+
     /* Creating Roles manager...*/
-    this.viewsManager = new ViewsManager(this.viewsMap, this.factoriesManager);
+    this.viewsManager = new ViewsManager(
+      this.viewsMap,
+      this.factoriesManager,
+      this.interactionsManager,
+      this
+    );
 
     /* Creating combined views Manager...*/
     this.combinedViewsManager = new CombinedViewsManager(
@@ -265,8 +273,6 @@ export class PrototypingToolDataObject
       this.configurationsMap,
       this.currentConfiguration
     );
-
-    this.interactionsManager = new InteractionsManager(this, this.interactions);
   }
 
   private registerDefaultFactories() {
@@ -358,7 +364,6 @@ export class PrototypingToolDataObject
     });
 
     this.rolesManager.on("changeState", () => {
-      this.runInteractions();
       this.emit("change", "Roles manager state changed.");
     });
 
@@ -415,7 +420,7 @@ export class PrototypingToolDataObject
       this.emit("connected");
     });
 
-    this.interactions.removeAllListeners();
+    this.interactionsMap.removeAllListeners();
 
     this.rolesManager.deleteRolesEventListener();
     this.removeAllListeners();
@@ -549,6 +554,10 @@ export class PrototypingToolDataObject
   public getMyViews = (): View[] => {
     const viewsIds = this.getMyRole().getViews();
     return this.viewsManager.getViewsByIds(viewsIds);
+  };
+
+  public getAllViews = (): IterableIterator<View> => {
+    return this.viewsManager.getViews();
   };
 
   public getViewsFrom = (role: string): View[] => {
@@ -902,8 +911,16 @@ export class PrototypingToolDataObject
   public combineViews = (view1: View, view2: View): MultiCombinedView => {
     const id = view1.getId() + "-" + view2.getId();
     const roles = [];
-    const view1New = View.from(view1.getSharedObject(), this.factoriesManager);
-    const view2New = View.from(view2.getSharedObject(), this.factoriesManager);
+    const view1New = View.from(
+      view1.getSharedObject(),
+      this.factoriesManager,
+      this.interactionsManager
+    );
+    const view2New = View.from(
+      view2.getSharedObject(),
+      this.factoriesManager,
+      this.interactionsManager
+    );
     view1New.setCombinedViewID(id);
     view2New.setCombinedViewID(id);
 
@@ -988,12 +1005,20 @@ export class PrototypingToolDataObject
     return this.interactionsManager.getInteractions();
   }
 
-  public setInteractions(inter: string) {
-    this.interactionsManager.setInteractions(inter);
+  public getInteraction(key: string) {
+    return this.interactionsManager.getInteraction(key);
   }
 
-  public runInteractions() {
-    this.interactionsManager.runInteractions();
+  public renameInteraction(oldValue: string, newValue: string) {
+    this.interactionsManager.renameInteraction(oldValue, newValue);
+  }
+
+  public deleteInteraction(key: string) {
+    return this.interactionsManager.deleteInteraction(key);
+  }
+
+  public setInteraction(key: string, interaction: IInteraction) {
+    return this.interactionsManager.setInteraction(key, interaction);
   }
   /**
    * Event Listeners

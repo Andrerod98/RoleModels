@@ -1,10 +1,12 @@
 import { SharedCell } from "@fluidframework/cell";
 import { IUIComponent, UIComponentController } from "../components/UIComponent";
 import { FactoriesManager } from "../managers/FactoriesManager";
+import { InteractionsManager } from "../managers/InteractionsManager";
 import { IView } from "./IView";
 
 enum ViewEvents {
   Changed = "viewChanged",
+  ComponentEvent = "componentEvent",
 }
 export class View {
   protected root: UIComponentController;
@@ -12,7 +14,8 @@ export class View {
   private combinedViewID: string;
   constructor(
     protected readonly sharedView: SharedCell,
-    private readonly factoriesManager: FactoriesManager
+    private readonly factoriesManager: FactoriesManager,
+    private readonly interactionsManager: InteractionsManager
   ) {
     this.loadObject();
     this.setEventListener();
@@ -76,6 +79,14 @@ export class View {
     this.root.on("componentChanged", (snapshot) => {
       this.emitChange(snapshot);
     });
+
+    this.root.on("componentChangedSynced", (snapshot) => {
+      console.log("SYNCHING");
+      this.updateObject(this.toView());
+    });
+    this.root.on("event", (eventName, componentId, ...args) => {
+      this.emitComponentEvent(eventName, componentId, args);
+    });
   }
 
   public deleteEventListeners() {
@@ -104,8 +115,12 @@ export class View {
     };
   }
 
-  static from(sharedView: SharedCell, factoriesManager: FactoriesManager) {
-    const view = new View(sharedView, factoriesManager);
+  static from(
+    sharedView: SharedCell,
+    factoriesManager: FactoriesManager,
+    interactionsManager: InteractionsManager
+  ) {
+    const view = new View(sharedView, factoriesManager, interactionsManager);
 
     return view;
   }
@@ -114,5 +129,14 @@ export class View {
 
   private emitChange(data?: any) {
     this.sharedView.emit(ViewEvents.Changed, data);
+  }
+
+  private emitComponentEvent(eventName: string, componentId: string, ...args) {
+    this.sharedView.emit(
+      ViewEvents.ComponentEvent,
+      eventName,
+      componentId,
+      args
+    );
   }
 }

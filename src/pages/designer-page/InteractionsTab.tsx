@@ -1,54 +1,108 @@
-import { Box, Flex, Heading, Button, VStack } from "@chakra-ui/react";
-import React, { useState } from "react";
-import { CrossDeviceApplication } from "../../shared-application/CrossDeviceApplication";
-import { CodeEditor } from "./components/CodeEditor";
+import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
+import {
+  Button,
+  Checkbox,
+  Editable,
+  EditableInput,
+  EditablePreview,
+  IconButton,
+  Table,
+  TableCaption,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+  useDisclosure,
+} from "@chakra-ui/react";
+import React, { useContext, useState } from "react";
+import { CrossAppState, CrossAppContext } from "../../context/AppContext";
+import { IInteraction } from "../../shared-application/managers/InteractionsManager";
+import { CreateInteractionModal } from "./CreateInteractionModal";
 
-export function InteractionsTab(props: {
-  application: CrossDeviceApplication;
-}) {
-  const [value, setValue] = useState(
-    props.application.getSharedObject().getInteractions()
-  );
-
-  const handleLoad = () => {
-    props.application.getSharedObject().setInteractions(value);
-  };
+export function InteractionsTab() {
+  const { app } = useContext<CrossAppState>(CrossAppContext);
+  const interactions = Array.from(app.getSharedObject().getInteractions());
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [interaction, setInteraction] = useState(undefined);
   return (
-    <Box h={"100%"} bg={"gray.100"}>
-      <Flex h={"100%"} bg={"gray.100"}>
-        <Box h={"100%"} py={3} width={"70%"} bg={"gray.100"} mb={"20px"}>
-          <Heading
-            as={"h5"}
-            px={5}
-            fontSize={"12px"}
-            textAlign={"left"}
-            mb={"5px"}
-          >
-            INTERACTIONS
-          </Heading>
-          <CodeEditor
-            mode={"javascript"}
-            title={"Interactions"}
-            value={value}
-            onChange={(value: string) => {
-              setValue(value);
+    <Table variant='simple' mx={"10px"}>
+      <TableCaption>Interactions</TableCaption>
+      <Thead>
+        <Tr>
+          <Th w={"50%"}>Interaction Name</Th>
+
+          <Th w={"15%"}>Active</Th>
+
+          <Th w={"15%"}></Th>
+
+          <CreateInteractionModal
+            views={Array.from(app.getSharedObject().getAllViews())}
+            app={app}
+            isOpen={isOpen}
+            onOpen={onOpen}
+            onClose={onClose}
+            interaction={interaction}
+            onCreate={(
+              viewId: string,
+              componentIds: string[],
+              eventName: string,
+              code: string
+            ) => {
+              componentIds.forEach((cid) => {
+                const name = viewId + "/" + cid + "/" + eventName;
+
+                const object = {
+                  name: name,
+                  active: true,
+                  code: code,
+                } as IInteraction;
+                app.getSharedObject().setInteraction(name, object);
+              });
             }}
           />
-        </Box>
-        <Box h={"100%"} py={3} width={"30%"} bg={"gray.100"} mb={"20px"}>
-          <Heading
-            as={"h5"}
-            px={5}
-            fontSize={"12px"}
-            textAlign={"left"}
-            mb={"5px"}
-          >
-            AVAILABLE COMMANDS
-          </Heading>
-          <Button onClick={handleLoad}>Load</Button>
-          <VStack></VStack>
-        </Box>
-      </Flex>
-    </Box>
+        </Tr>
+      </Thead>
+
+      <Tbody key={"table-body"}>
+        {interactions.map((inter: IInteraction, index: number) => {
+          return (
+            <Tr key={"table-tr-" + index} bg={"white"}>
+              <Td fontSize={{ base: "10px", md: "16px", lg: "16px" }}>
+                <Editable
+                  defaultValue={inter.name}
+                  onSubmit={(nextValue: string) => {}}
+                >
+                  <EditablePreview />
+                  <EditableInput />
+                </Editable>
+              </Td>
+
+              <Td>
+                <Checkbox defaultIsChecked>Active</Checkbox>
+              </Td>
+
+              <Td>
+                <IconButton
+                  aria-label='Search database'
+                  icon={<EditIcon />}
+                  onClick={() => {
+                    setInteraction(inter);
+                    onOpen();
+                  }}
+                />
+                <IconButton
+                  onClick={() => {
+                    app.getSharedObject().deleteInteraction(inter.name);
+                  }}
+                  aria-label='Search database'
+                  icon={<DeleteIcon />}
+                />
+              </Td>
+            </Tr>
+          );
+        })}
+      </Tbody>
+    </Table>
   );
 }

@@ -13,12 +13,10 @@ export function AppTest(props: { layout: LayoutNode }) {
   useEffect(() => {
     props.layout.getRoot().setMaxListeners(1);
     props.layout.on("change", (layout) => {
-      console.log("changing");
       setLayout(props.layout.toLayout());
     });
   });
 
-  console.log(selectedNode);
   return (
     <Box height={"100vh"} width={"100vw"}>
       <PreviewTest

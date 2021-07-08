@@ -1,39 +1,51 @@
-import { SharedCell } from "@fluidframework/cell";
+import { SharedMap } from "@fluidframework/map";
 import EventEmitter from "events";
-import { PrototypingToolDataObject } from "../shared-object/PrototypingToolDataObject";
 
 enum InteractionsManagerEvents {
   ChangeState = "changeState",
 }
 
+export interface IInteraction {
+  name: string;
+  active: boolean;
+  code: string;
+}
+
 export class InteractionsManager extends EventEmitter {
-  constructor(
-    readonly app: PrototypingToolDataObject,
-    readonly interactions: SharedCell
-  ) {
+  constructor(readonly interactionsMap: SharedMap) {
     super();
     this.setEventListeners();
   }
 
   private setEventListeners() {
-    this.interactions.on("valueChanged", () => {
-      this.runInteractions();
+    this.interactionsMap.on("valueChanged", () => {
+      this.emitChange();
     });
   }
 
   public getInteractions() {
-    return this.interactions.get();
+    return this.interactionsMap.values();
   }
 
-  public setInteractions(inter: string) {
-    if (inter !== this.interactions.get()) this.interactions.set(inter);
+  public getInteraction(key: string) {
+    return this.interactionsMap.get(key);
   }
 
-  public runInteractions() {
-    const app = this.app;
-    console.log(app);
-    eval(this.interactions.get());
+  public renameInteraction(oldValue: string, newValue: string) {
+    this.interactionsMap.set(newValue, {
+      ...this.interactionsMap.get(oldValue),
+      name: newValue,
+    });
+    this.interactionsMap.delete(oldValue);
     this.emitChange();
+  }
+
+  public deleteInteraction(key: string) {
+    return this.interactionsMap.delete(key);
+  }
+
+  public setInteraction(key: string, interaction: IInteraction) {
+    return this.interactionsMap.set(key, interaction);
   }
 
   private emitChange(message?: string) {

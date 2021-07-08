@@ -10,6 +10,7 @@ import { ErrorPage } from "./pages/error-page/ErrorPage";
 import { LandingPage } from "./pages/landing-page/LandingPage";
 
 import Utils from "./utils/Utils";
+import { CreateInteractionModal } from "./pages/designer-page/CreateInteractionModal";
 
 const HASH = window.location.hash.substring(1);
 const HASH_PARTS = Utils.getURLHashParts(HASH);
@@ -17,17 +18,9 @@ const PROJECT_NAME = HASH_PARTS["project"];
 const IP = window.location.hostname;
 
 /*
-const layout = new LayoutNode({
-  id: uuid(),
-  name: "view",
-  viewId: "view",
-});
-
-const selectedNode = "view";
-
 ReactDOM.render(
   <ChakraProvider resetCSS>
-    <AppTest layout={layout} />
+    <InteractionsTab />
   </ChakraProvider>,
 
   document.getElementById("content")

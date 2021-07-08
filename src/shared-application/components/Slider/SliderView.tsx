@@ -17,7 +17,7 @@ export function SliderView({ controller }: { controller: SliderController }) {
       aria-label={"slider-ex-1"}
       value={value}
       onChange={(val) => {
-        controller.emit("change", val);
+        controller.emitEvent("onChange", val);
         controller.update({ ...component, value: val });
       }}
       {...component}

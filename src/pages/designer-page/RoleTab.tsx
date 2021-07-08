@@ -58,8 +58,6 @@ export function RoleTab(props: RoleTabProps) {
     props.role.updateIViews(iviews);
     app.getSharedObject().updateIViews(iviews);
 
-    console.log(app.getSharedObject().getViewsFrom(props.role.getName()));
-
     setCodeState(
       newValue === undefined
         ? { ...codeState, value: codeState.value }

@@ -41,6 +41,16 @@ export class UIComponentController extends EventEmitter {
     return snapshot;
   }
 
+  toComponentsString(): string[] {
+    let componentsString = [this.model.id];
+
+    for (const child of this.children) {
+      componentsString = [...componentsString, ...child.toComponentsString()];
+    }
+
+    return componentsString;
+  }
+
   isRoot() {
     return this.parent == undefined;
   }
@@ -104,6 +114,9 @@ export class UIComponentController extends EventEmitter {
     }
   }
 
+  public emitEvent(eventName: string, ...args) {
+    this.getRoot().emit("event", eventName, this.get().id, args);
+  }
   getChildren() {
     return this.children;
   }
@@ -117,6 +130,19 @@ export class UIComponentController extends EventEmitter {
     });
 
     this.getRoot().emit("componentChanged", this.getRoot().getSnapshot());
+    //TODO: Send change to root
+  }
+
+  updateObject(model: any) {
+    this.model = { ...model };
+    this.children = [];
+
+    model.children.forEach((child) => {
+      this.addChild(child);
+    });
+
+    console.log("Emitting sync");
+    this.getRoot().emit("componentChangedSynced", this.getRoot().getSnapshot());
     //TODO: Send change to root
   }
 

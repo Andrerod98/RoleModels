@@ -45,9 +45,6 @@ export class ConfigurationsManager extends EventEmitter {
   public loadObject() {
     const currentConfigValue = this.currentConfiguration.get();
 
-    console.trace("loading object");
-    console.log(currentConfigValue);
-
     const currentConfigKeys = Object.keys(currentConfigValue.layouts);
 
     const currentKeys = Object.keys(this.current.layouts);
@@ -61,9 +58,6 @@ export class ConfigurationsManager extends EventEmitter {
       const layoutValue = currentConfigValue.layouts[key];
       this.current.layouts[key] = new LayoutNode(layoutValue);
       this.current.layouts[key].getRoot().on("change", (l) => {
-        console.trace("Updating" + key + " layout with:");
-        console.log(l);
-        console.log(l.toLayout());
         this.updateCurrent(key, l.toLayout());
       });
     }
@@ -72,12 +66,7 @@ export class ConfigurationsManager extends EventEmitter {
 
   public updateCurrent(role: string, value: ILayoutNode) {
     const configValue = this.currentConfiguration.get();
-    console.log("Updating layout of" + role + " with the value ");
-    console.log(value);
     configValue.layouts[role] = value;
-
-    console.log("Setting ");
-    console.log(configValue);
 
     this.currentConfiguration.set(configValue);
   }
@@ -99,7 +88,6 @@ export class ConfigurationsManager extends EventEmitter {
     const configValue = this.currentConfiguration.get();
     const node = this.current.layouts[role].getChildByViewId(viewId);
     if (node) {
-      console.log("Removing child with id" + node.getViewId());
       node.removeChild(node.getId());
 
       //const layouts = { ...configValue.layouts };
