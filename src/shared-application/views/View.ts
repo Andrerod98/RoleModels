@@ -84,7 +84,7 @@ export class View {
       console.log("SYNCHING");
       this.updateObject(this.toView());
     });
-    this.root.on("event", (eventName, componentId, ...args) => {
+    this.root.on("event", (eventName, componentId, args) => {
       this.emitComponentEvent(eventName, componentId, args);
     });
   }
@@ -131,7 +131,11 @@ export class View {
     this.sharedView.emit(ViewEvents.Changed, data);
   }
 
-  private emitComponentEvent(eventName: string, componentId: string, ...args) {
+  private emitComponentEvent(
+    eventName: string,
+    componentId: string,
+    args: any[]
+  ) {
     this.sharedView.emit(
       ViewEvents.ComponentEvent,
       eventName,

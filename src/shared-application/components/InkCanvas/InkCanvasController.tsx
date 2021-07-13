@@ -30,9 +30,12 @@ export class InkCanvasController extends UIComponentController {
   }
 
   public setInkCanvas(canvasElement: HTMLCanvasElement) {
-    if (this.inkCanvas) this.inkCanvas.removeEventListeners();
-
-    this.inkCanvas = new InkCanvas(canvasElement, this.getInk());
+    if (this.inkCanvas) {
+      this.inkCanvas.removeEventListeners();
+      this.inkCanvas.setCanvas(canvasElement);
+    } else {
+      this.inkCanvas = new InkCanvas(canvasElement, this.getInk());
+    }
   }
 
   public removeEventListeners() {

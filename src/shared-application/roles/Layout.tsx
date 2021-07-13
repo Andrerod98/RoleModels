@@ -78,6 +78,17 @@ export class LayoutNode extends EventEmitter {
     } else {
       this.children.push(new LayoutNode(model, this));
     }
+    console.trace("START");
+    console.log(this.toLayout());
+    console.log(this.parent ? this.parent.toLayout() : "");
+    console.log(
+      this.parent
+        ? this.parent.parent
+          ? this.parent.parent.toLayout()
+          : ""
+        : ""
+    );
+    console.log("END");
   }
 
   removeChild(childId: string) {
@@ -112,69 +123,10 @@ export class LayoutNode extends EventEmitter {
       if (this.children.length === 0) {
         this.parent.removeChild(this.getId());
       } else {
-        this.getRoot().emit("change", this.getRoot());
+        this.getRoot().emit("change", this.getRoot().toLayout());
       }
     }
   }
-
-  /*removeChild(viewId: string) {
-    const index = this.children.findIndex((c) => c.getViewId() === viewId);
-    if (index == -1) {
-      this.children.forEach((child) => {
-        child.removeChild(viewId);
-      });
-    } else {
-      this.children.splice(index, 1);
-    }
-  }*/
-
-  /*
-  removeChild(viewId: string){
-    const index = this.children.findIndex((c) => c.getViewId() === viewId);
-    if(index != -1){
-      this.children.splice(index, 1);
-      if (this.children.length === 0) {
-        this.parent.removeChild(this.);
-      }
-    } 
-
-
-        
-      
-      
-  }
-
-  removeView(viewId: string) {
-    if (this.getViewId() === viewId) {
-      if (this.children.length === 0) {
-        this.parent.removeChild(viewId);
-      } else {
-        const index = this.children.findIndex((c) => c.getViewId() === viewId);
-        this.children.splice(index, 1);
-      }
-    }
-
-    const child = this.getChildByID(viewId);
-    if (child) {
-      this.children.forEach((child) => {
-        child.removeChild(viewId);
-      });
-    } else {
-      this.children.splice(index, 1);
-    }
-  }
-
-  public removeView(viewId: string) {
-    if (this.getViewId() === viewId) {
-      this.update({ name: "div", children: [], viewId: "" });
-    } else {
-      const child = this.getChildByID(viewId);
-      if (child) {
-        child.parent.removeChild(viewId);
-      }
-    }
-    this.getRoot().emit("change");
-  }*/
 
   public setParent(node: LayoutNode) {
     this.parent = node;
@@ -192,18 +144,8 @@ export class LayoutNode extends EventEmitter {
       model.children.forEach((child) => this.addChild(child));
     }
 
-    this.getRoot().emit("change", this.getRoot());
+    this.getRoot().emit("change", this.getRoot().toLayout());
   }
-
-  /*getSnapshot(): ILayoutNode {
-    let snapshot = { name: this.name, viewId: this.viewId, children: [] };
-
-    this.children.forEach((child) => {
-      snapshot.children.push(child.getSnapshot());
-    });
-
-    return snapshot;
-  }*/
 
   public getChildren() {
     return this.children;
@@ -343,6 +285,8 @@ export class LayoutNode extends EventEmitter {
               .getChildren()
               .findIndex((l) => l.getId() === this.getId());
 
+            console.log(index);
+
             this.parent.addChild(newView, index + 1);
           }
 
@@ -355,295 +299,6 @@ export class LayoutNode extends EventEmitter {
     }
   }
 
-  /*
-  public splitLeft(viewId: string) {
-    // if the parent is a flex then add view to parent right next to it
-    // if the parent is a div then add flex with view
-    if (!this.parent) {
-      const newValue = {
-        name: "flex",
-        viewId: "",
-        children: [
-          {
-            name: "view",
-            viewId: viewId,
-          },
-          this.toLayout(),
-        ],
-      } as ILayoutNode;
-      this.update(newValue);
-      // Update parent with new value
-    } else {
-      if (this.parent!.getSnapshot().name === "div") {
-        const newValue = {
-          name: "flex",
-          viewId: "",
-          children: [
-            {
-              name: "view",
-              viewId: viewId,
-            },
-            this.toLayout(),
-          ],
-        } as ILayoutNode;
-        this.update(newValue);
-        // Update parent with new value
-      } else if (this.parent!.getSnapshot().name === "flex") {
-        const children = this.parent.toLayout().children;
-        const index = children.findIndex((l) => l.viewId === this.viewId);
-        children.splice(index, 0, {
-          name: "view",
-          viewId: viewId,
-        });
-
-        const newValue = {
-          ...this.parent.toLayout(),
-          children: [...children],
-        } as ILayoutNode;
-        this.parent.update(newValue);
-        // Update parent with new value
-      }
-    }
-  }
-
-  public splitExtremeLeft(viewId: string) {
-    // if the parent is a flex then add view to parent right next to it
-    // if the parent is a div then add flex with view
-    if (!this.parent) {
-      const newValue = {
-        name: "flex",
-        viewId: "",
-        children: [
-          {
-            name: "view",
-            viewId: viewId,
-          },
-          this.toLayout(),
-        ],
-      } as ILayoutNode;
-      this.update(newValue);
-      // Update parent with new value
-    } else {
-      if (this.parent!.getSnapshot().name === "div") {
-        const newValue = {
-          name: "flex",
-          viewId: "",
-          children: [
-            {
-              name: "view",
-              viewId: viewId,
-            },
-            this.toLayout(),
-          ],
-        } as ILayoutNode;
-        this.update(newValue);
-        // Update parent with new value
-      } else if (this.parent!.getSnapshot().name === "flex") {
-        const children = this.parent.toLayout().children;
-
-        const newValue = {
-          ...this.parent.toLayout(),
-          children: [
-            {
-              name: "view",
-              viewId: viewId,
-            },
-            ...children,
-          ],
-        } as ILayoutNode;
-        this.parent.update(newValue);
-        // Update parent with new value
-      }
-    }
-  }
-
-  
-  public splitExtremeTop(viewId: string) {
-    if (!this.parent) {
-      const newValue = {
-        name: "div",
-        viewId: "",
-        children: [
-          {
-            name: "view",
-            viewId: viewId,
-          },
-          this.toLayout(),
-        ],
-      } as ILayoutNode;
-      this.update(newValue);
-      // Update parent with new value
-    } else {
-      if (this.parent!.getSnapshot().name === "flex") {
-        const newValue = {
-          name: "div",
-          viewId: "",
-          children: [
-            {
-              name: "view",
-              viewId: viewId,
-            },
-            this.toLayout(),
-          ],
-        } as ILayoutNode;
-        this.update(newValue);
-        // Update parent with new value
-      } else if (this.parent!.getSnapshot().name === "div") {
-        const newValue = {
-          ...this.parent.toLayout(),
-          children: [
-            {
-              name: "view",
-              viewId: viewId,
-            },
-            ...this.parent.toLayout().children,
-          ],
-        } as ILayoutNode;
-        this.parent.update(newValue);
-        // Update parent with new value
-      }
-    }
-  }
-  public splitTop(viewId: string) {
-    if (!this.parent) {
-      const newValue = {
-        name: "div",
-        viewId: "",
-        children: [
-          {
-            name: "view",
-            viewId: viewId,
-          },
-          this.toLayout(),
-        ],
-      } as ILayoutNode;
-      this.update(newValue);
-      // Update parent with new value
-    } else {
-      if (this.parent!.getSnapshot().name === "flex") {
-        const newValue = {
-          name: "div",
-          viewId: "",
-          children: [
-            {
-              name: "view",
-              viewId: viewId,
-            },
-            this.toLayout(),
-          ],
-        } as ILayoutNode;
-        this.update(newValue);
-        // Update parent with new value
-      } else if (this.parent!.getSnapshot().name === "div") {
-        const children = this.parent.toLayout().children;
-        const index = children.findIndex((l) => l.viewId === this.viewId);
-        children.splice(index, 0, {
-          name: "view",
-          viewId: viewId,
-        });
-        const newValue = {
-          ...this.parent.toLayout(),
-          children: [...children],
-        } as ILayoutNode;
-        this.parent.update(newValue);
-        // Update parent with new value
-      }
-    }
-  }
-  public splitBottom(viewId: string) {
-    if (!this.parent) {
-      const newValue = {
-        name: "div",
-        viewId: "",
-        children: [
-          this.toLayout(),
-          {
-            name: "view",
-            viewId: viewId,
-          },
-        ],
-      } as ILayoutNode;
-      this.update(newValue);
-      // Update parent with new value
-    } else {
-      if (this.parent!.getSnapshot().name === "flex") {
-        const newValue = {
-          name: "div",
-          viewId: "",
-          children: [
-            this.toLayout(),
-            {
-              name: "view",
-              viewId: viewId,
-            },
-          ],
-        } as ILayoutNode;
-        this.update(newValue);
-        // Update parent with new value
-      } else if (this.parent!.getSnapshot().name === "div") {
-        const children = this.parent.toLayout().children;
-        const index = children.findIndex((l) => l.viewId === this.viewId);
-        children.splice(index + 1, 0, {
-          name: "view",
-          viewId: viewId,
-        });
-        const newValue = {
-          ...this.parent.toLayout(),
-          children: [...children],
-        } as ILayoutNode;
-        this.parent.update(newValue);
-        // Update parent with new value
-      }
-    }
-  }
-
-  public splitExtremeBottom(viewId: string) {
-    if (!this.parent) {
-      const newValue = {
-        name: "div",
-        viewId: "",
-        children: [
-          this.toLayout(),
-          {
-            name: "view",
-            viewId: viewId,
-          },
-        ],
-      } as ILayoutNode;
-      this.update(newValue);
-      // Update parent with new value
-    } else {
-      if (this.parent!.getSnapshot().name === "flex") {
-        const newValue = {
-          name: "div",
-          viewId: "",
-          children: [
-            this.toLayout(),
-            {
-              name: "view",
-              viewId: viewId,
-            },
-          ],
-        } as ILayoutNode;
-        this.update(newValue);
-        // Update parent with new value
-      } else if (this.parent!.getSnapshot().name === "div") {
-        const newValue = {
-          ...this.parent.toLayout(),
-          children: [
-            ...this.parent.toLayout().children,
-            {
-              name: "view",
-              viewId: viewId,
-            },
-          ],
-        } as ILayoutNode;
-        this.parent.update(newValue);
-        // Update parent with new value
-      }
-    }
-  }
-*/
   public toLayout(): ILayoutNode {
     return {
       id: this.id,

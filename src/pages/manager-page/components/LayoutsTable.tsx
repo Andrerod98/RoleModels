@@ -26,10 +26,10 @@ export function LayoutsTable(props: LayoutTableProps) {
 
   return (
     <Table variant='simple'>
-      <TableCaption>Layout Manager</TableCaption>
+      <TableCaption>Workspace Manager</TableCaption>
       <Thead>
         <Tr>
-          <Th>Configuration Name</Th>
+          <Th>Workspace Name</Th>
 
           <Th>Load</Th>
         </Tr>

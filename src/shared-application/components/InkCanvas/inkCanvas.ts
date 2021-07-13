@@ -127,39 +127,37 @@ function drawShapes(
 }
 
 export class InkCanvas {
-  private readonly context: CanvasRenderingContext2D;
+  private context: CanvasRenderingContext2D;
   private readonly localActiveStrokeMap: Map<number, string> = new Map();
-  private readonly currentPen: IPen;
+  private currentPen: IPen;
 
-  constructor(
-    private readonly canvas: HTMLCanvasElement,
-    private readonly model: IInk
-  ) {
+  constructor(private canvas: HTMLCanvasElement, private readonly model: IInk) {
     console.log("Creating a new ink canvas!");
     this.model.on("clear", this.redraw.bind(this));
     this.model.on("stylus", this.handleStylus.bind(this));
-    this.canvas.style.touchAction = "none";
 
-    this.canvas.addEventListener(
-      "pointerdown",
-      this.handlePointerDown.bind(this)
-    );
-    this.canvas.addEventListener(
-      "pointermove",
-      this.handlePointerMove.bind(this)
-    );
-    this.canvas.addEventListener("pointerup", this.handlePointerUp.bind(this));
-
-    const context = this.canvas.getContext("2d");
-    if (context === null) {
-      throw new Error("InkCanvas requires a canvas with 2d rendering context");
-    }
-    this.context = context;
-
+    this.setCanvas(canvas);
     this.currentPen = {
       color: { r: 0, g: 161, b: 241, a: 0 },
       thickness: 7,
     };
+
+    this.sizeCanvasBackingStore();
+  }
+
+  public setCanvas(canvas: HTMLCanvasElement) {
+    canvas.style.touchAction = "none";
+
+    canvas.addEventListener("pointerdown", this.handlePointerDown.bind(this));
+    canvas.addEventListener("pointermove", this.handlePointerMove.bind(this));
+    canvas.addEventListener("pointerup", this.handlePointerUp.bind(this));
+
+    const context = canvas.getContext("2d");
+    if (context === null) {
+      throw new Error("InkCanvas requires a canvas with 2d rendering context");
+    }
+    this.context = context;
+    this.canvas = canvas;
 
     this.sizeCanvasBackingStore();
   }
@@ -196,6 +194,7 @@ export class InkCanvas {
 
   public setPenThickness(thickness: number) {
     this.currentPen.thickness = thickness;
+    console.log(this.currentPen);
   }
 
   public replay() {

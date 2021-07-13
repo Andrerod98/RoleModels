@@ -131,7 +131,12 @@ export const DesignerPage = (props: SingleTabProps) => {
             </TabPanel>
           ))}
           <TabPanel key={"tab-panel-add"} p={0} h={"100%"}></TabPanel>
-          <TabPanel key={"tab-panel-interactions"} p={0} h={"100%"}>
+          <TabPanel
+            key={"tab-panel-interactions"}
+            p={0}
+            h={"100%"}
+            overflowY={"scroll"}
+          >
             <InteractionsTab />
           </TabPanel>
         </TabPanels>

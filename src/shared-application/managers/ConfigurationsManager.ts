@@ -21,12 +21,15 @@ export interface Configuration {
 /* This class is responsible for managing the combined views */
 export class ConfigurationsManager extends EventEmitter {
   current: Configuration;
+  primary: LayoutNode;
   public constructor(
     private readonly configurationsSharedMap: SharedMap,
-    private readonly currentConfiguration: SharedCell
+    private readonly currentConfiguration: SharedCell,
+    private readonly primaryConfiguration: SharedCell
   ) {
     super();
     this.current = { name: "default", layouts: {} };
+    this.primary = undefined;
     //this.loadObject();
     this.setEventListeners();
   }
@@ -37,8 +40,21 @@ export class ConfigurationsManager extends EventEmitter {
       this.emitChange();
     });
 
+    this.primaryConfiguration.on("valueChanged", () => {
+      this.loadPrimaryObject();
+      this.emitChange();
+    });
+
     this.configurationsSharedMap.on("valueChanged", () => {
       this.emitChange();
+    });
+  }
+
+  public loadPrimaryObject() {
+    const primaryConfigValue = this.primaryConfiguration.get();
+    this.primary = new LayoutNode(primaryConfigValue);
+    this.primary.getRoot().on("change", (l) => {
+      this.primaryConfiguration.set(l);
     });
   }
 
@@ -58,7 +74,8 @@ export class ConfigurationsManager extends EventEmitter {
       const layoutValue = currentConfigValue.layouts[key];
       this.current.layouts[key] = new LayoutNode(layoutValue);
       this.current.layouts[key].getRoot().on("change", (l) => {
-        this.updateCurrent(key, l.toLayout());
+        console.log(l);
+        this.updateCurrent(key, l);
       });
     }
   }
@@ -105,8 +122,16 @@ export class ConfigurationsManager extends EventEmitter {
     return this.current;
   }
 
+  public getPrimaryConfiguration(): LayoutNode {
+    return this.primary;
+  }
+
   public getCurrentConfigurationShared(): IConfiguration {
     return this.currentConfiguration.get();
+  }
+
+  public getPrimaryConfigurationShared(): ILayoutNode {
+    return this.primaryConfiguration.get();
   }
 
   public getCurrentConfigurationOfRole(role: string): LayoutNode {

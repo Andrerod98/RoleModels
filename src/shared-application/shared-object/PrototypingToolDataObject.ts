@@ -69,6 +69,7 @@ import { View } from "../views/View";
 import { ButtonFactory } from "../components/Button";
 import { uuid } from "uuidv4";
 import { ViewsManager } from "../managers/ViewsManager";
+import { ILayoutNode } from "../roles/ILayout";
 // import { SharedCounter } from "@fluidframework/counter";
 
 export class PrototypingToolDataObject
@@ -98,6 +99,7 @@ export class PrototypingToolDataObject
   /* The Map with the configurations */
   private configurationsMap: SharedMap;
   private currentConfiguration: SharedCell;
+  private primaryConfiguration: SharedCell;
   private configurationsManager: ConfigurationsManager;
 
   private interactionsMap: SharedMap;
@@ -140,10 +142,16 @@ export class PrototypingToolDataObject
 
     const configurationsMap = SharedMap.create(this.runtime);
     const currentConfiguration = SharedCell.create(this.runtime);
+    const primaryConfiguration = SharedCell.create(this.runtime);
     currentConfiguration.set({
       name: "default",
       layouts: { default: { id: uuid(), name: "div" } },
     } as IConfiguration);
+
+    primaryConfiguration.set({
+      id: uuid(),
+      name: "div",
+    } as ILayoutNode);
     /* Creating default roles */
     const managerRole = SharedCell.create(this.runtime);
 
@@ -186,6 +194,7 @@ export class PrototypingToolDataObject
     this.root.set("ping", sharedPing.handle);
     this.root.set("configurations", configurationsMap.handle);
     this.root.set("current-configuration", currentConfiguration.handle);
+    this.root.set("primary-configuration", primaryConfiguration.handle);
     this.root.set("interactions", interactionsMap.handle);
   }
 
@@ -214,29 +223,35 @@ export class PrototypingToolDataObject
   }
 
   private async loadSharedObjects() {
-    const sharedObjects = await Promise.all([
+    const sharedMaps = await Promise.all([
       this.root.get<IFluidHandle<SharedMap>>("devices").get(),
       this.root.get<IFluidHandle<SharedMap>>("combined-views").get(),
       this.root.get<IFluidHandle<SharedMap>>("roles").get(),
       this.root.get<IFluidHandle<SharedMap>>("qrs").get(),
-      this.root.wait<IFluidHandle<IInk>>("ink"),
-      this.root.get<IFluidHandle<SharedCounter>>("ping").get(),
       this.root.get<IFluidHandle<SharedMap>>("configurations").get(),
-      this.root.get<IFluidHandle<SharedCell>>("current-configuration").get(),
       this.root.get<IFluidHandle<SharedMap>>("interactions").get(),
       this.root.get<IFluidHandle<SharedMap>>("views").get(),
     ]);
 
-    this.devicesMap = sharedObjects[0];
-    this.combinedViewsMap = sharedObjects[1];
-    this.rolesMap = sharedObjects[2];
-    this.qrMap = sharedObjects[3];
-    this.pingCounter = sharedObjects[5];
-    this.configurationsMap = sharedObjects[6];
-    this.currentConfiguration = sharedObjects[7];
-    this.interactionsMap = sharedObjects[8];
-    this.viewsMap = sharedObjects[9];
-    this.ink = await sharedObjects[4].get();
+    const sharedObjects = await Promise.all([
+      this.root.get<IFluidHandle<SharedCounter>>("ping").get(),
+      this.root.get<IFluidHandle<SharedCell>>("current-configuration").get(),
+      this.root.get<IFluidHandle<SharedCell>>("primary-configuration").get(),
+      this.root.wait<IFluidHandle<IInk>>("ink"),
+    ]);
+
+    this.devicesMap = sharedMaps[0];
+    this.combinedViewsMap = sharedMaps[1];
+    this.rolesMap = sharedMaps[2];
+    this.qrMap = sharedMaps[3];
+    this.configurationsMap = sharedMaps[4];
+    this.interactionsMap = sharedMaps[5];
+    this.viewsMap = sharedMaps[6];
+
+    this.pingCounter = sharedObjects[0];
+    this.currentConfiguration = sharedObjects[1];
+    this.primaryConfiguration = sharedObjects[2];
+    this.ink = await sharedObjects[3].get();
   }
 
   private loadManagers() {
@@ -271,7 +286,8 @@ export class PrototypingToolDataObject
     /* Creating configurations Manager...*/
     this.configurationsManager = new ConfigurationsManager(
       this.configurationsMap,
-      this.currentConfiguration
+      this.currentConfiguration,
+      this.primaryConfiguration
     );
   }
 
@@ -415,6 +431,7 @@ export class PrototypingToolDataObject
     this.deleteMapEventListeners("configurations", this.configurationsMap);
 
     this.currentConfiguration.removeAllListeners();
+    this.primaryConfiguration.removeAllListeners();
     this.pingCounter.removeAllListeners();
     this.runtime.off("connected", () => {
       this.emit("connected");
@@ -981,6 +998,15 @@ export class PrototypingToolDataObject
   public getCurrentConfigurationShared() {
     return this.configurationsManager.getCurrentConfigurationShared();
   }
+
+  public getPrimaryConfiguration() {
+    return this.configurationsManager.getPrimaryConfiguration();
+  }
+
+  public getPrimaryConfigurationShared() {
+    return this.configurationsManager.getPrimaryConfigurationShared();
+  }
+
   public renameConfiguration(oldValue: string, newValue: string) {
     this.configurationsManager.renameConfiguration(oldValue, newValue);
   }

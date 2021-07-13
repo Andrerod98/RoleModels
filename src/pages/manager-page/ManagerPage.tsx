@@ -73,14 +73,14 @@ export function ManagerPage(props: ManagerPageProps) {
       <Tabs variant='enclosed'>
         <TabList pl={"20px"}>
           <Tab>Roles</Tab>
-          <Tab>Configurations</Tab>
+          <Tab>Workspaces</Tab>
           <Spacer />
           <Button
             mr={"40px"}
             size={"sm"}
             onClick={() => app.getSharedObject().saveConfiguration()}
           >
-            Save Configuration
+            Save Workspace
           </Button>
         </TabList>
         <TabPanels>

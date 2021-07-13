@@ -86,7 +86,7 @@ export class ViewsManager extends EventEmitter {
 
     sharedView.off(
       "componentEvent",
-      (eventName: string, componentId: string) => {
+      (eventName: string, componentId: string, args) => {
         const interaction = this.interactionsManager.getInteraction(
           sharedView.get().id + "/" + componentId + "/" + eventName
         );
@@ -101,7 +101,7 @@ export class ViewsManager extends EventEmitter {
 
     sharedView.on(
       "componentEvent",
-      (eventName: string, componentId: string, ...args) => {
+      (eventName: string, componentId: string, args) => {
         const interaction = this.interactionsManager.getInteraction(
           sharedView.get().id + "/" + componentId + "/" + eventName
         );
