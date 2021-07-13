@@ -8,8 +8,15 @@ import { CrossAppState, CrossAppContext } from "../../context/AppContext";
 interface RoleProps {}
 
 export function RolePage(props: RoleProps) {
-  const { app, role, layout, selectedNode, setSelectedNode, isLayoutOpen } =
-    useContext<CrossAppState>(CrossAppContext);
+  const {
+    app,
+    role,
+    layout,
+    selectedNode,
+    setSelectedNode,
+    isLayoutOpen,
+    devices,
+  } = useContext<CrossAppState>(CrossAppContext);
   const model = app.getSharedObject();
   //const views = props.app.getViewsOrCombinedViews(props.role.getName());
   const qrs = app.getSharedObject().getMyQrCodes();

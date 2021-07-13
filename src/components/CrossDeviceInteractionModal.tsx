@@ -23,7 +23,7 @@ export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
     const { app, setLayoutOpen, setNewViewId } =
       useContext<CrossAppState>(CrossAppContext);
 
-    const [{ view }, setState] = useState({
+    const [{ view, from }, setState] = useState({
       view: undefined,
       combinedView: undefined,
       qr: undefined,
@@ -57,7 +57,7 @@ export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
       e: React.MouseEvent<HTMLButtonElement, MouseEvent>
     ) => {
       e.stopPropagation();
-      app.grabView(view);
+      app.grabView(view, from);
       setNewViewId(view.id);
       setLayoutOpen(true);
 

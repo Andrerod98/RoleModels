@@ -122,8 +122,8 @@ export class CrossDeviceApplication {
     return "https://" + this.serverUrl + ":8080/#project=" + this.projectName;
   }
 
-  public grabView(view: View): void {
-    this.sharedObject.grabView(view);
+  public grabView(view: View, from: string): void {
+    this.sharedObject.grabView(view, from);
   }
 
   public async addRole(role: string): Promise<Role> {

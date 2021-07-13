@@ -36,9 +36,16 @@ export const CrossAppProvider = ({
   const [isLayoutOpen, setLayoutOpen] = useState(false);
   const [newViewId, setNewViewId] = useState("");
   const generateState = () => {
-    const layoutNode = model.getCurrentConfigurationOfRole(
-      model.getMyRole().getName()
-    );
+    let layoutNode;
+
+    if (Array.from(model.getDevices()).length === 1) {
+      layoutNode = app.getSharedObject().getPrimaryConfiguration();
+    } else {
+      layoutNode = model.getCurrentConfigurationOfRole(
+        model.getMyRole().getName()
+      );
+    }
+
     if (
       layoutNode &&
       selectedNode != "" &&
@@ -46,6 +53,7 @@ export const CrossAppProvider = ({
     ) {
       setSelectedNode("");
     }
+
     return {
       devices: Array.from(model.getDevices()),
       role: model.getMyRole(),

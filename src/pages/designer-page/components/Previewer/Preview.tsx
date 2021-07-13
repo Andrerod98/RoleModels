@@ -10,7 +10,7 @@ interface PreviewProps {
   width: string;
   height: string;
   app: CrossDeviceApplication;
-  role: Role;
+
   selectedNode: string;
   isOpenLayoutModal: boolean;
   setSelected: (newSelected: string) => void;
@@ -48,12 +48,9 @@ export const Preview = (props: PreviewProps) => {
           </Flex>
         );
       case "view":
-        const [view, combinedView] = props.app.getViewOrCombinedView(
-          props.role.getName(),
-          node.viewId
-        );
+        const view = props.app.getSharedObject().getView(node.viewId);
 
-        if (!view && !combinedView) {
+        if (!view) {
           return <></>;
         }
 
@@ -74,8 +71,8 @@ export const Preview = (props: PreviewProps) => {
             <ViewComponent
               key={props.app.getMyRole().getName() + "_view_" + node.viewId}
               view={view}
-              combinedView={combinedView}
-              role={props.role}
+              combinedView={undefined}
+              role={props.app.getMyRole()}
             />
             <Box
               _hover={

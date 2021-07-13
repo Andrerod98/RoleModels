@@ -1,4 +1,10 @@
-import { ChevronDownIcon, MoonIcon, SunIcon, ViewIcon } from "@chakra-ui/icons";
+import {
+  AddIcon,
+  ChevronDownIcon,
+  MoonIcon,
+  SunIcon,
+  ViewIcon,
+} from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -106,7 +112,7 @@ export function Header(props: HeaderProps) {
                       <Button
                         key={"header-button-" + index}
                         leftIcon={<ViewIcon />}
-                        mx={"5px"}
+                        ml={"5px"}
                         colorScheme={"blue"}
                         variant={"solid"}
                         onClick={() => {
@@ -120,6 +126,8 @@ export function Header(props: HeaderProps) {
                     return (
                       <Button
                         key={"header-button-" + index}
+                        ml={"5px"}
+                        colorScheme={"green"}
                         leftIcon={<FaPencilRuler />}
                         onClick={() => {
                           props.onRoleClick("designer");
@@ -131,14 +139,21 @@ export function Header(props: HeaderProps) {
                   }
                   return (
                     <Button
-                      mx={"5px"}
+                      ml={"5px"}
                       key={"header-button-" + index}
                       onClick={() => props.onRoleClick(role)}
                     >
                       {role}
                     </Button>
                   );
-                })}{" "}
+                })}
+                <Button
+                  ml={"5px"}
+                  key={"header-button-add"}
+                  onClick={() => props.app.addRole("new")}
+                >
+                  <AddIcon />
+                </Button>
               </Box>
             </Box>
             <Spacer />

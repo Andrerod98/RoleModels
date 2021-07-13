@@ -21,6 +21,7 @@ interface LayoutModalProps {
   onOpen: () => void;
   onClose: () => void;
   setSelected: (newSelected: string) => void;
+  onButtonClick: (buttonName: string) => void;
   newViewId: string;
 }
 export function LayoutModal(props: LayoutModalProps) {
@@ -63,12 +64,7 @@ export function LayoutModal(props: LayoutModalProps) {
             mx={"5px"}
             isDisabled={props.selectedNode === ""}
             onClick={() => {
-              props.layout
-                .getChildByViewId(props.selectedNode)
-                .splitTop(props.newViewId, true);
-
-              props.setSelected(props.newViewId);
-              props.onClose();
+              props.onButtonClick("ET");
             }}
             my={"5px"}
             icon={<Icon fontSize={"30px"} as={BiArrowToTop} />}
@@ -84,12 +80,7 @@ export function LayoutModal(props: LayoutModalProps) {
             my={"5px"}
             isDisabled={props.selectedNode === ""}
             onClick={() => {
-              props.layout
-                .getChildByViewId(props.selectedNode)
-                .splitTop(props.newViewId, false);
-
-              props.setSelected(props.newViewId);
-              props.onClose();
+              props.onButtonClick("T");
             }}
             icon={<Icon fontSize={"30px"} as={BiDockTop} />}
           />
@@ -103,12 +94,7 @@ export function LayoutModal(props: LayoutModalProps) {
             my={"5px"}
             isDisabled={props.selectedNode === ""}
             onClick={() => {
-              props.layout
-                .getChildByViewId(props.selectedNode)
-                .splitLeft(props.newViewId, true);
-
-              props.setSelected(props.newViewId);
-              props.onClose();
+              props.onButtonClick("EL");
             }}
             icon={<Icon fontSize={"30px"} as={BiArrowToLeft} />}
           />{" "}
@@ -121,12 +107,7 @@ export function LayoutModal(props: LayoutModalProps) {
             my={"5px"}
             isDisabled={props.selectedNode === ""}
             onClick={() => {
-              props.layout
-                .getChildByViewId(props.selectedNode)
-                .splitLeft(props.newViewId, false);
-
-              props.setSelected(props.newViewId);
-              props.onClose();
+              props.onButtonClick("L");
             }}
             icon={<Icon fontSize={"30px"} as={BiDockLeft} />}
           />
@@ -139,15 +120,7 @@ export function LayoutModal(props: LayoutModalProps) {
             my={"5px"}
             isDisabled={props.selectedNode !== ""}
             onClick={() => {
-              props.layout.update({
-                id: uuid(),
-                name: "view",
-                viewId: props.newViewId,
-              } as ILayoutNode);
-
-              props.setSelected(props.newViewId);
-
-              props.onClose();
+              props.onButtonClick("C");
             }}
             icon={<Icon fontSize={"30px"} as={BiRectangle} />}
           />
@@ -160,12 +133,7 @@ export function LayoutModal(props: LayoutModalProps) {
             my={"5px"}
             isDisabled={props.selectedNode === ""}
             onClick={() => {
-              props.layout
-                .getChildByViewId(props.selectedNode)
-                .splitRight(props.newViewId, false);
-
-              props.setSelected(props.newViewId);
-              props.onClose();
+              props.onButtonClick("R");
             }}
             icon={<Icon fontSize={"30px"} as={BiDockRight} />}
           />
@@ -178,13 +146,7 @@ export function LayoutModal(props: LayoutModalProps) {
             my={"5px"}
             isDisabled={props.selectedNode === ""}
             onClick={() => {
-              const id = uuid();
-              props.layout
-                .getChildByViewId(props.selectedNode)
-                .splitRight(id, true);
-
-              props.setSelected(id);
-              props.onClose();
+              props.onButtonClick("ER");
             }}
             icon={<Icon fontSize={"30px"} as={BiArrowToRight} />}
           />
@@ -198,12 +160,7 @@ export function LayoutModal(props: LayoutModalProps) {
             my={"5px"}
             isDisabled={props.selectedNode === ""}
             onClick={() => {
-              props.layout
-                .getChildByViewId(props.selectedNode)
-                .splitBottom(props.newViewId, false);
-
-              props.setSelected(props.newViewId);
-              props.onClose();
+              props.onButtonClick("B");
             }}
             icon={<Icon fontSize={"30px"} as={BiDockBottom} />}
           />
@@ -218,12 +175,7 @@ export function LayoutModal(props: LayoutModalProps) {
             my={"5px"}
             isDisabled={props.selectedNode === ""}
             onClick={() => {
-              props.layout
-                .getChildByViewId(props.selectedNode)
-                .splitBottom(props.newViewId, true);
-
-              props.setSelected(props.newViewId);
-              props.onClose();
+              props.onButtonClick("EB");
             }}
             icon={<Icon fontSize={"30px"} as={BiArrowToBottom} />}
           />

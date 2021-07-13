@@ -22,16 +22,20 @@ import { CodeEditor } from "./components/CodeEditor";
 import { Previewer } from "./components/Previewer/Previewer";
 import { ComponentsExamples } from "./ComponentsExamples";
 
-interface RoleTabProps {
-  role: Role;
-}
+interface RoleTabProps {}
 
 export function RoleTab(props: RoleTabProps) {
-  const { app } = useContext<CrossAppState>(CrossAppContext);
-  const views = app.getSharedObject().getViewsFrom(props.role.getName());
-  const layout = app
-    .getSharedObject()
-    .getCurrentConfigurationOfRole(props.role.getName());
+  const {
+    app,
+    selectedNode,
+    setSelectedNode,
+    newViewId,
+    setNewViewId,
+    isLayoutOpen,
+    setLayoutOpen,
+  } = useContext<CrossAppState>(CrossAppContext);
+  const views = Array.from(app.getSharedObject().getAllViews());
+  const layout = app.getSharedObject().getPrimaryConfiguration();
 
   const [codeState, setCodeState] = useState({
     value: Utils.jsonToString(views.map((v) => v.toView())),
@@ -39,8 +43,6 @@ export function RoleTab(props: RoleTabProps) {
   });
 
   const [alert, setAlert] = useState(false);
-  const [newViewId, setNewViewId] = useState("");
-  const [selectedNode, setSelectedNode] = useState("");
 
   const [layoutSnapshot, setLayoutSnapshot] = useState(
     layout
@@ -48,14 +50,12 @@ export function RoleTab(props: RoleTabProps) {
       : ({ id: uuid(), name: "div", viewId: "", children: [] } as ILayoutNode)
   );
 
-  const { isOpen, onClose, onOpen } = useDisclosure();
-
   const preview = (newValue?: string, nvid?: string) => {
     //props.project.stringToViews(value)
     const iviews = Utils.stringToJson(
       newValue === undefined ? codeState.value : newValue
     );
-    props.role.updateIViews(iviews);
+    //props.role.updateIViews(iviews);
     app.getSharedObject().updateIViews(iviews);
 
     setCodeState(
@@ -88,7 +88,7 @@ export function RoleTab(props: RoleTabProps) {
         setCodeState({ ...codeState, value: Utils.jsonToString(json) });
         preview(Utils.jsonToString(json));
         setNewViewId(newView.id);
-        onOpen();
+        setLayoutOpen(true);
 
         return;
       case "image":
@@ -186,30 +186,23 @@ export function RoleTab(props: RoleTabProps) {
   };
 
   const handleChangeView = (newView: View) => {
-    app
-      .getSharedObject()
-      .updateViewOrCombinedView(props.role.getName(), newView);
+    app.getSharedObject().updateViewOrCombinedView("", newView);
+
     setCodeState({
       ...codeState,
       value: Utils.jsonToString(
-        app
-          .getSharedObject()
-          .getViewsFrom(props.role.getName())
-          .map((v) => v.toView())
+        Array.from(app.getSharedObject().getAllViews()).map((v) => v.toView())
       ),
     });
   };
 
   const handleChangeViews = (newViews: View[]) => {
-    props.role.updateViews(newViews.map((nv) => nv.getId()));
+    //props.role.updateViews(newViews.map((nv) => nv.getId()));
     app.getSharedObject().updateViews(newViews);
     setCodeState({
       ...codeState,
       value: Utils.jsonToString(
-        app
-          .getSharedObject()
-          .getViewsFrom(props.role.getName())
-          .map((v) => v.toView())
+        Array.from(app.getSharedObject().getAllViews()).map((v) => v.toView())
       ),
     });
   };
@@ -240,9 +233,8 @@ export function RoleTab(props: RoleTabProps) {
                       children: [],
                     } as ILayoutNode)
               }
-              role={props.role}
               app={app}
-              isOpenLayoutModal={isOpen}
+              isOpenLayoutModal={isLayoutOpen}
               handleClick={() => {
                 preview();
               }}
@@ -293,18 +285,6 @@ export function RoleTab(props: RoleTabProps) {
           </Box>
         </Box>
       </Flex>
-      <LayoutModal
-        layout={layout ? layout.getRoot() : layout}
-        newViewId={newViewId}
-        isOpen={isOpen}
-        onOpen={onOpen}
-        onClose={onClose}
-        setSelected={(newSelected: string) => {
-          setSelectedNode(newSelected);
-          preview();
-        }}
-        selectedNode={selectedNode}
-      />
     </Box>
   );
 }

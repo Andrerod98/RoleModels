@@ -13,7 +13,7 @@ import { ILayoutNode } from "../../../../shared-application/roles/ILayout";
 interface PreviewerProps {
   layout: ILayoutNode;
   app: CrossDeviceApplication;
-  role: Role;
+
   isOpenLayoutModal: boolean;
   handleClick: () => void;
   selectedNode: string;
@@ -51,7 +51,6 @@ export const Previewer = (props: PreviewerProps) => {
                 height={"500px"}
                 layout={props.layout}
                 app={props.app}
-                role={props.role}
                 selectedNode={props.selectedNode}
                 isOpenLayoutModal={props.isOpenLayoutModal}
                 setSelected={(newSelected: string) => {

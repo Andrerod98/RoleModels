@@ -70,6 +70,7 @@ import { ButtonFactory } from "../components/Button";
 import { uuid } from "uuidv4";
 import { ViewsManager } from "../managers/ViewsManager";
 import { ILayoutNode } from "../roles/ILayout";
+import { LayoutNode } from "../roles/Layout";
 // import { SharedCounter } from "@fluidframework/counter";
 
 export class PrototypingToolDataObject
@@ -217,6 +218,7 @@ export class PrototypingToolDataObject
       this.rolesManager.loadRoles(1),
       this.combinedViewsManager.loadCombinedViews(1),
       this.configurationsManager.loadObject(),
+      this.configurationsManager.loadPrimaryObject(),
       this.viewsManager.loadViews(1),
       this.qrManager.loadQRCodes(),
     ]);
@@ -595,24 +597,20 @@ export class PrototypingToolDataObject
   };
 
   public getView = (viewId: string): View => {
-    const roles = this.rolesManager.getRoles();
-    for (const role of roles) {
-      if (role.hasViewWithId(viewId)) {
-        return this.viewsManager.getView(viewId);
-      }
-    }
-
-    return undefined;
+    return this.viewsManager.getView(viewId);
   };
 
-  public grabView = (view: View): void => {
-    this.getViewOwners(view.getId()).forEach((role) => {
-      this.configurationsManager.removeViewFromRole(
-        role.getName(),
+  public getLayoutWithView(viewId: string): LayoutNode {
+    return this.configurationsManager.getLayoutWithView(viewId);
+  }
+
+  public grabView = (view: View, from: string): void => {
+    this.configurationsManager.removeViewFromRole(
+        from,
         view.getId()
       );
-      this.rolesManager.getRole(role.getName()).removeView(view.getId());
-    });
+      this.rolesManager.getRole(from).removeView(view.getId());
+   
     this.rolesManager.getRole(this.getMyRole().getName()).addView(view);
   };
 

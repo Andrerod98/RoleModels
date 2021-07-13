@@ -103,7 +103,9 @@ export class ConfigurationsManager extends EventEmitter {
 
   public removeViewFromRole(role: string, viewId: string) {
     const configValue = this.currentConfiguration.get();
+    console.log("Removing " + viewId + " from role " + role);
     const node = this.current.layouts[role].getChildByViewId(viewId);
+    console.log(node);
     if (node) {
       node.removeChild(node.getId());
 
@@ -111,6 +113,16 @@ export class ConfigurationsManager extends EventEmitter {
       // layouts[role] = node.toLayout();
       //this.currentConfiguration.set({ ...configValue, layouts: layouts });
     }
+  }
+
+  public getLayoutWithView(viewId: string): LayoutNode {
+    const keys = Object.values(this.current.layouts);
+    for (const layout of keys) {
+      const child = layout.getChildByViewId(viewId);
+      if (child) return child;
+    }
+
+    return undefined;
   }
 
   /* Returns all the combined views */

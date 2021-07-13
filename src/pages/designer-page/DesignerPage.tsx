@@ -70,67 +70,26 @@ export const DesignerPage = (props: SingleTabProps) => {
 
   return (
     <Box h={"100%"} overflow={"hidden"}>
-      <Tabs
-        size={"sm"}
-        variant={"enclosed"}
-        h={"100%"}
-        mt={"5px"}
-        isManual
-        onChange={() => {}}
-        index={
-          curIndex === -1
-            ? curTab === "interactions"
-              ? tabs.length + 1
-              : 0
-            : curIndex
-        }
-      >
+      <Tabs size={"sm"} variant={"enclosed"} h={"100%"} mt={"5px"}>
         <Box>
           <TabList pl={10}>
-            {tabs.map((tab, index) => (
-              <EditableTab
-                key={"tab-" + index}
-                title={tab.getName()}
-                onClick={() => {
-                  handleTabClick(tab.getName());
-                }}
-                onClose={() => {
-                  handleTabClose(tab.getName());
-                }}
-                onSubmit={(e) => {
-                  handleTabSubmit(tab.getName(), e);
-                }}
-              />
-            ))}
-
             <Tab
               ml={"5px"}
               bg={"transparent"}
               _hover={{ bg: "blackAlpha.100" }}
-              onClick={() => {
-                app.addRole("new");
-              }}
             >
-              <AddIcon />
+              Design
             </Tab>
-            <Tab
-              ml={"5px"}
-              _hover={{ bg: "blackAlpha.100" }}
-              onClick={() => {
-                setCurTab("interactions");
-              }}
-            >
+            <Tab ml={"5px"} _hover={{ bg: "blackAlpha.100" }}>
               Interactions
             </Tab>
           </TabList>
         </Box>
         <TabPanels h={"calc(100vh - 40px)"}>
-          {tabs.map((tab, index) => (
-            <TabPanel key={"tab-panel-" + index} p={0} h={"100%"}>
-              <MemoizedRole role={tab} />
-            </TabPanel>
-          ))}
-          <TabPanel key={"tab-panel-add"} p={0} h={"100%"}></TabPanel>
+          <TabPanel key={"tab-panel-design"} p={0} h={"100%"}>
+            <MemoizedRole />
+          </TabPanel>
+
           <TabPanel
             key={"tab-panel-interactions"}
             p={0}
