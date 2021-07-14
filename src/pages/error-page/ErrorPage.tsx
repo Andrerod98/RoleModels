@@ -10,7 +10,6 @@ interface ErrorPageProps {
 
 export function ErrorPage(props: ErrorPageProps) {
   const [timer, setTimer] = useState(5);
-  const [isFirst, setFirst] = useState(true);
   useEffect(() => {
     setTimeout(() => {
       if (timer === 1) {

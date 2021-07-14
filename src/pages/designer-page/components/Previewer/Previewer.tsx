@@ -3,12 +3,9 @@
 import { Box, Spacer, IconButton, Flex, useColorMode } from "@chakra-ui/react";
 
 import { IoRefresh } from "react-icons/io5";
-import { FullScreenWrapper } from "./FullScreenWrapper";
 import React, { useMemo } from "react";
-import { View } from "../../../../shared-application/views/View";
 import { Preview } from "./Preview";
 import { CrossDeviceApplication } from "../../../../shared-application/CrossDeviceApplication";
-import { Role } from "../../../../shared-application/roles/Role";
 import { ILayoutNode } from "../../../../shared-application/roles/ILayout";
 interface PreviewerProps {
   layout: ILayoutNode;

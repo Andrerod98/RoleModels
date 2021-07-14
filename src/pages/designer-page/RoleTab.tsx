@@ -7,15 +7,11 @@ import {
   CloseButton,
   Flex,
   Heading,
-  useDisclosure,
 } from "@chakra-ui/react";
 import React, { useContext, useState } from "react";
 import { uuid } from "uuidv4";
-import { LayoutModal } from "../../components/LayoutModal";
 import { CrossAppState, CrossAppContext } from "../../context/AppContext";
 import { ILayoutNode } from "../../shared-application/roles/ILayout";
-import { Role } from "../../shared-application/roles/Role";
-import { View } from "../../shared-application/views/View";
 import Utils from "../../utils/Utils";
 import { SingleTabCatalogBar } from "./CatalogBar";
 import { CodeEditor } from "./components/CodeEditor";
@@ -29,7 +25,6 @@ export function RoleTab(props: RoleTabProps) {
     app,
     selectedNode,
     setSelectedNode,
-    newViewId,
     setNewViewId,
     isLayoutOpen,
     setLayoutOpen,
@@ -49,6 +44,8 @@ export function RoleTab(props: RoleTabProps) {
       ? layout.toLayout()
       : ({ id: uuid(), name: "div", viewId: "", children: [] } as ILayoutNode)
   );
+
+  console.log(layoutSnapshot);
 
   const preview = (newValue?: string, nvid?: string) => {
     //props.project.stringToViews(value)
@@ -185,8 +182,8 @@ export function RoleTab(props: RoleTabProps) {
     setCodeState({ value: value, position: event.end });
   };
 
-  const handleChangeView = (newView: View) => {
-    app.getSharedObject().updateViewOrCombinedView("", newView);
+  /*const handleChangeView = (newView: View) => {
+    app.getSharedObject().updateView(newView);
 
     setCodeState({
       ...codeState,
@@ -194,9 +191,9 @@ export function RoleTab(props: RoleTabProps) {
         Array.from(app.getSharedObject().getAllViews()).map((v) => v.toView())
       ),
     });
-  };
+  };*/
 
-  const handleChangeViews = (newViews: View[]) => {
+  /*const handleChangeViews = (newViews: View[]) => {
     //props.role.updateViews(newViews.map((nv) => nv.getId()));
     app.getSharedObject().updateViews(newViews);
     setCodeState({
@@ -205,7 +202,7 @@ export function RoleTab(props: RoleTabProps) {
         Array.from(app.getSharedObject().getAllViews()).map((v) => v.toView())
       ),
     });
-  };
+  };*/
   return (
     <Box h={"100%"} bg={"gray.100"}>
       <Flex h={"100%"} bg={"gray.100"}>

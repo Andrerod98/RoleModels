@@ -1,7 +1,6 @@
 import { SharedCell } from "@fluidframework/cell";
 import { IUIComponent, UIComponentController } from "../components/UIComponent";
 import { FactoriesManager } from "../managers/FactoriesManager";
-import { InteractionsManager } from "../managers/InteractionsManager";
 import { IView } from "./IView";
 
 enum ViewEvents {
@@ -14,8 +13,7 @@ export class View {
   private combinedViewID: string;
   constructor(
     protected readonly sharedView: SharedCell,
-    private readonly factoriesManager: FactoriesManager,
-    private readonly interactionsManager: InteractionsManager
+    private readonly factoriesManager: FactoriesManager
   ) {
     this.loadObject();
     this.setEventListener();
@@ -113,12 +111,8 @@ export class View {
     };
   }
 
-  static from(
-    sharedView: SharedCell,
-    factoriesManager: FactoriesManager,
-    interactionsManager: InteractionsManager
-  ) {
-    const view = new View(sharedView, factoriesManager, interactionsManager);
+  static from(sharedView: SharedCell, factoriesManager: FactoriesManager) {
+    const view = new View(sharedView, factoriesManager);
 
     return view;
   }

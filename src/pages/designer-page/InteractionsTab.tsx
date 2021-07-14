@@ -1,6 +1,5 @@
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import {
-  Button,
   Checkbox,
   Editable,
   EditableInput,

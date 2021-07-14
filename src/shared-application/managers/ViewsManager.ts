@@ -69,11 +69,7 @@ export class ViewsManager extends EventEmitter {
       view = this.views.get(viewValue.id);
       view.update(viewValue);
     } else {
-      view = View.from(
-        sharedView,
-        this.factoriesManager,
-        this.interactionsManager
-      );
+      view = View.from(sharedView, this.factoriesManager);
 
       this.views.set(view.getId(), view);
     }
@@ -94,6 +90,9 @@ export class ViewsManager extends EventEmitter {
           const app = this.app;
           const view = this.getView(sharedView.get().id);
           const component = view.getRoot().getChildByID(componentId);
+          console.log(app);
+          console.log(view);
+          console.log(component);
           eval(interaction.code);
         }
       }
@@ -109,6 +108,9 @@ export class ViewsManager extends EventEmitter {
           const app = this.app;
           const view = this.getView(sharedView.get().id);
           const component = view!.getRoot().getChildByID(componentId);
+          console.log(app);
+          console.log(view);
+          console.log(component);
           eval(interaction.code);
         }
       }
@@ -166,11 +168,7 @@ export class ViewsManager extends EventEmitter {
     this.viewsSharedMap.set(id, sharedView.handle);
 
     /* Get Combined View */
-    const view = View.from(
-      sharedView,
-      this.factoriesManager,
-      this.interactionsManager
-    );
+    const view = View.from(sharedView, this.factoriesManager);
 
     this.views.set(id, view);
 

@@ -11,8 +11,6 @@ import {
   BiArrowToRight,
   BiArrowToBottom,
 } from "react-icons/bi";
-import { uuid } from "uuidv4";
-import { ILayoutNode } from "../shared-application/roles/ILayout";
 import { LayoutNode } from "../shared-application/roles/Layout";
 interface LayoutModalProps {
   layout: LayoutNode;

@@ -2,7 +2,6 @@ import { Box, Flex } from "@chakra-ui/react";
 import React from "react";
 import { CrossDeviceApplication } from "../../../../shared-application/CrossDeviceApplication";
 import { ILayoutNode } from "../../../../shared-application/roles/ILayout";
-import { Role } from "../../../../shared-application/roles/Role";
 import { ViewComponent } from "../../../../shared-application/views/ViewComponent";
 
 interface PreviewProps {
@@ -71,7 +70,6 @@ export const Preview = (props: PreviewProps) => {
             <ViewComponent
               key={props.app.getMyRole().getName() + "_view_" + node.viewId}
               view={view}
-              combinedView={undefined}
               role={props.app.getMyRole()}
             />
             <Box

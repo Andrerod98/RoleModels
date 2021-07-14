@@ -1,6 +1,5 @@
 /* eslint-disable no-undef */
 import {
-  Box,
   Center,
   Flex,
   Icon,
@@ -17,14 +16,12 @@ import {
 import React from "react";
 import { GrUnlink } from "react-icons/gr";
 import { ImQrcode } from "react-icons/im";
-import { StitchingCombinedView } from "../combined-views/stitching-combined-view/StitchingCombinedView";
 
 const QRCode = require("qrcode.react");
 
 interface ViewHeaderProps {
   qrURL: string;
   onUnlink?: () => void;
-  stitchingCombinedView?: StitchingCombinedView;
 }
 
 export const ViewHeader = (props: ViewHeaderProps) => {
@@ -38,10 +35,6 @@ export const ViewHeader = (props: ViewHeaderProps) => {
         onClick={props.onUnlink}
         icon={<Icon as={GrUnlink} />}
       />
-
-      <Box display={props.stitchingCombinedView === undefined ? "none" : "box"}>
-        {props.stitchingCombinedView === undefined ? <></> : <></>}
-      </Box>
 
       <Popover>
         <PopoverTrigger>

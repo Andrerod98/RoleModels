@@ -8,15 +8,8 @@ import { CrossAppState, CrossAppContext } from "../../context/AppContext";
 interface RoleProps {}
 
 export function RolePage(props: RoleProps) {
-  const {
-    app,
-    role,
-    layout,
-    selectedNode,
-    setSelectedNode,
-    isLayoutOpen,
-    devices,
-  } = useContext<CrossAppState>(CrossAppContext);
+  const { app, role, layout, selectedNode, setSelectedNode, isLayoutOpen } =
+    useContext<CrossAppState>(CrossAppContext);
   const model = app.getSharedObject();
   //const views = props.app.getViewsOrCombinedViews(props.role.getName());
   const qrs = app.getSharedObject().getMyQRCodes();
@@ -53,12 +46,9 @@ export function RolePage(props: RoleProps) {
           </Flex>
         );
       case "view":
-        const [view, combinedView] = app.getViewOrCombinedView(
-          role.getName(),
-          node.viewId
-        );
+        const view = app.getSharedObject().getView(node.viewId);
 
-        if (!view && !combinedView) {
+        if (!view) {
           return <></>;
         }
 
@@ -76,7 +66,6 @@ export function RolePage(props: RoleProps) {
             <ViewComponent
               key={model.getDeviceRole() + "_view_" + node.viewId}
               view={view}
-              combinedView={combinedView}
               role={role}
             />
             );

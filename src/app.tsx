@@ -10,7 +10,6 @@ import { ErrorPage } from "./pages/error-page/ErrorPage";
 import { LandingPage } from "./pages/landing-page/LandingPage";
 
 import Utils from "./utils/Utils";
-import { CreateInteractionModal } from "./pages/designer-page/CreateInteractionModal";
 
 const HASH = window.location.hash.substring(1);
 const HASH_PARTS = Utils.getURLHashParts(HASH);

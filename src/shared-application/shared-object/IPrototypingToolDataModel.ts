@@ -1,5 +1,4 @@
 import { EventEmitter } from "events";
-import { CombinedView } from "../combined-views/combined-view/CombinedView";
 import { IDevice } from "../devices/IDevice";
 import { Role } from "../roles/Role";
 
@@ -26,9 +25,6 @@ export interface IPrototypingToolDataModel extends EventEmitter {
   onRolesChange(listener: () => void): this;
 
   getId: () => string;
-
-  /* UI */
-  getCombinedViews: () => IterableIterator<CombinedView>;
 
   on(event: "change", listener: () => void): this;
   off(event: "change", listener: () => void): this;

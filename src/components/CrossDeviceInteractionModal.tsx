@@ -25,27 +25,18 @@ export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
 
     const [{ view, from }, setState] = useState({
       view: undefined,
-      combinedView: undefined,
       qr: undefined,
       from: "",
     });
 
-    const handleScan = (
-      view: string,
-      combinedView: string,
-      qr: string,
-      from: string
-    ) => {
+    const handleScan = (view: string, qr: string, from: string) => {
       const state = {
         view: undefined,
-        combinedView: undefined,
         qr: undefined,
         from: from,
       };
       if (view != "") {
         state.view = app.getSharedObject().getView(view);
-      } else if (combinedView != "") {
-        state.combinedView = app.getCombinedViewWithId(combinedView);
       } else if (qr != "") {
         state.qr = app.getQRCode(qr);
       }
@@ -70,7 +61,7 @@ export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
     ) => {
       e.stopPropagation();
       app.getMyRole().addView(view);
-      app.mirrorViews(view, view);
+      //app.mirrorViews(view, view);
       setNewViewId(view.id);
       setLayoutOpen(true);
       props.onViewChange(view.id);
@@ -82,9 +73,9 @@ export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
     ) => {
       e.stopPropagation();
       app.getMyRole().addView(view.view);
-      const stitchingCV = app.stitchViews(view.view, view.view);
+      //const stitchingCV = app.stitchViews(view.view, view.view);
 
-      stitchingCV.stitchBottom(app.getMyRole().getName(), view.from);
+      //stitchingCV.stitchBottom(app.getMyRole().getName(), view.from);
       onClose();
     };
 
@@ -100,7 +91,6 @@ export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
             onOpen();
             setState({
               view: undefined,
-              combinedView: undefined,
               qr: undefined,
               from: "",
             });

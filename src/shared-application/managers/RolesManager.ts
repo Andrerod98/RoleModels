@@ -143,10 +143,10 @@ export class RolesManager extends EventEmitter {
   }
 
   public deleteRolesEventListener() {
-    const values = this.roles.values();
-    for (const v of values) {
-      //v.deleteAllViewsListeners();
-    }
+    //const values = this.roles.values();
+    //for (const v of values) {
+    //v.deleteAllViewsListeners();
+    //}
   }
 
   /*

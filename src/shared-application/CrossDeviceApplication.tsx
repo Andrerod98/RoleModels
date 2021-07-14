@@ -3,7 +3,6 @@ import { getContainer } from "@fluid-experimental/get-container";
 import { getDefaultObjectFromContainer } from "@fluidframework/aqueduct";
 import React from "react";
 import ReactDOM from "react-dom";
-import { CombinedView } from "./combined-views/combined-view";
 import { UIComponentFactory } from "./components/UIComponent";
 import { PrototypingToolContainerFactory } from "./container";
 import { IQRCode } from "./qrcode/IQRCode";
@@ -20,8 +19,6 @@ import { PrototypingToolDataObject } from "./shared-object/PrototypingToolDataOb
 export class CrossDeviceApplication {
   protected sharedObject: PrototypingToolDataObject;
   protected container: Container;
-
-  private setInteractions: () => void = () => {};
 
   constructor(
     public readonly serverUrl: string,
@@ -48,10 +45,6 @@ export class CrossDeviceApplication {
     element.click();
 
     document.body.removeChild(element);
-  }
-
-  public defineInteractions(listener: () => void) {
-    this.setInteractions = listener;
   }
 
   public getSharedObject(): PrototypingToolDataObject {
@@ -149,96 +142,11 @@ export class CrossDeviceApplication {
 
   public addDevice(device: string) {}
 
-  public mirrorViews(view1: View, view2: View) {
-    const cvm = this.sharedObject.mirrorViews(view1, view2);
-    this.setInteractions();
-    return cvm;
-  }
-
-  public stitchViews(view1: View, view2: View) {
-    const cvm = this.sharedObject.stitchViews(1, 1, {}, view1, view2);
-    this.setInteractions();
-    return cvm;
-  }
-
   public getQRsWithId(qrIDs: string[]) {
     return this.sharedObject.getQRCodesWithIds(qrIDs);
   }
 
-  public getCombinedViewWithId(id: string) {
-    return this.sharedObject.getCombinedViewWithId(id);
-  }
-
-  public getCombinedViewsWithId(combinedViewsIDs: string[]) {
-    return this.sharedObject.getCombinedViewsWithIds(combinedViewsIDs);
-  }
-
-  public getSingleCombinedView(id: string) {
-    return this.sharedObject.getSingleCombinedView(id);
-  }
-
-  public getMultiCombinedView(id: string) {
-    return this.sharedObject.getMultiCombinedView(id);
-  }
-
   public getRole(role: string): Role {
     return this.sharedObject.getRole(role);
-  }
-
-  public getCombinedViewOfView() {}
-
-  public getViewOrCombinedView(
-    role: string,
-    viewID: string
-  ): [View, CombinedView] {
-    const view = this.sharedObject.getView(viewID);
-    if (view === undefined) {
-      console.error("The view does not exist in role " + role);
-      return [undefined, undefined];
-    }
-
-    if (view.isCombined()) {
-      const combinedView = this.sharedObject.getCombinedViewOfView(view);
-      if (combinedView === undefined) return [view, null];
-      const viewC = this.sharedObject.getViewOfCombinedView(combinedView, role);
-      return [viewC, combinedView];
-    }
-
-    return [view, null];
-  }
-
-  public getViewsOrCombinedViews(role: string): [View, CombinedView][] {
-    const views = this.getRole(role).getViews();
-    let result = [];
-
-    views.forEach((viewId, index) => {
-      result.push(this.getViewOrCombinedView(role, viewId));
-    });
-
-    return result;
-  }
-
-  public fromViewToCombinedView(view: View, role: string): View {
-    return this.sharedObject.fromViewToCombinedView(view, role);
-  }
-
-  public fromCombinedViewToView(
-    combinedView: CombinedView,
-    role: string
-  ): View {
-    return this.sharedObject.getViewOfCombinedView(combinedView, role);
-  }
-
-  public alternateViews(
-    id: string,
-    view1: View,
-    view2: View,
-    options?: { alternateVariables: string[] }
-  ) {
-    return this.sharedObject.alternateViews(view1, view2);
-  }
-
-  public combineViews(view1: View, view2: View) {
-    return this.sharedObject.combineViews(view1, view2);
   }
 }
