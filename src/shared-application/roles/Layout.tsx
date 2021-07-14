@@ -78,25 +78,11 @@ export class LayoutNode extends EventEmitter {
     } else {
       this.children.push(new LayoutNode(model, this));
     }
-    console.trace("START");
-    console.log(this.toLayout());
-    console.log(this.parent ? this.parent.toLayout() : "");
-    console.log(
-      this.parent
-        ? this.parent.parent
-          ? this.parent.parent.toLayout()
-          : ""
-        : ""
-    );
-    console.log("END");
   }
 
   removeChild(childId: string) {
-    console.log("Removing child with id" + childId);
     if (this.id === childId) {
-      console.log("Is the node");
       if (this.parent) {
-        console.log("Has parent");
         this.parent.removeChild(childId);
       } else {
         this.update({
@@ -110,16 +96,12 @@ export class LayoutNode extends EventEmitter {
     }
     const index = this.children.findIndex((c) => c.getId() === childId);
     if (index == -1) {
-      console.log("Not found");
       this.children.forEach((child) => {
         child.removeChild(childId);
       });
     } else {
-      console.log("Removing children with index:" + index);
-
       this.children[index].setParent(undefined);
       this.children.splice(index, 1);
-      console.log(this.children);
       if (this.children.length === 0) {
         this.parent.removeChild(this.getId());
       } else {
@@ -284,8 +266,6 @@ export class LayoutNode extends EventEmitter {
             const index = this.parent
               .getChildren()
               .findIndex((l) => l.getId() === this.getId());
-
-            console.log(index);
 
             this.parent.addChild(newView, index + 1);
           }

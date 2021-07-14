@@ -74,7 +74,6 @@ export class ConfigurationsManager extends EventEmitter {
       const layoutValue = currentConfigValue.layouts[key];
       this.current.layouts[key] = new LayoutNode(layoutValue);
       this.current.layouts[key].getRoot().on("change", (l) => {
-        console.log(l);
         this.updateCurrent(key, l);
       });
     }
@@ -103,9 +102,7 @@ export class ConfigurationsManager extends EventEmitter {
 
   public removeViewFromRole(role: string, viewId: string) {
     const configValue = this.currentConfiguration.get();
-    console.log("Removing " + viewId + " from role " + role);
     const node = this.current.layouts[role].getChildByViewId(viewId);
-    console.log(node);
     if (node) {
       node.removeChild(node.getId());
 
@@ -171,9 +168,6 @@ export class ConfigurationsManager extends EventEmitter {
       name,
       layouts: { ...this.currentConfiguration.get().layouts },
     });
-
-    console.log("Saving layout:");
-    console.log({ ...this.currentConfiguration.get().layouts });
   }
 
   /* Callback functions */

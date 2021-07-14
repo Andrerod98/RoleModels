@@ -102,8 +102,6 @@ export class CrossDeviceApplication {
         this.container
       );
 
-    // Setting "fluidStarted" is just for our test automation
-    // eslint-disable-next-line dot-notation
     window["fluidStarted"] = true;
   }
 
@@ -123,7 +121,7 @@ export class CrossDeviceApplication {
   }
 
   public grabView(view: View, from: string): void {
-    this.sharedObject.grabView(view, from);
+    this.sharedObject.migrateView(view, from);
   }
 
   public async addRole(role: string): Promise<Role> {
@@ -164,7 +162,7 @@ export class CrossDeviceApplication {
   }
 
   public getQRsWithId(qrIDs: string[]) {
-    return this.sharedObject.getQrsWithIds(qrIDs);
+    return this.sharedObject.getQRCodesWithIds(qrIDs);
   }
 
   public getCombinedViewWithId(id: string) {

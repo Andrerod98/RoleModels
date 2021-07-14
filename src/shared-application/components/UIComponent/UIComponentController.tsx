@@ -141,7 +141,6 @@ export class UIComponentController extends EventEmitter {
       this.addChild(child);
     });
 
-    console.log("Emitting sync");
     this.getRoot().emit("componentChangedSynced", this.getRoot().getSnapshot());
     //TODO: Send change to root
   }

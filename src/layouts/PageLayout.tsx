@@ -32,7 +32,6 @@ export function PageLayout(props: PageLayoutProps) {
   };
 
   const handleLayoutClose = () => {
-    console.log("Layout closing");
     setLayoutOpen(false);
   };
 
@@ -118,7 +117,6 @@ export function PageLayout(props: PageLayoutProps) {
       default:
         break;
     }
-    console.log("Selected node");
     setSelectedNode(newViewId);
     handleLayoutClose();
   };

@@ -1,9 +1,3 @@
-/* eslint-disable no-undef */
-/* eslint-disable no-redeclare */
-/* eslint-disable guard-for-in */
-/* eslint-disable no-invalid-this */
-/* eslint-disable valid-jsdoc */
-
 import { IFluidHandle } from "@fluidframework/core-interfaces";
 import { SharedMap } from "@fluidframework/map";
 import { SharedCell } from "@fluidframework/cell";
@@ -71,7 +65,7 @@ import { uuid } from "uuidv4";
 import { ViewsManager } from "../managers/ViewsManager";
 import { ILayoutNode } from "../roles/ILayout";
 import { LayoutNode } from "../roles/Layout";
-// import { SharedCounter } from "@fluidframework/counter";
+import { Logger } from "../Logger";
 
 export class PrototypingToolDataObject
   extends DataObject
@@ -103,6 +97,7 @@ export class PrototypingToolDataObject
   private primaryConfiguration: SharedCell;
   private configurationsManager: ConfigurationsManager;
 
+  /* The Map with the interactions */
   private interactionsMap: SharedMap;
   private interactionsManager: InteractionsManager;
 
@@ -113,7 +108,6 @@ export class PrototypingToolDataObject
   private ink: IInk;
 
   private pingCounter: SharedCounter;
-
   private audio = new Audio("/public/ping.mp3");
 
   public static get DataObjectName() {
@@ -126,15 +120,10 @@ export class PrototypingToolDataObject
 
   protected async initializingFirstTime() {
     const devicesMap = SharedMap.create(this.runtime);
-
     const combinedViewsMap = SharedMap.create(this.runtime);
-
     const rolesMap = SharedMap.create(this.runtime);
-
     const viewsMap = SharedMap.create(this.runtime);
-
     const qrMap = SharedMap.create(this.runtime);
-
     const interactionsMap = SharedMap.create(this.runtime);
 
     const ink = Ink.create(this.runtime);
@@ -143,16 +132,17 @@ export class PrototypingToolDataObject
 
     const configurationsMap = SharedMap.create(this.runtime);
     const currentConfiguration = SharedCell.create(this.runtime);
-    const primaryConfiguration = SharedCell.create(this.runtime);
     currentConfiguration.set({
       name: "default",
       layouts: { default: { id: uuid(), name: "div" } },
     } as IConfiguration);
 
+    const primaryConfiguration = SharedCell.create(this.runtime);
     primaryConfiguration.set({
       id: uuid(),
       name: "div",
     } as ILayoutNode);
+
     /* Creating default roles */
     const managerRole = SharedCell.create(this.runtime);
 
@@ -197,23 +187,29 @@ export class PrototypingToolDataObject
     this.root.set("current-configuration", currentConfiguration.handle);
     this.root.set("primary-configuration", primaryConfiguration.handle);
     this.root.set("interactions", interactionsMap.handle);
+
+    Logger.getInstance().info("The application has been setup with success.");
   }
 
   protected async hasInitialized() {
     /* Loading shared objects...*/
+    Logger.getInstance().info("Loading shared objects...");
     await this.loadSharedObjects();
 
     /* Loading managers...*/
+    Logger.getInstance().info("Loading managers...");
     this.loadManagers();
 
     /* Registering factories...*/
+    Logger.getInstance().info("Registering default factories...");
     this.registerDefaultFactories();
 
     /* Creating event listeners...*/
+    Logger.getInstance().info("Creating event listeners...");
     this.createAllEventListeners();
 
     /* Loading combined views...*/
-
+    Logger.getInstance().info("Loading shared objects into the objects...");
     await Promise.all([
       this.rolesManager.loadRoles(1),
       this.combinedViewsManager.loadCombinedViews(1),
@@ -222,6 +218,7 @@ export class PrototypingToolDataObject
       this.viewsManager.loadViews(1),
       this.qrManager.loadQRCodes(),
     ]);
+    Logger.getInstance().info("The application has been loaded with success.");
   }
 
   private async loadSharedObjects() {
@@ -412,14 +409,6 @@ export class PrototypingToolDataObject
     this.pingCounter.on("incremented", this.playSound);
   }
 
-  public clearAll(): void {
-    this.devicesMap.clear();
-    this.combinedViewsMap.clear();
-    this.rolesMap.clear();
-    this.qrMap.clear();
-    this.ink.clear();
-  }
-
   public deleteAllEventListeners() {
     this.devicesMap.removeAllListeners();
     this.combinedViewsMap.removeAllListeners();
@@ -451,7 +440,7 @@ export class PrototypingToolDataObject
       promises.push(value.get());
     }
 
-    const results = await Promise.all([]);
+    const results = await Promise.all(promises);
 
     for (const result of results) {
       result.removeAllListeners();
@@ -463,7 +452,7 @@ export class PrototypingToolDataObject
       promises.push(value.get());
     }
 
-    const results = await Promise.all([]);
+    const results = await Promise.all(promises);
 
     for (const result of results) {
       result.on("valueChanged", () => {
@@ -509,6 +498,9 @@ export class PrototypingToolDataObject
    */
   public isManager = (): boolean => this.devicesManager.isManager();
 
+  /**
+   * Returns true if the current device is the designer
+   */
   public isDesigner = (): boolean => this.devicesManager.isDesigner();
 
   /**
@@ -516,10 +508,19 @@ export class PrototypingToolDataObject
    */
   public promoteToManager = (): void => {
     this.devicesManager.promoteToManager();
+    Logger.getInstance().info(
+      "The current device has been promoted to manager."
+    );
   };
 
+  /**
+   * Promotes the current device to the designer
+   */
   public promoteToDesigner = (): void => {
     this.devicesManager.promoteToDesigner();
+    Logger.getInstance().info(
+      "The current device has been promoted to designer."
+    );
   };
 
   /**
@@ -527,28 +528,36 @@ export class PrototypingToolDataObject
    */
   public promoteToRole = (role: string, deviceId?: string): void => {
     this.devicesManager.promoteToRole(role, deviceId);
-    // this.combinedViewsManager.changeRole(role);
+    Logger.getInstance().info(
+      `The device with id ${deviceId} has been promoted to ${role}.`
+    );
   };
 
   /**
    * Updates the properties of a device
    */
-  public changeDevice = (device: IDevice): void =>
+  public updateDevice = (device: IDevice): void => {
     this.devicesManager.updateDevice(device);
+    Logger.getInstance().info(
+      `The device with id ${device.id} has been updated`
+    );
+  };
 
-  /* ******************************************************** 
+  /********************************************************* 
                           Ink
-   ******************************************************** */
+   *********************************************************/
+
   public getInk = (): IInk => this.ink;
 
-  /* ******************************************************** 
+  /********************************************************* 
                 QR Codes Management Functions
-   ******************************************************** */
-  public getMyQrCodes = (): QRCodeController[] => {
+   *********************************************************/
+
+  public getMyQRCodes = (): QRCodeController[] => {
     return this.qrManager.getQRsWithIds(this.getMyRole().getQRIds());
   };
 
-  public getQrsWithIds = (qrIDs: string[]): QRCodeController[] => {
+  public getQRCodesWithIds = (qrIDs: string[]): QRCodeController[] => {
     return this.qrManager.getQRsWithIds(qrIDs);
   };
 
@@ -564,11 +573,12 @@ export class PrototypingToolDataObject
 
     sharedCell.set(qrCode);
     this.qrMap.set(id, sharedCell.handle);
+    Logger.getInstance().info(`The QRCode with id ${id} has been added.`);
     return this.qrManager.addQR(sharedCell);
   }
 
   /* ******************************************************** 
-                Role Management Functions
+                View Management Functions
    ******************************************************** */
   public getMyViews = (): View[] => {
     const viewsIds = this.getMyRole().getViews();
@@ -604,14 +614,14 @@ export class PrototypingToolDataObject
     return this.configurationsManager.getLayoutWithView(viewId);
   }
 
-  public grabView = (view: View, from: string): void => {
-    this.configurationsManager.removeViewFromRole(
-        from,
-        view.getId()
-      );
-      this.rolesManager.getRole(from).removeView(view.getId());
-   
+  public migrateView = (view: View, from: string): void => {
+    this.configurationsManager.removeViewFromRole(from, view.getId());
+    this.rolesManager.getRole(from).removeView(view.getId());
+
     this.rolesManager.getRole(this.getMyRole().getName()).addView(view);
+    Logger.getInstance().info(
+      `The view with id ${view.getId()} from ${from} has been migrated.`
+    );
   };
 
   /* Roles */
@@ -626,10 +636,14 @@ export class PrototypingToolDataObject
 
   public removeRole(roleName: string) {
     this.rolesManager.removeRole(roleName);
+    Logger.getInstance().info(`The role ${roleName} has been removed.`);
   }
 
   public renameRole(oldName: string, newName: string) {
     this.rolesManager.renameRole(oldName, newName);
+    Logger.getInstance().info(
+      `The role ${oldName} has been renamed to ${newName}.`
+    );
   }
 
   public addRole = async (role: string): Promise<Role> => {
@@ -656,6 +670,7 @@ export class PrototypingToolDataObject
     });
 
     await this.rolesMap.wait<IFluidHandle<SharedCell>>(role);
+    Logger.getInstance().info(`The role ${role} has been added.`);
     return this.rolesManager.getRole(role);
   };
   /**

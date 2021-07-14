@@ -23,7 +23,6 @@ export class View {
 
   private setEventListener() {
     this.sharedView.on("valueChanged", (e: any) => {
-      console.log("View " + e.name + " changed so loading object.");
       this.loadObject();
     });
 
@@ -81,7 +80,6 @@ export class View {
     });
 
     this.root.on("componentChangedSynced", (snapshot) => {
-      console.log("SYNCHING");
       this.updateObject(this.toView());
     });
     this.root.on("event", (eventName, componentId, args) => {

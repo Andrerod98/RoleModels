@@ -8,7 +8,7 @@ export interface IPrototypingToolDataModel extends EventEmitter {
   getDevices: () => IterableIterator<IDevice>;
   getDevice: () => IDevice;
   getDevicesByRole(role: string): IDevice[];
-  changeDevice: (device: IDevice) => void;
+  updateDevice: (device: IDevice) => void;
   onDeviceJoin(listener: () => void): this;
   onDeviceLeave(listener: () => void): this;
   onDeviceChanges(listener: () => void): this;

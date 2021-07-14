@@ -16,7 +16,7 @@ const HASH = window.location.hash.substring(1);
 const HASH_PARTS = Utils.getURLHashParts(HASH);
 const PROJECT_NAME = HASH_PARTS["project"];
 const IP = window.location.hostname;
-
+let dataObjectStarted = false;
 /*
 ReactDOM.render(
   <ChakraProvider resetCSS>
@@ -42,6 +42,8 @@ if (PROJECT_NAME === undefined) {
               ReactDOM.render(
                 <ChakraProvider resetCSS>
                   <ErrorPage
+                    application={application}
+                    reconnect={true}
                     message={"The project already exists! Redirecting..."}
                   />
                 </ChakraProvider>,
@@ -70,7 +72,11 @@ if (PROJECT_NAME === undefined) {
 
       ReactDOM.render(
         <ChakraProvider resetCSS>
-          <ErrorPage message={e.message} />
+          <ErrorPage
+            application={application}
+            reconnect={true}
+            message={e.message}
+          />
         </ChakraProvider>,
 
         document.getElementById("content")
@@ -81,6 +87,8 @@ if (PROJECT_NAME === undefined) {
         ReactDOM.render(
           <ChakraProvider resetCSS>
             <ErrorPage
+              application={application}
+              reconnect={true}
               message={"The container has been disconnected. Reconnecting..."}
             />
           </ChakraProvider>,
@@ -91,7 +99,11 @@ if (PROJECT_NAME === undefined) {
       application.getContainer().on("closed", () => {
         ReactDOM.render(
           <ChakraProvider resetCSS>
-            <ErrorPage message={"The container has been closed."} />
+            <ErrorPage
+              application={application}
+              reconnect={true}
+              message={"The container has been closed."}
+            />
           </ChakraProvider>,
 
           document.getElementById("content")
@@ -99,12 +111,18 @@ if (PROJECT_NAME === undefined) {
       });
 
       application.getContainer().on("connected", () => {
+        if (dataObjectStarted) {
+          return;
+        }
         console.log("The container is connected.");
+        window.location.href = application.getFullHost();
+        window.location.reload();
         //application.render(document.getElementById("content"));
       });
 
       application.getSharedObject().on("connected", () => {
         console.log("The data object is connected.");
+        dataObjectStarted = true;
         application.render(document.getElementById("content"));
       });
     });

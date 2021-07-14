@@ -25,9 +25,6 @@ interface LayoutModalProps {
   newViewId: string;
 }
 export function LayoutModal(props: LayoutModalProps) {
-  console.log(
-    props.layout ? props.layout.getChildByViewId(props.selectedNode) : ""
-  );
   return (
     <Box
       m={0}

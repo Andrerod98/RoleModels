@@ -27,7 +27,6 @@ export const LoggingWindow = (props: LogginWindowProps) => {
 
   useEffect(() => {
     const onChange = () => {
-      console.log("The logging has changed...");
       setLogs(Logger.getInstance().getLogs());
     };
     Logger.getInstance().on("change", onChange);

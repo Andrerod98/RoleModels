@@ -19,7 +19,7 @@ export function RolePage(props: RoleProps) {
   } = useContext<CrossAppState>(CrossAppContext);
   const model = app.getSharedObject();
   //const views = props.app.getViewsOrCombinedViews(props.role.getName());
-  const qrs = app.getSharedObject().getMyQrCodes();
+  const qrs = app.getSharedObject().getMyQRCodes();
 
   const generateWidget = (node: ILayoutNode): JSX.Element => {
     switch (node.name) {

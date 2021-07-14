@@ -188,7 +188,6 @@ export class DevicesManager {
   private memberRemoved(clientId: string) {
     if (this.devicesMap.has(clientId)) {
       this.devicesMap.delete(clientId);
-      console.log("Member " + clientId + " deleted.");
     }
   }
 }

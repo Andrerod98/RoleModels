@@ -132,7 +132,6 @@ export class InkCanvas {
   private currentPen: IPen;
 
   constructor(private canvas: HTMLCanvasElement, private readonly model: IInk) {
-    console.log("Creating a new ink canvas!");
     this.model.on("clear", this.redraw.bind(this));
     this.model.on("stylus", this.handleStylus.bind(this));
 
@@ -194,7 +193,6 @@ export class InkCanvas {
 
   public setPenThickness(thickness: number) {
     this.currentPen.thickness = thickness;
-    console.log(this.currentPen);
   }
 
   public replay() {

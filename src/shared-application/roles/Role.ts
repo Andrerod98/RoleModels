@@ -24,7 +24,6 @@ export class Role {
 
   private setEventListener() {
     this.sharedRole.on("valueChanged", (e: any) => {
-      console.log("Role " + e.name + " changed so loading object.");
       this.loadObject();
     });
   }
