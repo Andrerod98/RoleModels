@@ -8,7 +8,7 @@ export function BoxView({ controller }: { controller: ButtonController }) {
 
   return (
     <Button
-      key={"button_" + component.id}
+      key={"button-" + component.id}
       {...component}
       onClick={() => {
         controller.emitEvent("onClick");

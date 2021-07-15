@@ -8,19 +8,18 @@ export function MapView({ controller }: { controller: MapController }) {
   const { children, ...component } = controller.get() as MapUI;
 
   return (
-    <Box {...component}>
+    <Box {...component} key={"map-box-" + component.id}>
       <GoogleMapReact
-        onChange={({ center, zoom }) =>
+        key={"map-" + component.id}
+        onChange={({ center, zoom }) => {
+          controller.emitEvent("onChange", { center, zoom });
           controller.update({
             ...component,
             center: center,
             zoom: zoom,
             children: [],
-          })
-        }
-        /* onChange={({ center, zoom }) => {
-            this.handleChange({ center, zoom });
-          }}*/
+          });
+        }}
         bootstrapURLKeys={{ key: "" }}
         defaultCenter={component.center}
         center={component.center}

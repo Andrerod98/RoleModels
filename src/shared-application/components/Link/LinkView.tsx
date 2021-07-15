@@ -1,19 +1,20 @@
 import { LinkUI } from "./LinkModel";
 import React from "react";
 import { LinkController } from ".";
+import { Link } from "@chakra-ui/react";
 
 export function LinkView({ controller }: { controller: LinkController }) {
   const component = controller.get() as LinkUI;
   return (
-    <a
-      key={component.id}
+    <Link
+      key={"link-" + component.id}
       href={component.href}
       style={component.style}
       onClick={() => {
-        return false;
+        controller.emitEvent("onClick");
       }}
     >
       {component.value}
-    </a>
+    </Link>
   );
 }

@@ -8,7 +8,11 @@ export function GridView({ controller }: { controller: GridController }) {
   const component = controller.get() as GridUI;
 
   return (
-    <Grid key={"grid_" + component.id} {...component}>
+    <Grid
+      key={"grid-" + component.id}
+      onClick={() => controller.emitEvent("onClick")}
+      {...component}
+    >
       {controller
         .getChildren()
         .map((component: UIComponentController) => component.generateWidget())}

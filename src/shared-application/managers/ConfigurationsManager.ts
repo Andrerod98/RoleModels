@@ -162,6 +162,10 @@ export class ConfigurationsManager extends EventEmitter {
     });
   }
 
+  public resetConfiguration() {
+    //TODO
+  }
+
   /* Callback functions */
 
   private emitChange(message?: string) {

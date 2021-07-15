@@ -96,8 +96,11 @@ export function CreateInteractionModal(props: CreateInteractionModalProps) {
                           setSelectedViewId(value);
                         }}
                       >
-                        {props.views.map((v) => (
-                          <MenuItemOption value={v.getId()}>
+                        {props.views.map((v, index) => (
+                          <MenuItemOption
+                            key={"view-menu-item-" + index}
+                            value={v.getId()}
+                          >
                             {v.getId()}
                           </MenuItemOption>
                         ))}
@@ -122,8 +125,13 @@ export function CreateInteractionModal(props: CreateInteractionModalProps) {
                           }
                         }}
                       >
-                        {components.map((c) => (
-                          <MenuItemOption value={c}>{c}</MenuItemOption>
+                        {components.map((c, index) => (
+                          <MenuItemOption
+                            key={"component-menu-item-" + index}
+                            value={c}
+                          >
+                            {c}
+                          </MenuItemOption>
                         ))}
                       </MenuOptionGroup>
                     </MenuList>

@@ -8,7 +8,11 @@ export function StackView({ controller }: { controller: StackController }) {
   const component = controller.get() as StackUI;
 
   return (
-    <Stack key={"stack_" + component.id} {...component}>
+    <Stack
+      key={"stack-" + component.id}
+      onClick={() => controller.emitEvent("onClick")}
+      {...component}
+    >
       {controller
         .getChildren()
         .map((component: UIComponentController) => component.generateWidget())}

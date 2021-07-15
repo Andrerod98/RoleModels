@@ -1,4 +1,4 @@
-import { GridOptions } from "@chakra-ui/react";
+import { GridProps } from "@chakra-ui/react";
 import { IUIComponent } from "../UIComponent/UIComponentModel";
 
-export interface GridUI extends IUIComponent, GridOptions {}
+export type GridUI = IUIComponent & GridProps;

@@ -76,6 +76,14 @@ export function ManagerPage(props: ManagerPageProps) {
           <Tab>Workspaces</Tab>
           <Spacer />
           <Button
+            mr={"10px"}
+            size={"sm"}
+            colorScheme={"red"}
+            onClick={() => app.getSharedObject().resetConfiguration()}
+          >
+            Reset Workspace
+          </Button>
+          <Button
             mr={"40px"}
             size={"sm"}
             onClick={() => app.getSharedObject().saveConfiguration()}

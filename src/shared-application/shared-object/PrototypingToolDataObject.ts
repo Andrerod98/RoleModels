@@ -713,6 +713,10 @@ export class PrototypingToolDataObject
     this.configurationsManager.saveConfiguration();
   }
 
+  public resetConfiguration() {
+    this.configurationsManager.resetConfiguration();
+  }
+
   public loadConfiguration(configName: string) {
     this.configurationsManager.loadConfiguration(configName);
   }

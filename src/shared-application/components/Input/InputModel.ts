@@ -1,5 +1,4 @@
+import { InputProps } from "@chakra-ui/react";
 import { IUIComponent } from "../UIComponent/UIComponentModel";
 
-export interface InputUI extends IUIComponent {
-  label: string;
-}
+export type InputUI = IUIComponent & InputProps;

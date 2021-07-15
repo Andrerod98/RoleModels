@@ -8,7 +8,11 @@ export function BoxView({ controller }: { controller: BoxController }) {
   const component = controller.get() as BoxUI;
 
   return (
-    <Box key={"box_" + component.id} {...component}>
+    <Box
+      key={"box-" + component.id}
+      onClick={() => controller.emitEvent("onClick")}
+      {...component}
+    >
       {controller
         .getChildren()
         .map((component: UIComponentController) => component.generateWidget())}

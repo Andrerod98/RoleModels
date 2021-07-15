@@ -8,9 +8,10 @@ export function ImageView({ controller }: { controller: ImageController }) {
 
   const element = (
     <Image
+      key={"image-" + component.id}
       {...component}
       onError={() => {}}
-      onClick={controller.getListener("onClick")}
+      onClick={() => controller.emitEvent("onClick")}
     />
   );
 

@@ -13,7 +13,7 @@ export function SliderView({ controller }: { controller: SliderController }) {
 
   return (
     <Slider
-      key={"slider_" + component.id}
+      key={"slider-" + component.id}
       aria-label={"slider-ex-1"}
       value={value}
       onChange={(val) => {

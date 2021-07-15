@@ -15,6 +15,8 @@ import {
   CheckboxUI,
   EditableUI,
   SpacerUI,
+  SliderUI,
+  InkCanvasUI,
 } from "../../shared-application/components";
 import { IView } from "../../shared-application/views/IView";
 
@@ -24,7 +26,7 @@ export class ComponentsExamples {
       id: uuid(),
       root: {
         id: "button",
-        name: "Button",
+        name: "button",
         children: [],
       },
       combinedViewID: "",
@@ -34,15 +36,16 @@ export class ComponentsExamples {
     return {
       id: "image-id",
       name: "image",
-      width: "100%",
-      height: "100%",
+      width: "100px",
+      height: "100px",
       src: "https://singularityhub.com/wp-content/uploads/2018/10/shutterstock_672433252-1068x601.jpg",
     } as ImageUI;
   }
   static getInput(): InputUI {
     return {
       id: "input-id",
-      name: "Input",
+      name: "input",
+      label: "Default label",
       //width: "200px",
       //height: "20px",
       value: "Default text...",
@@ -62,27 +65,25 @@ export class ComponentsExamples {
     return {
       id: "list-id",
       name: "list",
-      width: "100%",
-      height: "100%",
+      width: "100px",
+      height: "100px",
       items: ["one", "two", "three"],
     } as ListUI;
   }
   static getMap(): MapUI {
     return {
-      id: "map1",
+      id: "map-id",
       name: "map",
       width: "100%",
       height: "100%",
       type: "satelite",
-      value: "",
-      style: {},
       center: { lat: 59.95, lng: 30.33 },
       zoom: 11,
     } as MapUI;
   }
   static getRadio(): RadioUI {
     return {
-      id: "gender_controller",
+      id: "radio-id",
       name: "radio",
       width: 100,
       height: 40,
@@ -95,7 +96,7 @@ export class ComponentsExamples {
   static getBasic(): IUIComponent {
     return {
       id: "button-id",
-      name: "Button",
+      name: "button",
       //width: "100px",
       //height: "30px",
       value: "Button",
@@ -112,13 +113,12 @@ export class ComponentsExamples {
     };
   }
 
-  static getInk(): IUIComponent {
+  static getInk(): InkCanvasUI {
     return {
-      id: "ink",
+      id: "ink-id",
       name: "ink",
-      //width: 460,
-      //height: 300,
-      value: "Ink",
+      color: { r: 0, g: 255, b: 255, a: 1 },
+      thickness: 1,
     };
   }
 
@@ -128,7 +128,6 @@ export class ComponentsExamples {
       name: "flex",
       h: "100%",
       w: "100%",
-      align: "center",
       children: [],
     };
   }
@@ -137,9 +136,8 @@ export class ComponentsExamples {
     return {
       id: "box-id",
       name: "box",
-
-      //type: "text",
-      //align: "center",
+      h: "100%",
+      w: "100%",
       children: [],
     };
   }
@@ -148,6 +146,8 @@ export class ComponentsExamples {
     return {
       id: "center-id",
       name: "center",
+      h: "100%",
+      w: "100%",
       children: [],
     };
   }
@@ -155,7 +155,9 @@ export class ComponentsExamples {
   static getGrid(): GridUI {
     return {
       id: "grid-id",
-      name: "center",
+      name: "grid",
+      h: "100%",
+      w: "100%",
       children: [],
     };
   }
@@ -163,7 +165,9 @@ export class ComponentsExamples {
   static getStack(): StackUI {
     return {
       id: "stack-id",
-      name: "center",
+      name: "stack",
+      h: "100%",
+      w: "100%",
       children: [],
     };
   }
@@ -172,7 +176,6 @@ export class ComponentsExamples {
     return {
       id: "checkbox-id",
       name: "checkbox",
-      children: [],
     };
   }
 
@@ -180,15 +183,13 @@ export class ComponentsExamples {
     return {
       id: "editable-id",
       name: "editable",
-      children: [],
     };
   }
 
-  static getSlider(): EditableUI {
+  static getSlider(): SliderUI {
     return {
       id: "slider-id",
       name: "slider",
-      children: [],
     };
   }
 

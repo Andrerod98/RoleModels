@@ -1,10 +1,13 @@
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import {
+  Box,
   Checkbox,
   Editable,
   EditableInput,
   EditablePreview,
+  Flex,
   IconButton,
+  Spacer,
   Table,
   TableCaption,
   Tbody,
@@ -24,84 +27,89 @@ export function InteractionsTab() {
   const interactions = Array.from(app.getSharedObject().getInteractions());
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [interaction, setInteraction] = useState(undefined);
+
   return (
-    <Table variant='simple' mx={"10px"}>
-      <TableCaption>Interactions</TableCaption>
-      <Thead>
-        <Tr>
-          <Th w={"50%"}>Interaction Name</Th>
+    <Box>
+      <Flex w='100%'>
+        <Spacer />
+        <CreateInteractionModal
+          views={Array.from(app.getSharedObject().getAllViews())}
+          app={app}
+          isOpen={isOpen}
+          onOpen={onOpen}
+          onClose={onClose}
+          interaction={interaction}
+          onCreate={(
+            viewId: string,
+            componentIds: string[],
+            eventName: string,
+            code: string
+          ) => {
+            componentIds.forEach((cid) => {
+              const name = viewId + "/" + cid + "/" + eventName;
 
-          <Th w={"15%"}>Active</Th>
+              const object = {
+                name: name,
+                active: true,
+                code: code,
+              } as IInteraction;
+              app.getSharedObject().setInteraction(name, object);
+            });
+          }}
+        />
+      </Flex>
+      <Table variant='simple' mx={"10px"}>
+        <TableCaption>Interactions</TableCaption>
+        <Thead>
+          <Tr>
+            <Th w={"50%"}>Interaction Name</Th>
 
-          <Th w={"15%"}></Th>
+            <Th w={"15%"}>Active</Th>
 
-          <CreateInteractionModal
-            views={Array.from(app.getSharedObject().getAllViews())}
-            app={app}
-            isOpen={isOpen}
-            onOpen={onOpen}
-            onClose={onClose}
-            interaction={interaction}
-            onCreate={(
-              viewId: string,
-              componentIds: string[],
-              eventName: string,
-              code: string
-            ) => {
-              componentIds.forEach((cid) => {
-                const name = viewId + "/" + cid + "/" + eventName;
+            <Th w={"15%"}></Th>
+          </Tr>
+        </Thead>
 
-                const object = {
-                  name: name,
-                  active: true,
-                  code: code,
-                } as IInteraction;
-                app.getSharedObject().setInteraction(name, object);
-              });
-            }}
-          />
-        </Tr>
-      </Thead>
+        <Tbody key={"table-body"}>
+          {interactions.map((inter: IInteraction, index: number) => {
+            return (
+              <Tr key={"table-tr-" + index} bg={"white"}>
+                <Td fontSize={{ base: "10px", md: "16px", lg: "16px" }}>
+                  <Editable
+                    defaultValue={inter.name}
+                    onSubmit={(nextValue: string) => {}}
+                  >
+                    <EditablePreview />
+                    <EditableInput />
+                  </Editable>
+                </Td>
 
-      <Tbody key={"table-body"}>
-        {interactions.map((inter: IInteraction, index: number) => {
-          return (
-            <Tr key={"table-tr-" + index} bg={"white"}>
-              <Td fontSize={{ base: "10px", md: "16px", lg: "16px" }}>
-                <Editable
-                  defaultValue={inter.name}
-                  onSubmit={(nextValue: string) => {}}
-                >
-                  <EditablePreview />
-                  <EditableInput />
-                </Editable>
-              </Td>
+                <Td>
+                  <Checkbox defaultIsChecked>Active</Checkbox>
+                </Td>
 
-              <Td>
-                <Checkbox defaultIsChecked>Active</Checkbox>
-              </Td>
-
-              <Td>
-                <IconButton
-                  aria-label='Search database'
-                  icon={<EditIcon />}
-                  onClick={() => {
-                    setInteraction(inter);
-                    onOpen();
-                  }}
-                />
-                <IconButton
-                  onClick={() => {
-                    app.getSharedObject().deleteInteraction(inter.name);
-                  }}
-                  aria-label='Search database'
-                  icon={<DeleteIcon />}
-                />
-              </Td>
-            </Tr>
-          );
-        })}
-      </Tbody>
-    </Table>
+                <Td>
+                  <IconButton
+                    aria-label='Search database'
+                    icon={<EditIcon />}
+                    onClick={() => {
+                      setInteraction(inter);
+                      onOpen();
+                    }}
+                  />
+                  <IconButton
+                    onClick={() => {
+                      app.getSharedObject().deleteInteraction(inter.name);
+                    }}
+                    aria-label='Search database'
+                    icon={<DeleteIcon />}
+                  />
+                </Td>
+              </Tr>
+            );
+          })}
+        </Tbody>
+      </Table>
+    </Box>
   );
 }

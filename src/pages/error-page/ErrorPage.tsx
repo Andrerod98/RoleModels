@@ -11,7 +11,7 @@ interface ErrorPageProps {
 export function ErrorPage(props: ErrorPageProps) {
   const [timer, setTimer] = useState(5);
   useEffect(() => {
-    setTimeout(() => {
+    const time = setTimeout(() => {
       if (timer === 1) {
         window.location.href = props.application.getFullHost();
         window.location.reload();
@@ -19,6 +19,10 @@ export function ErrorPage(props: ErrorPageProps) {
         setTimer(timer - 1);
       }
     }, 1000);
+
+    return () => {
+      clearTimeout(time);
+    };
   });
   return (
     <Center h={"100vh"}>

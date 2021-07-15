@@ -45,47 +45,53 @@ export function RoleTab(props: RoleTabProps) {
       : ({ id: uuid(), name: "div", viewId: "", children: [] } as ILayoutNode)
   );
 
-  console.log(layoutSnapshot);
-
   const preview = (newValue?: string, nvid?: string) => {
     //props.project.stringToViews(value)
     const iviews = Utils.stringToJson(
       newValue === undefined ? codeState.value : newValue
     );
+
+    if (iviews) {
+      const newFormattedValue = Utils.jsonToString(iviews);
+      setCodeState({ ...codeState, value: newFormattedValue });
+      setAlert(false);
+    } else {
+      setCodeState({ ...codeState, value: newValue });
+    }
+
     //props.role.updateIViews(iviews);
     app.getSharedObject().updateIViews(iviews);
 
-    setCodeState(
-      newValue === undefined
-        ? { ...codeState, value: codeState.value }
-        : { ...codeState, value: newValue }
-    );
-
     setLayoutSnapshot({ ...layout.toLayout() });
+  };
+
+  const addViewToEditor = () => {
+    const newView = ComponentsExamples.getView();
+    const valueAsString = codeState.value;
+    let valueAsJson = Utils.stringToJson(codeState.value);
+    if (
+      valueAsString === "{}" ||
+      valueAsString === "" ||
+      valueAsString === "[]"
+    ) {
+      valueAsJson = [newView];
+    } else {
+      valueAsJson = [...valueAsJson, newView];
+    }
+    const newValueAsString = Utils.jsonToString(valueAsJson);
+    setCodeState({ ...codeState, value: newValueAsString });
+    preview(newValueAsString);
+    setNewViewId(newView.id);
+    setLayoutOpen(true);
   };
 
   const addUIComponent = (name: string) => {
     setAlert(false);
     let object;
-    let json = Utils.stringToJson(codeState.value);
-    if (json === undefined) {
-      setAlert(true);
-      return;
-    }
+
     switch (name) {
       case "view":
-        const newView = ComponentsExamples.getView();
-        if (Utils.jsonToString(json) === "{}") {
-          json = [newView];
-        } else {
-          json = [...json, newView];
-        }
-        //Open layout modal
-
-        setCodeState({ ...codeState, value: Utils.jsonToString(json) });
-        preview(Utils.jsonToString(json));
-        setNewViewId(newView.id);
-        setLayoutOpen(true);
+        addViewToEditor();
 
         return;
       case "image":
@@ -154,23 +160,27 @@ export function RoleTab(props: RoleTabProps) {
     const row = codeState.position.row;
     const column = codeState.position.column;
     const line = rows[row];
-    let previous = line.substring(0, column);
-    previous = previous.trim();
-    if (previous.endsWith("}")) previous += ",";
 
-    rows[row] = previous + str + line.substring(column);
+    rows[row] = line.substring(0, column) + str + line.substring(column);
+
     const newValue = rows.join("\n");
 
-    const newFormattedValue = Utils.stringToJson(newValue);
-    if (newFormattedValue === undefined) {
-      setAlert(true);
-    } else {
+    const newJson = Utils.stringToJson(newValue);
+    const newFormattedValue = Utils.jsonToString(newJson);
+
+    if (newJson) {
+      setAlert(false);
+      preview(newFormattedValue);
       setCodeState({
         ...codeState,
-        value: Utils.jsonToString(newFormattedValue),
+        value: newFormattedValue,
       });
-
-      preview(Utils.jsonToString(newFormattedValue));
+    } else {
+      setAlert(true);
+      setCodeState({
+        ...codeState,
+        value: newValue,
+      });
     }
   };
 
@@ -248,7 +258,7 @@ export function RoleTab(props: RoleTabProps) {
             <Alert status={"error"}>
               <AlertIcon />
               <AlertDescription>
-                The Json is incorrect fix it to add new components
+                The Json is incorrect fix it to be able to preview
               </AlertDescription>
               <CloseButton
                 position={"absolute"}

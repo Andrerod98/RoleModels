@@ -47,7 +47,7 @@ export function InkCanvasView({
   const { color, thickness, ...props } = component;
 
   return (
-    <Box {...props}>
+    <Box {...props} key={"ink-surface-" + component.id}>
       <canvas id={"ink-canvas"} style={{ width: "100%", height: "100%" }} />
     </Box>
   );

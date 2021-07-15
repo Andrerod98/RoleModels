@@ -11,7 +11,13 @@ export function EditableView({
   const component = controller.get() as EditableUI;
 
   return (
-    <Editable key={"editable_" + component.id} {...component}>
+    <Editable
+      key={"editable-" + component.id}
+      {...component}
+      onChange={(nextValue: string) =>
+        controller.emitEvent("onChange", nextValue)
+      }
+    >
       <EditablePreview />
       <EditableInput />
     </Editable>

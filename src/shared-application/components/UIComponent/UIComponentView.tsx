@@ -14,7 +14,7 @@ export function UIComponentView(props: UIComponentProps) {
       className: "remove-all-styles",
       // ref: this.componentRef,
       id: controller.get().id,
-      key: controller.get().id,
+      key: "uicomponent-" + controller.get().id,
       style: {
         ...controller.get().style,
       },

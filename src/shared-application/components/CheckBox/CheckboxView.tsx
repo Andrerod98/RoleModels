@@ -10,5 +10,11 @@ export function CheckboxView({
 }) {
   const component = controller.get() as CheckboxUI;
 
-  return <Checkbox key={"checkbox_" + component.id} {...component} />;
+  return (
+    <Checkbox
+      onClick={() => controller.emitEvent("onClick")}
+      key={"checkbox-" + component.id}
+      {...component}
+    />
+  );
 }
