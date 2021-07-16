@@ -113,12 +113,12 @@ export function LayoutModal(props: LayoutModalProps) {
             size={"lg"}
             mx={"5px"}
             my={"5px"}
-            isDisabled={props.selectedNode !== ""}
             onClick={() => {
               props.onButtonClick("C");
             }}
             icon={<Icon fontSize={"30px"} as={BiRectangle} />}
           />
+          Replace
         </GridItem>
         <GridItem rowSpan={1} colSpan={1} bg='gray.400'>
           <IconButton

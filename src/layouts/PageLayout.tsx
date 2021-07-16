@@ -127,13 +127,16 @@ export function PageLayout(props: PageLayoutProps) {
     .getCurrentConfigurationOfRole(role.getId());
   if (role.getName() === "designer") {
     currentLayout = app.getSharedObject().getLayoutWithView(selectedNode);
+    console.log(currentLayout);
     if (!currentLayout) {
-      const firstRole = Array.from(app.getSharedObject().getRoles())[0];
+      const firstRole = Array.from(app.getSharedObject().getRoles())[2];
+
       currentLayout = app
         .getSharedObject()
         .getCurrentConfigurationOfRole(firstRole.getId());
     }
   }
+  console.log(currentLayout);
   /*const layout = app
     .getSharedObject()
     .getCurrentConfigurationOfRole(role.getName());*/

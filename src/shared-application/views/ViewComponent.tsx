@@ -28,7 +28,7 @@ interface ViewComponentProps {
 export const ViewComponent: FC<ViewComponentProps> = (
   props: ViewComponentProps
 ) => {
-  let qrUrl = "view/" + props.view.getId() + "#from=" + props.role.getName();
+  let qrUrl = "view/" + props.view.getId() + "#from=" + props.role.getId();
 
   return (
     <Box

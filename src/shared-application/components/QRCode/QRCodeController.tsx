@@ -1,6 +1,4 @@
 /* eslint-disable no-undef */
-import { SharedCell } from "@fluidframework/cell";
-import { SharedMap } from "@fluidframework/map";
 import React from "react";
 import { UIComponentController } from "../UIComponent/UIComponentController";
 import { QRCodeUI } from "./QRCodeModel";

@@ -42,7 +42,7 @@ if (PROJECT_NAME === undefined) {
                 <ChakraProvider resetCSS>
                   <ErrorPage
                     application={application}
-                    reconnect={true}
+                    reconnect={false}
                     message={"The project already exists! Redirecting..."}
                   />
                 </ChakraProvider>,
@@ -51,8 +51,8 @@ if (PROJECT_NAME === undefined) {
               );
             })
             .then(() => {
-              window.location.href = application.getFullHost();
-              window.location.reload();
+              //window.location.href = application.getFullHost();
+              //window.location.reload();
             });
         }}
       />
@@ -73,7 +73,7 @@ if (PROJECT_NAME === undefined) {
         <ChakraProvider resetCSS>
           <ErrorPage
             application={application}
-            reconnect={true}
+            reconnect={false}
             message={e.message}
           />
         </ChakraProvider>,
@@ -87,7 +87,7 @@ if (PROJECT_NAME === undefined) {
           <ChakraProvider resetCSS>
             <ErrorPage
               application={application}
-              reconnect={true}
+              reconnect={false}
               message={"The container has been disconnected. Reconnecting..."}
             />
           </ChakraProvider>,
@@ -100,7 +100,7 @@ if (PROJECT_NAME === undefined) {
           <ChakraProvider resetCSS>
             <ErrorPage
               application={application}
-              reconnect={true}
+              reconnect={false}
               message={"The container has been closed."}
             />
           </ChakraProvider>,
@@ -114,8 +114,8 @@ if (PROJECT_NAME === undefined) {
           return;
         }
         console.log("The container is connected.");
-        window.location.href = application.getFullHost();
-        window.location.reload();
+        //window.location.href = application.getFullHost();
+        //window.location.reload();
         //application.render(document.getElementById("content"));
       });
 

@@ -71,7 +71,7 @@ export function LayoutsTable(props: LayoutTableProps) {
                   <Editable
                     defaultValue={config.name}
                     onSubmit={(nextValue: string) => {
-                      sharedObject.renameConfiguration(config.name, nextValue);
+                      sharedObject.renameConfiguration(config.id,config.name, nextValue);
                     }}
                   >
                     <EditablePreview />
@@ -87,7 +87,7 @@ export function LayoutsTable(props: LayoutTableProps) {
                       as={Button}
                       fontSize={{ base: "10px", md: "16px", lg: "16px" }}
                       onClick={() => {
-                        sharedObject.loadConfiguration(config.name);
+                        sharedObject.loadConfiguration(config.id);
                       }}
                     >
                       Load
@@ -96,7 +96,9 @@ export function LayoutsTable(props: LayoutTableProps) {
                 </Td>
                 <Td>
                   <IconButton
-                    onClick={() => {}}
+                    onClick={() => {
+                      sharedObject.deleteConfigurationWithId(config.id);
+                    }}
                     aria-label='Delete Workspace'
                     icon={<DeleteIcon />}
                   />

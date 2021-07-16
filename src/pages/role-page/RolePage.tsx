@@ -1,7 +1,6 @@
 import React, { useContext } from "react";
 
 import { Box, Flex } from "@chakra-ui/react";
-import { QRCodeController } from "../../shared-application/qrcode/QRCodeController";
 import { ViewComponent } from "../../shared-application/views/ViewComponent";
 import { ILayoutNode } from "../../shared-application/roles/ILayout";
 import { CrossAppState, CrossAppContext } from "../../context/AppContext";

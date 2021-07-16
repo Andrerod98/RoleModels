@@ -11,18 +11,19 @@ interface ErrorPageProps {
 export function ErrorPage(props: ErrorPageProps) {
   const [timer, setTimer] = useState(5);
   useEffect(() => {
-    const time = setTimeout(() => {
-      if (timer === 1) {
-        window.location.href = props.application.getFullHost();
-        window.location.reload();
-      } else {
-        setTimer(timer - 1);
-      }
-    }, 1000);
-
-    return () => {
-      clearTimeout(time);
-    };
+    if (props.reconnect) {
+      const time = setTimeout(() => {
+        if (timer === 1) {
+          window.location.href = props.application.getFullHost();
+          window.location.reload();
+        } else {
+          setTimer(timer - 1);
+        }
+      }, 1000);
+      return () => {
+        clearTimeout(time);
+      };
+    }
   });
   return (
     <Center h={"100vh"}>

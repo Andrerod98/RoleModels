@@ -10,10 +10,12 @@ enum ConfigurationsManagerEvents {
 }
 
 export interface IConfiguration {
+  id: string;
   name: string;
   layouts: { [role: string]: ILayoutNode };
 }
 export interface Configuration {
+  id: string;
   name: string;
   layouts: { [role: string]: LayoutNode };
 }
@@ -28,8 +30,7 @@ export class ConfigurationsManager extends EventEmitter {
     private readonly primaryConfiguration: SharedCell
   ) {
     super();
-    this.current = { name: "default", layouts: {} };
-    this.primary = undefined;
+
     //this.loadObject();
     this.setEventListeners();
   }
@@ -63,12 +64,19 @@ export class ConfigurationsManager extends EventEmitter {
 
     const currentConfigKeys = Object.keys(currentConfigValue.layouts);
 
-    const currentKeys = Object.keys(this.current.layouts);
+    if (this.current) {
+      const currentKeys = Object.keys(this.current.layouts);
 
-    for (const key of currentKeys) {
-      this.current.layouts[key].removeAllListeners();
+      for (const key of currentKeys) {
+        this.current.layouts[key].removeAllListeners();
+      }
     }
-    this.current = { name: currentConfigValue.name, layouts: {} };
+
+    this.current = {
+      id: currentConfigValue.id,
+      name: currentConfigValue.name,
+      layouts: {},
+    };
 
     for (const key of currentConfigKeys) {
       const layoutValue = currentConfigValue.layouts[key];
@@ -87,23 +95,20 @@ export class ConfigurationsManager extends EventEmitter {
     this.currentConfiguration.set(configValue);
   }
 
-  public renameConfiguration(oldValue: string, newValue: string) {
+  public renameConfiguration(id: string, oldValue: string, newValue: string) {
     if (this.current.name === oldValue) {
       const configValue = this.currentConfiguration.get();
       this.currentConfiguration.set({ ...configValue, name: newValue });
     }
-    this.configurationsSharedMap.set(newValue, {
-      ...this.configurationsSharedMap.get(oldValue),
+    this.configurationsSharedMap.set(id, {
+      ...this.configurationsSharedMap.get(id),
       name: newValue,
     });
-    this.configurationsSharedMap.delete(oldValue);
     this.emitChange();
   }
 
-  public removeViewFromRole(role: string, viewId: string) {
-    console.log(role);
-    console.log(this.current.layouts);
-    const node = this.current.layouts[role].getChildByViewId(viewId);
+  public removeViewFromRole(roleId: string, viewId: string) {
+    const node = this.current.layouts[roleId].getChildByViewId(viewId);
     if (node) {
       node.removeChild(node.getId());
     }
@@ -144,28 +149,56 @@ export class ConfigurationsManager extends EventEmitter {
     return this.current.layouts[role];
   }
 
-  public loadConfiguration(configurationName: string): void {
-    const config = this.configurationsSharedMap.get(configurationName);
+  public loadConfiguration(configurationId: string): void {
+    const config = this.configurationsSharedMap.get(configurationId);
     if (config) {
       this.currentConfiguration.set({ ...config });
     }
   }
 
-  public saveConfiguration() {
-    const name = uuid();
-    this.currentConfiguration.set({
-      ...this.currentConfiguration.get(),
-      name: name,
-    });
+  public deleteConfigurationWithId(configurationId: string): void {
+    this.configurationsSharedMap.delete(configurationId);
+  }
 
-    this.configurationsSharedMap.set(name, {
-      name,
-      layouts: { ...this.currentConfiguration.get().layouts },
+  public saveConfiguration() {
+    const id = uuid();
+    const value = Object.assign({}, this.currentConfiguration.get());
+    this.currentConfiguration.set({
+      ...value,
+      id: id,
+      name: "name",
+    });
+    const layouts = Object.assign({}, value.layouts);
+    this.configurationsSharedMap.set(id, {
+      id,
+      name: "name",
+      layouts: layouts,
     });
   }
 
   public resetConfiguration() {
     //TODO
+    const layouts = { ...this.currentConfiguration.get().layouts };
+
+    const keys = Object.keys(layouts);
+    let i = 0;
+    for (const key of keys) {
+      if (i === 0) {
+        layouts[key] = { ...this.primaryConfiguration.get() };
+      } else {
+        layouts[key] = {
+          id: uuid(),
+          name: "div",
+        };
+      }
+
+      i++;
+    }
+
+    this.currentConfiguration.set({
+      ...this.currentConfiguration.get(),
+      layouts: { ...layouts },
+    });
   }
 
   /* Callback functions */

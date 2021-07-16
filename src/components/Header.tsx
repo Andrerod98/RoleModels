@@ -1,7 +1,6 @@
 import {
   AddIcon,
   ChevronDownIcon,
-  EditIcon,
   MoonIcon,
   SunIcon,
   ViewIcon,
@@ -11,9 +10,6 @@ import {
   Button,
   Drawer,
   DrawerContent,
-  Editable,
-  EditableInput,
-  EditablePreview,
   Flex,
   Icon,
   IconButton,
@@ -26,7 +22,6 @@ import {
   TagLabel,
   useColorMode,
   useDisclosure,
-  useEditableControls,
 } from "@chakra-ui/react";
 import React from "react";
 import { RiFileListLine, RiMusicLine } from "react-icons/ri";
@@ -48,18 +43,7 @@ export function Header(props: HeaderProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { colorMode, toggleColorMode } = useColorMode();
   const btnRef = React.useRef();
-  function EditableControls() {
-    const { getEditButtonProps } = useEditableControls();
 
-    return (
-      <IconButton
-        aria-label='edit'
-        size='sm'
-        icon={<EditIcon />}
-        {...getEditButtonProps()}
-      />
-    );
-  }
   return (
     <>
       <IconButton

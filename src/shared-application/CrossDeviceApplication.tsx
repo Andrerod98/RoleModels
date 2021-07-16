@@ -5,7 +5,6 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { UIComponentFactory } from "./components/UIComponent";
 import { PrototypingToolContainerFactory } from "./container";
-import { IQRCode } from "./qrcode/IQRCode";
 import { QRCodeController } from "./qrcode/QRCodeController";
 import { Role } from "./roles/Role";
 import { IView } from "./views/IView";

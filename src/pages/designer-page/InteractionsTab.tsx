@@ -2,9 +2,6 @@ import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import {
   Box,
   Checkbox,
-  Editable,
-  EditableInput,
-  EditablePreview,
   Flex,
   IconButton,
   Spacer,
@@ -75,13 +72,7 @@ export function InteractionsTab() {
             return (
               <Tr key={"table-tr-" + index}>
                 <Td fontSize={{ base: "10px", md: "16px", lg: "16px" }}>
-                  <Editable
-                    defaultValue={inter.name}
-                    onSubmit={(nextValue: string) => {}}
-                  >
-                    <EditablePreview />
-                    <EditableInput />
-                  </Editable>
+                  {inter.name}
                 </Td>
 
                 <Td>

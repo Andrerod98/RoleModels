@@ -139,6 +139,7 @@ export class PrototypingToolDataObject
     } as IRole);
 
     currentConfiguration.set({
+      id: uuid(),
       name: "default",
       layouts: { [defaultRoleId]: { id: uuid(), name: "div" } },
     } as IConfiguration);
@@ -698,8 +699,8 @@ export class PrototypingToolDataObject
     return this.configurationsManager.getPrimaryConfigurationShared();
   }
 
-  public renameConfiguration(oldValue: string, newValue: string) {
-    this.configurationsManager.renameConfiguration(oldValue, newValue);
+  public renameConfiguration(id: string, oldValue: string, newValue: string) {
+    this.configurationsManager.renameConfiguration(id, oldValue, newValue);
   }
 
   public getCurrentConfigurationOfRole(roleId: string) {
@@ -714,12 +715,12 @@ export class PrototypingToolDataObject
     this.configurationsManager.resetConfiguration();
   }
 
-  public loadConfiguration(configName: string) {
-    this.configurationsManager.loadConfiguration(configName);
+  public loadConfiguration(configId: string) {
+    this.configurationsManager.loadConfiguration(configId);
   }
 
-  public deleteConfiguration() {
-    this.configurationsManager.getConfigurations();
+  public deleteConfigurationWithId(configId: string) {
+    this.configurationsManager.deleteConfigurationWithId(configId);
   }
 
   public getInteractions() {
