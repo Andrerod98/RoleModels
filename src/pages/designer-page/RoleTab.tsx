@@ -39,11 +39,11 @@ export function RoleTab(props: RoleTabProps) {
 
   const [alert, setAlert] = useState(false);
 
-  const [layoutSnapshot, setLayoutSnapshot] = useState(
+  /* const [layoutSnapshot, setLayoutSnapshot] = useState(
     layout
       ? layout.toLayout()
       : ({ id: uuid(), name: "div", viewId: "", children: [] } as ILayoutNode)
-  );
+  );*/
 
   const preview = (newValue?: string, nvid?: string) => {
     //props.project.stringToViews(value)
@@ -62,7 +62,7 @@ export function RoleTab(props: RoleTabProps) {
     //props.role.updateIViews(iviews);
     app.getSharedObject().updateIViews(iviews);
 
-    setLayoutSnapshot({ ...layout.toLayout() });
+    //setLayoutSnapshot({ ...layout.toLayout() });
   };
 
   const addViewToEditor = () => {

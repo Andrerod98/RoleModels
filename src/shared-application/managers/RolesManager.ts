@@ -52,7 +52,9 @@ export class RolesManager extends EventEmitter {
     roles.forEach((role) => {
       if (role) {
         const r = this.loadRole(role);
-        newRoles.set(r.getName(), r);
+        if (r) {
+          newRoles.set(r.getId(), r);
+        }
       }
     });
 
@@ -67,24 +69,22 @@ export class RolesManager extends EventEmitter {
   public loadRole(sharedRole: SharedCell): Role {
     const sharedRoleValue = sharedRole.get();
     let role: Role;
-    if (this.roles.has(sharedRoleValue.name)) {
-      role = this.roles.get(sharedRoleValue.name);
+    if (this.roles.has(sharedRoleValue.id)) {
+      role = this.roles.get(sharedRoleValue.id);
       role.loadObject();
     } else {
       role = new Role(sharedRole, this.factoriesManager);
-      this.roles.set(role.getName(), role);
+      this.roles.set(role.getId(), role);
     }
 
-    sharedRole.off("valueChanged", () => {
+    function change() {
       this.emitChange(
         "Role " + sharedRoleValue.name + " changed so changing state"
       );
-    });
-    sharedRole.on("valueChanged", () => {
-      this.emitChange(
-        "Role " + sharedRoleValue.name + " changed so changing state"
-      );
-    });
+    }
+
+    sharedRole.off("valueChanged", change);
+    sharedRole.on("valueChanged", change);
 
     return role;
   }
@@ -93,8 +93,14 @@ export class RolesManager extends EventEmitter {
   /*
    * Gets a role by the name
    */
-  public getRole(roleName: string): Role {
-    return this.roles.get(roleName);
+  public getRole(roleId: string): Role {
+    return this.roles.get(roleId);
+  }
+
+  public getRoleByName(roleName: string): Role {
+    return Array.from(this.roles.values()).find(
+      (role) => role.getName() === roleName
+    );
   }
 
   /*
@@ -105,21 +111,18 @@ export class RolesManager extends EventEmitter {
   /*
    * Check if the role exists
    */
-  public hasRole(roleName: string): boolean {
-    return this.roles.has(roleName);
+  public hasRole(roleId: string): boolean {
+    return this.roles.has(roleId);
   }
 
   /*
    * Renames a role
    */
-  public renameRole(oldRoleName: string, newRoleName: string) {
+  public renameRole(id: string, oldRoleName: string, newRoleName: string) {
     if (oldRoleName === newRoleName) return;
-    const role = this.roles.get(oldRoleName);
+    const role = this.roles.get(id);
     if (!role) return;
     const cell = role.getSharedObject();
-    this.rolesMap.set(newRoleName, cell.handle);
-    this.rolesMap.delete(oldRoleName);
-    // TODO:Set all the stitching position to new value
     cell.set({ ...cell.get(), name: newRoleName });
   }
 
@@ -129,15 +132,15 @@ export class RolesManager extends EventEmitter {
   public addRole(sharedRole: SharedCell): Role {
     const sharedRoleValue = sharedRole.get();
 
-    if (this.rolesMap.has(sharedRoleValue.name)) {
-      console.error("The role " + sharedRoleValue.name + " already exists.");
+    if (this.rolesMap.has(sharedRoleValue.id)) {
+      console.error("The role " + sharedRoleValue.id + " already exists.");
       return;
     }
-
-    this.rolesMap.set(sharedRoleValue.name, sharedRole.handle);
-
+    console.log("Adding role " + sharedRoleValue.id);
+    this.rolesMap.set(sharedRoleValue.id, sharedRole.handle);
+    console.log(this.roles.keys());
     const role = new Role(sharedRole, this.factoriesManager);
-    this.roles.set(sharedRoleValue.name, role);
+    this.roles.set(sharedRoleValue.id, role);
 
     return role;
   }
@@ -152,9 +155,9 @@ export class RolesManager extends EventEmitter {
   /*
    * Removes a role to the roles map and roles shared map
    */
-  public removeRole(roleName: string): void {
-    this.roles.delete(roleName);
-    this.rolesMap.delete(roleName);
+  public removeRole(roleId: string): void {
+    this.roles.delete(roleId);
+    this.rolesMap.delete(roleId);
   }
 
   /* Callback functions */

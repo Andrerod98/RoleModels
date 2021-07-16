@@ -24,7 +24,11 @@ export const Preview = (props: PreviewProps) => {
             maxH={"100%"}
             w={"100%"}
             h={"100%"}
-            key={props.app.getMyRole().getName() + "-div-" + node.id}
+            key={
+              props.app.getSharedObject().getMyRole().getName() +
+              "-div-" +
+              node.id
+            }
             direction={"column"}
           >
             {node.children.map((child) => {
@@ -40,7 +44,11 @@ export const Preview = (props: PreviewProps) => {
             w={"100%"}
             h={"100%"}
             grow={1}
-            key={props.app.getMyRole().getName() + "-flex-" + node.id}
+            key={
+              props.app.getSharedObject().getMyRole().getName() +
+              "-flex-" +
+              node.id
+            }
             direction={"row"}
           >
             {node.children.map((child) => {
@@ -57,7 +65,11 @@ export const Preview = (props: PreviewProps) => {
 
         return (
           <Box
-            key={props.app.getMyRole().getName() + "-box-" + node.viewId}
+            key={
+              props.app.getSharedObject().getMyRole().getName() +
+              "-box-" +
+              node.viewId
+            }
             w={"100%"}
             h={"100%"}
             maxW={"100%"}
@@ -71,10 +83,12 @@ export const Preview = (props: PreviewProps) => {
           >
             <ViewComponent
               key={
-                props.app.getMyRole().getName() + "-preview-view-" + node.viewId
+                props.app.getSharedObject().getMyRole().getName() +
+                "-preview-view-" +
+                node.viewId
               }
               view={view}
-              role={props.app.getMyRole()}
+              role={props.app.getSharedObject().getMyRole()}
             />
             <Box
               _hover={

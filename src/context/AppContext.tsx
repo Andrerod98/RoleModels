@@ -62,13 +62,13 @@ export const CrossAppProvider = ({
     };
   };
   const [state, setState] = useState(generateState());
-
+  const debug = false;
   useEffect(() => {
     const onChange = () => {
       setState(generateState());
     };
     model.on("change", (type) => {
-      console.log(type);
+      if (debug) console.log(type);
       onChange();
     });
 

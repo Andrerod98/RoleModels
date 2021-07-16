@@ -70,7 +70,11 @@ export function RolesTable(props: LayoutTableProps) {
                     }
                     defaultValue={role.getName()}
                     onSubmit={(nextValue: string) => {
-                      sharedObject.renameRole(role.getName(), nextValue);
+                      sharedObject.renameRole(
+                        role.getId(),
+                        role.getName(),
+                        nextValue
+                      );
                     }}
                   >
                     <EditablePreview />
@@ -87,7 +91,7 @@ export function RolesTable(props: LayoutTableProps) {
                         : "block"
                     }
                     onClick={() => {
-                      sharedObject.removeRole(role.getName());
+                      sharedObject.removeRole(role.getId());
                     }}
                     aria-label='Delete Role'
                     icon={<DeleteIcon />}

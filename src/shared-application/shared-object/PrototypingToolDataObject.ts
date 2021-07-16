@@ -38,10 +38,7 @@ import {
   IInteraction,
   InteractionsManager,
 } from "../managers/InteractionsManager";
-import { QRsManager } from "../managers/QRsManager";
 import { RolesManager } from "../managers/RolesManager";
-import { IQRCode } from "../qrcode/IQRCode";
-import { QRCodeController } from "../qrcode/QRCodeController";
 import { IRole } from "../roles/IRole";
 import { Role } from "../roles/Role";
 import { IView } from "../views/IView";
@@ -69,10 +66,6 @@ export class PrototypingToolDataObject
   /* The Map with the views */
   private viewsMap: SharedMap; // <view id, IView>
   private viewsManager: ViewsManager;
-
-  /* The Map with the qr codes */
-  private qrMap: SharedMap;
-  private qrManager: QRsManager;
 
   /* The Map with the configurations */
   private configurationsMap: SharedMap;
@@ -106,7 +99,6 @@ export class PrototypingToolDataObject
     const combinedViewsMap = SharedMap.create(this.runtime);
     const rolesMap = SharedMap.create(this.runtime);
     const viewsMap = SharedMap.create(this.runtime);
-    const qrMap = SharedMap.create(this.runtime);
     const interactionsMap = SharedMap.create(this.runtime);
 
     const ink = Ink.create(this.runtime);
@@ -118,16 +110,16 @@ export class PrototypingToolDataObject
 
     /* Creating default roles */
     const managerRole = SharedCell.create(this.runtime);
-
+    const managerRoleId = uuid();
     managerRole.set({
-      id: uuid(),
+      id: managerRoleId,
       name: "manager",
     } as IRole);
 
     const designerRole = SharedCell.create(this.runtime);
-
+    const designerRoleId = uuid();
     designerRole.set({
-      id: uuid(),
+      id: designerRoleId,
       name: "designer",
     } as IRole);
 
@@ -150,16 +142,15 @@ export class PrototypingToolDataObject
       name: "div",
     } as ILayoutNode);
 
-    rolesMap.set("manager", managerRole.handle);
-    rolesMap.set("designer", designerRole.handle);
-    rolesMap.set("default", defaultRole.handle);
+    rolesMap.set(managerRoleId, managerRole.handle);
+    rolesMap.set(designerRoleId, designerRole.handle);
+    rolesMap.set(defaultRoleId, defaultRole.handle);
 
     /* Setting shared objects in the root Map...*/
     this.root.set("devices", devicesMap.handle);
     this.root.set("roles", rolesMap.handle);
     this.root.set("views", viewsMap.handle);
     this.root.set("combined-views", combinedViewsMap.handle);
-    this.root.set("qrs", qrMap.handle);
     this.root.set("ink", ink.handle);
     this.root.set("ping", sharedPing.handle);
     this.root.set("configurations", configurationsMap.handle);
@@ -189,7 +180,6 @@ export class PrototypingToolDataObject
       this.configurationsManager.loadObject(),
       this.configurationsManager.loadPrimaryObject(),
       this.viewsManager.loadViews(1),
-      this.qrManager.loadQRCodes(),
     ]);
 
     Logger.getInstance().success(
@@ -202,7 +192,6 @@ export class PrototypingToolDataObject
       this.root.get<IFluidHandle<SharedMap>>("devices").get(),
       this.root.get<IFluidHandle<SharedMap>>("combined-views").get(),
       this.root.get<IFluidHandle<SharedMap>>("roles").get(),
-      this.root.get<IFluidHandle<SharedMap>>("qrs").get(),
       this.root.get<IFluidHandle<SharedMap>>("configurations").get(),
       this.root.get<IFluidHandle<SharedMap>>("interactions").get(),
       this.root.get<IFluidHandle<SharedMap>>("views").get(),
@@ -217,10 +206,9 @@ export class PrototypingToolDataObject
 
     this.devicesMap = sharedMaps[0];
     this.rolesMap = sharedMaps[2];
-    this.qrMap = sharedMaps[3];
-    this.configurationsMap = sharedMaps[4];
-    this.interactionsMap = sharedMaps[5];
-    this.viewsMap = sharedMaps[6];
+    this.configurationsMap = sharedMaps[3];
+    this.interactionsMap = sharedMaps[4];
+    this.viewsMap = sharedMaps[5];
 
     this.pingCounter = sharedObjects[0];
     this.currentConfiguration = sharedObjects[1];
@@ -247,9 +235,6 @@ export class PrototypingToolDataObject
       this.interactionsManager,
       this
     );
-
-    /* Creating qr Manager...*/
-    this.qrManager = new QRsManager(this.qrMap);
 
     /* Creating configurations Manager...*/
     this.configurationsManager = new ConfigurationsManager(
@@ -341,10 +326,6 @@ export class PrototypingToolDataObject
       this.emit("change", "Roles map changed");
     });
 
-    this.qrMap.on("valueChanged", () => {
-      this.emit("change", "QR map changed");
-    });
-
     this.rolesManager.on("changeState", () => {
       this.emit("change", "Roles manager state changed.");
     });
@@ -361,29 +342,15 @@ export class PrototypingToolDataObject
       this.emit("change", "Interactions manager state changed.");
     });
 
-    //Remove this event listeners
-
-    /* Creating shared cell event listeners*/
-    await Promise.all([
-      //this.createMapEventListeners("Combined View", this.combinedViewsMap),
-
-      /* Creating views event listeners*/
-      //this.createMapEventListeners("roles", this.rolesMap),
-
-      this.createMapEventListeners("qrs", this.qrMap),
-    ]);
-
     this.pingCounter.on("incremented", this.playSound);
   }
 
   public deleteAllEventListeners() {
     this.devicesMap.removeAllListeners();
     this.rolesMap.removeAllListeners();
-    this.qrMap.removeAllListeners();
 
     this.deleteMapEventListeners("roles", this.rolesMap);
     this.deleteMapEventListeners("views", this.viewsMap);
-    this.deleteMapEventListeners("qrs", this.qrMap);
     this.deleteMapEventListeners("configurations", this.configurationsMap);
 
     this.currentConfiguration.removeAllListeners();
@@ -411,7 +378,7 @@ export class PrototypingToolDataObject
       result.removeAllListeners();
     }
   }
-  private async createMapEventListeners(name: string, map: SharedMap) {
+  /* private async createMapEventListeners(name: string, map: SharedMap) {
     const promises = [];
     for (const value of map.values()) {
       promises.push(value.get());
@@ -424,7 +391,7 @@ export class PrototypingToolDataObject
         this.emit("change", "Cell of " + name + " changed.");
       });
     }
-  }
+  }*/
 
   public pingAll() {
     this.pingCounter.increment(1);
@@ -518,30 +485,6 @@ export class PrototypingToolDataObject
 
   public getInk = (): IInk => this.ink;
 
-  /********************************************************* 
-                QR Codes Management Functions
-   *********************************************************/
-
-  public getQRCodesWithIds = (qrIDs: string[]): QRCodeController[] => {
-    return this.qrManager.getQRsWithIds(qrIDs);
-  };
-
-  public getQRCode = (id: string): QRCodeController => {
-    return this.qrManager.getQR(id);
-  };
-
-  public addQRCode(id: string, qrCode: IQRCode): QRCodeController {
-    if (this.qrMap.has(id)) {
-      return this.qrManager.getQR(id);
-    }
-    const sharedCell = SharedCell.create(this.runtime);
-
-    sharedCell.set(qrCode);
-    this.qrMap.set(id, sharedCell.handle);
-    Logger.getInstance().info(`The QRCode with id ${id} has been added.`);
-    return this.qrManager.addQR(sharedCell);
-  }
-
   /* ******************************************************** 
                 View Management Functions
    ******************************************************** */
@@ -593,9 +536,12 @@ export class PrototypingToolDataObject
   /**
    * Get the role for the current device.
    */
-  public getMyRole = (): Role => this.getRole(this.getDeviceRole());
+  public getMyRole = (): Role => this.getRoleByName(this.getDeviceRole());
 
-  public getRole = (role: string): Role => this.rolesManager.getRole(role);
+  public getRole = (roleId: string): Role => this.rolesManager.getRole(roleId);
+
+  public getRoleByName = (roleName: string): Role =>
+    this.rolesManager.getRoleByName(roleName);
 
   public getDeviceRole = (): string => this.devicesManager.getMyDevice().role;
 
@@ -604,37 +550,31 @@ export class PrototypingToolDataObject
     Logger.getInstance().info(`The role ${roleName} has been removed.`);
   }
 
-  public renameRole(oldName: string, newName: string) {
-    this.rolesManager.renameRole(oldName, newName);
+  public renameRole(id: string, oldName: string, newName: string) {
+    this.rolesManager.renameRole(id, oldName, newName);
     Logger.getInstance().info(
       `The role ${oldName} has been renamed to ${newName}.`
     );
   }
 
-  public addRole = async (role: string): Promise<Role> => {
-    if (this.rolesMap.has(role)) {
-      return this.rolesManager.getRole(role);
-    }
-
+  public addRole = (role: string): Role => {
     const sharedRole = SharedCell.create(this.runtime);
-    sharedRole.on("valueChanged", () => {
-      this.emit("change");
-    });
+
     const roleId = uuid();
+    console.log("Adding role " + roleId);
     sharedRole.set({
       id: roleId,
       name: role,
     } as IRole);
 
-    this.rolesManager.addRole(sharedRole);
+    const newRole = this.rolesManager.addRole(sharedRole);
     this.configurationsManager.updateCurrent(roleId, {
       id: uuid(),
       name: "div",
     });
 
-    await this.rolesMap.wait<IFluidHandle<SharedCell>>(role);
     Logger.getInstance().info(`The role ${role} has been added.`);
-    return this.rolesManager.getRole(role);
+    return newRole;
   };
   /**
    * Get the available roles.

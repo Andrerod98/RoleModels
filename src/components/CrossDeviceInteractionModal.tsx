@@ -39,7 +39,6 @@ export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
       if (view != "") {
         state.view = app.getSharedObject().getView(view);
       } else if (qr != "") {
-        state.qr = app.getQRCode(qr);
         const qrController = app
           .getSharedObject()
           .getComponentFromAllViews(qr) as QRCodeController;
@@ -56,7 +55,7 @@ export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
       e: React.MouseEvent<HTMLButtonElement, MouseEvent>
     ) => {
       e.stopPropagation();
-      app.grabView(view, from);
+      app.getSharedObject().migrateView(view, from);
       setNewViewId(view.id);
       setLayoutOpen(true);
 

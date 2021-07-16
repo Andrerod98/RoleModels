@@ -152,7 +152,7 @@ export function Header(props: HeaderProps) {
                 <Button
                   ml={"5px"}
                   key={"header-button-add"}
-                  onClick={() => props.app.addRole("new")}
+                  onClick={() => props.app.getSharedObject().addRole("new")}
                 >
                   <AddIcon />
                 </Button>
@@ -204,7 +204,7 @@ export function Header(props: HeaderProps) {
                   my={"5px"}
                   size={"sm"}
                   onClick={() => {
-                    props.app.pingAll();
+                    props.app.getSharedObject().pingAll();
                   }}
                 />
                 <CrossDeviceInteractionModal
