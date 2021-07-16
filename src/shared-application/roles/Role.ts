@@ -28,10 +28,6 @@ export class Role {
     this.name = role.name;
   }
 
-  public onChange(listener: () => void) {
-    this.sharedRole.on("valueChanged", listener);
-  }
-
   /* GETTERS */
   public getObject(): IRole {
     return this.sharedRole.get();

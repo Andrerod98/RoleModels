@@ -4,6 +4,5 @@ export interface IUIComponent {
   name: string;
   value?: any;
   style?: React.CSSProperties;
-  additionalState?: { [name: string]: any };
   children?: IUIComponent[];
 }

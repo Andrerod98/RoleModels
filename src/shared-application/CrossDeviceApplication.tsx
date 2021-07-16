@@ -1,4 +1,3 @@
-import { ChakraProvider } from "@chakra-ui/react";
 import { getContainer } from "@fluid-experimental/get-container";
 import { getDefaultObjectFromContainer } from "@fluidframework/aqueduct";
 import React from "react";
@@ -15,16 +14,27 @@ export class CrossDeviceApplication {
 
   constructor(
     public readonly serverUrl: string,
-    public readonly projectName,
-    readonly isFirst
+    public readonly projectName: string
   ) {}
 
-  public getServerUrl(): string {
+  public getServerURL(): string {
     return this.serverUrl;
   }
 
-  public isFirstClient(): boolean {
-    return this.isFirst;
+  public getProjectName(): string {
+    return this.projectName;
+  }
+
+  public getFullURL() {
+    return "https://" + this.serverUrl + ":8080/#project=" + this.projectName;
+  }
+
+  public getSharedObject(): PrototypingToolDataObject {
+    return this.sharedObject;
+  }
+
+  public getContainer(): Container {
+    return this.container;
   }
 
   public downloadCertificate() {
@@ -40,30 +50,14 @@ export class CrossDeviceApplication {
     document.body.removeChild(element);
   }
 
-  public getSharedObject(): PrototypingToolDataObject {
-    return this.sharedObject;
-  }
-
-  public getContainer(): Container {
-    return this.container;
-  }
-
-  public reRender() {
-    this.sharedObject.emit("change");
-  }
-
-  public getProjectName(): string {
-    return this.projectName;
-  }
-
-  public async start() {
+  public async start(isFirst: boolean) {
     const serviceTiny = new TinyliciousServiceWithUrl(this.serverUrl, 7070);
 
     this.container = await getContainer(
       serviceTiny,
       this.projectName,
       PrototypingToolContainerFactory,
-      this.isFirst
+      isFirst
     );
 
     // Get the Default Object from the Container
@@ -76,17 +70,8 @@ export class CrossDeviceApplication {
   }
 
   public render(div: HTMLElement) {
-    ReactDOM.render(
-      <ChakraProvider>
-        <CrossDeviceApplicationView app={this} />
-      </ChakraProvider>,
-      div
-    );
+    ReactDOM.render(<CrossDeviceApplicationView app={this} />, div);
 
     return div;
-  }
-
-  public getFullHost() {
-    return "https://" + this.serverUrl + ":8080/#project=" + this.projectName;
   }
 }

@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { RolePage } from "../pages/role-page/RolePage";
 
 import "../styles/styles.scss";
-import { Box } from "@chakra-ui/react";
+import { Box, ChakraProvider } from "@chakra-ui/react";
 import { CrossDeviceApplication } from "./CrossDeviceApplication";
 
 import { DesignerPage } from "../pages/designer-page/DesignerPage";
@@ -22,11 +22,13 @@ export function CrossDeviceApplicationView(
   props: CrossDeviceApplicationViewProps
 ) {
   return (
-    <Box h={"100vh"} maxW={"100vw"} overflowX={"hidden"}>
-      <CrossAppProvider app={props.app}>
-        <Pages />
-      </CrossAppProvider>
-    </Box>
+    <ChakraProvider>
+      <Box h={"100vh"} maxW={"100vw"} overflowX={"hidden"}>
+        <CrossAppProvider app={props.app}>
+          <Pages />
+        </CrossAppProvider>
+      </Box>
+    </ChakraProvider>
   );
 }
 

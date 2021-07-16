@@ -20,27 +20,9 @@ export class FactoriesManager {
     parent?: UIComponentController
   ) {
     let factory = this.factories.get(component.name);
-    if (factory === undefined) {
+    if (!factory) {
       factory = this.factories.get("uicomponent");
     }
     return factory.generateComponent(component, parent);
-
-    /*
-    switch (component.name) {
-      case "map":
-        return new MapController(component as MapUI);
-      case "img":
-        return new ImageController(component as ImageUI);
-      case "input":
-        return new InputController(component as InputUI);
-      case "radio":
-        return new RadioController(component as RadioUI);
-      case "a":
-        return new LinkController(component as LinkUI);
-      case "list":
-        return new ListController(component as ListUI);
-      default:
-        return new UIComponentController(component);
-    }*/
   }
 }

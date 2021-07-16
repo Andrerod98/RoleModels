@@ -2,7 +2,7 @@ import { SharedCell } from "@fluidframework/cell";
 import { SharedMap } from "@fluidframework/map";
 import EventEmitter from "events";
 import { uuid } from "uuidv4";
-import { ILayoutNode } from "../roles/ILayout";
+import { ILayoutNode } from "../roles/ILayoutNode";
 import { LayoutNode } from "../roles/Layout";
 
 enum ConfigurationsManagerEvents {
@@ -31,7 +31,6 @@ export class ConfigurationsManager extends EventEmitter {
   ) {
     super();
 
-    //this.loadObject();
     this.setEventListeners();
   }
 
@@ -86,7 +85,6 @@ export class ConfigurationsManager extends EventEmitter {
       });
     }
   }
-  /* GETTERS */
 
   public updateCurrent(role: string, value: ILayoutNode) {
     const configValue = this.currentConfiguration.get();
@@ -113,7 +111,7 @@ export class ConfigurationsManager extends EventEmitter {
       node.removeChild(node.getId());
     }
   }
-
+  /* GETTERS */
   public getLayoutWithView(viewId: string): LayoutNode {
     const keys = Object.values(this.current.layouts);
     for (const layout of keys) {
@@ -177,7 +175,6 @@ export class ConfigurationsManager extends EventEmitter {
   }
 
   public resetConfiguration() {
-    //TODO
     const layouts = { ...this.currentConfiguration.get().layouts };
 
     const keys = Object.keys(layouts);

@@ -14,7 +14,6 @@ enum ViewsManagerEvents {
 /* This class is responsible for managing the views */
 export class ViewsManager extends EventEmitter {
   private views: Map<String, View>;
-
   private lastCommit: number;
 
   public constructor(
@@ -25,8 +24,8 @@ export class ViewsManager extends EventEmitter {
   ) {
     super();
     this.views = new Map<String, View>();
-    this.setEventListener();
     this.lastCommit = 0;
+    this.setEventListener();
   }
 
   /* Defines the event listeners needed */
@@ -129,19 +128,23 @@ export class ViewsManager extends EventEmitter {
   }
 
   /* Returns all the combined views with ids */
-  public getViewsByIds(cvids: string[]): View[] {
+  public getViewsByIds(viewsIds: string[]): View[] {
     const result = [];
-    cvids.forEach((id) => {
-      const cv = this.views.get(id);
-
-      if (cv) result.push(cv);
+    viewsIds.forEach((id) => {
+      const view = this.views.get(id);
+      if (view) result.push(view);
     });
     return result;
   }
 
   /* Get a combined view by id */
   public getView(viewId: string): View {
-    return this.views.get(viewId);
+    const view = this.views.get(viewId);
+    if(!view){
+      Logger.getInstance().error(`The view with id ${viewId} was not found.`);
+    }
+    
+    return view;
   }
 
   /* Checks if the combined view exists */
@@ -163,7 +166,7 @@ export class ViewsManager extends EventEmitter {
     const sharedViewValue = sharedView.get();
     const id = sharedViewValue.id;
     if (this.viewsSharedMap.has(id)) {
-      console.error("The view " + id + " already exists.");
+      Logger.getInstance().error("The view " + id + " already exists.");
       return;
     }
 

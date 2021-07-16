@@ -6,6 +6,7 @@ import { SharedMap } from "@fluidframework/map";
 import { FactoriesManager } from "./FactoriesManager";
 import { SharedCell } from "@fluidframework/cell";
 import EventEmitter from "events";
+import { Logger } from "../Logger";
 
 enum RolesManagerEvents {
   ChangeState = "changeState",
@@ -21,8 +22,8 @@ export class RolesManager extends EventEmitter {
   ) {
     super();
     this.roles = new Map<string, Role>();
-    this.setEventListener();
     this.lastCommit = 0;
+    this.setEventListener();
   }
 
   /* Defines the event listeners needed */
@@ -59,7 +60,7 @@ export class RolesManager extends EventEmitter {
     });
 
     this.roles = newRoles;
-    console.log("" + this.roles.size + " Roles loaded.");
+    Logger.getInstance().success("" + this.roles.size + " Roles loaded.");
   }
 
   /*
@@ -91,16 +92,28 @@ export class RolesManager extends EventEmitter {
 
   /* GETTERS */
   /*
-   * Gets a role by the name
+   * Gets a role by the id
    */
   public getRole(roleId: string): Role {
-    return this.roles.get(roleId);
+    const role = this.roles.get(roleId);
+    if (!role)
+      Logger.getInstance().error(`The role with id ${roleId} was not found.`);
+    return role;
   }
 
+  /*
+   * Gets a role by the name
+   */
   public getRoleByName(roleName: string): Role {
-    return Array.from(this.roles.values()).find(
+    const role = Array.from(this.roles.values()).find(
       (role) => role.getName() === roleName
     );
+    if (!role)
+      Logger.getInstance().error(
+        `The role with name ${roleName} was not found.`
+      );
+
+    return role;
   }
 
   /*
@@ -121,7 +134,12 @@ export class RolesManager extends EventEmitter {
   public renameRole(id: string, oldRoleName: string, newRoleName: string) {
     if (oldRoleName === newRoleName) return;
     const role = this.roles.get(id);
-    if (!role) return;
+    if (!role) {
+      Logger.getInstance().error(
+        `The role with id ${id} could not be renamed because it was not found.`
+      );
+      return;
+    }
     const cell = role.getSharedObject();
     cell.set({ ...cell.get(), name: newRoleName });
   }
@@ -133,12 +151,12 @@ export class RolesManager extends EventEmitter {
     const sharedRoleValue = sharedRole.get();
 
     if (this.rolesMap.has(sharedRoleValue.id)) {
-      console.error("The role " + sharedRoleValue.id + " already exists.");
+      Logger.getInstance().error(
+        `The role with id ${sharedRoleValue.id} already exists.`
+      );
       return;
     }
-    console.log("Adding role " + sharedRoleValue.id);
     this.rolesMap.set(sharedRoleValue.id, sharedRole.handle);
-    console.log(this.roles.keys());
     const role = new Role(sharedRole, this.factoriesManager);
     this.roles.set(sharedRoleValue.id, role);
 
@@ -146,22 +164,21 @@ export class RolesManager extends EventEmitter {
   }
 
   public deleteRolesEventListener() {
-    //const values = this.roles.values();
-    //for (const v of values) {
-    //v.deleteAllViewsListeners();
-    //}
+    this.rolesMap.removeAllListeners();
   }
 
   /*
    * Removes a role to the roles map and roles shared map
    */
   public removeRole(roleId: string): void {
-    this.roles.delete(roleId);
-    this.rolesMap.delete(roleId);
+    if (!(this.roles.delete(roleId) && this.rolesMap.delete(roleId))) {
+      Logger.getInstance().error(
+        `The role with id ${roleId} does not exist so it was not removed.`
+      );
+    }
   }
 
   /* Callback functions */
-
   private emitChange(message?: string) {
     this.emit(RolesManagerEvents.ChangeState, message);
   }

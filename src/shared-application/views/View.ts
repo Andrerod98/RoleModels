@@ -8,6 +8,7 @@ enum ViewEvents {
   Changed = "viewChanged",
   ComponentEvent = "componentEvent",
 }
+
 export class View {
   protected root: UIComponentController;
   private id: string;
@@ -20,7 +21,7 @@ export class View {
   }
 
   private setEventListener() {
-    this.sharedView.on("valueChanged", (e: any) => {
+    this.sharedView.on("valueChanged", () => {
       this.loadObject();
     });
 
@@ -68,9 +69,6 @@ export class View {
       this.emitChange(snapshot);
     });
 
-    this.root.on("componentChangedSynced", (snapshot) => {
-      this.updateObject(this.toView());
-    });
     this.root.on("event", (eventName, componentId, args) => {
       this.emitComponentEvent(eventName, componentId, args);
     });
@@ -78,7 +76,7 @@ export class View {
 
   public deleteEventListeners() {
     this.root.deleteEventListeners();
-    //this.removeAllListeners();
+    this.sharedView.removeAllListeners();
   }
 
   public updateObject(object: IView) {
@@ -87,7 +85,6 @@ export class View {
 
   public update(object: IView) {
     this.id = object.id;
-
     this.setRoot(object.root);
 
     this.emitChange();
@@ -107,7 +104,6 @@ export class View {
   }
 
   /* Callback functions */
-
   private emitChange(data?: any) {
     this.sharedView.emit(ViewEvents.Changed, data);
   }

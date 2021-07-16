@@ -1,23 +1,22 @@
 import EventEmitter from "events";
 import { uuid } from "uuidv4";
-import { ILayoutNode } from "./ILayout";
+import { ILayoutNode } from "./ILayoutNode";
 
 export class LayoutNode extends EventEmitter {
-  parent: LayoutNode;
-  children: LayoutNode[];
+  id: string;
   name: "view" | "flex" | "div";
   viewId: string;
-  id: string;
+  parent: LayoutNode;
+  children: LayoutNode[];
 
   constructor(model: ILayoutNode, parent?: LayoutNode) {
     super();
-    this.parent = parent;
-    this.children = [];
 
     this.id = model.id;
     this.name = model.name;
     this.viewId = model.viewId;
-
+    this.parent = parent;
+    this.children = [];
     if (model.children) {
       model.children.forEach((child) => this.addChild(child));
     }
@@ -35,6 +34,10 @@ export class LayoutNode extends EventEmitter {
     return this.viewId;
   }
 
+  getChildren() {
+    return this.children;
+  }
+
   getRoot(): LayoutNode {
     if (this.parent == null) {
       return this;
@@ -49,6 +52,17 @@ export class LayoutNode extends EventEmitter {
 
   getChildByViewId(viewId: string): LayoutNode {
     return this.searchInNode(this, viewId, true);
+  }
+
+  toViewsIds(): string[] {
+    let viewsIds = [];
+    if (this.viewId != "") viewsIds = [this.viewId];
+
+    for (const child of this.children) {
+      viewsIds = [...viewsIds, ...child.toViewsIds()];
+    }
+
+    return viewsIds;
   }
 
   public searchInNode(
@@ -110,17 +124,6 @@ export class LayoutNode extends EventEmitter {
     }
   }
 
-  public toViewsIds(): string[] {
-    let viewsIds = [];
-    if (this.viewId != "") viewsIds = [this.viewId];
-
-    for (const child of this.children) {
-      viewsIds = [...viewsIds, ...child.toViewsIds()];
-    }
-
-    return viewsIds;
-  }
-
   public setParent(node: LayoutNode) {
     this.parent = node;
   }
@@ -138,10 +141,6 @@ export class LayoutNode extends EventEmitter {
     }
 
     this.getRoot().emit("change", this.getRoot().toLayout());
-  }
-
-  public getChildren() {
-    return this.children;
   }
 
   public groupWith(name: string, newView: ILayoutNode, isFirst: boolean) {

@@ -2,6 +2,7 @@ import { SharedMap } from "@fluidframework/map";
 import { IFluidDataStoreRuntime } from "@fluidframework/datastore-definitions";
 import { IDevice } from "../devices/IDevice";
 import DeviceDetector, { DeviceDetectorResult } from "device-detector-js";
+import { Logger } from "../Logger";
 
 /* This class is responsible for managing the connected devices */
 enum DefaultRoles {
@@ -164,7 +165,9 @@ export class DevicesManager {
 
     const details = this.runtime.getQuorum().getMember(clientId);
     if (!details) {
-      //Error
+      Logger.getInstance().error(
+        `The details of the device with id ${clientId} could not be retrieved.`
+      );
       return;
     }
     const interactive = details.client.details.capabilities.interactive;
@@ -183,7 +186,7 @@ export class DevicesManager {
       this.devicesMap.set(device.id, device);
     }
 
-    console.log("This device has been connected and has id:" + clientId);
+    Logger.getInstance().success(`This device has been connected.`);
   }
 
   /**
@@ -191,6 +194,7 @@ export class DevicesManager {
    */
   private memberRemoved(clientId: string) {
     if (this.devicesMap.has(clientId)) {
+      Logger.getInstance().warning(`This device with id ${clientId} has been removed.`);
       this.devicesMap.delete(clientId);
     }
   }

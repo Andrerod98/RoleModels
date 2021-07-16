@@ -9,16 +9,13 @@ export function UIComponentView(props: UIComponentProps) {
   const controller = props.controller;
   return React.createElement(
     controller.get().name,
-
     {
       className: "remove-all-styles",
-      // ref: this.componentRef,
       id: controller.get().id,
       key: "uicomponent-" + controller.get().id,
       style: {
         ...controller.get().style,
       },
-      ...controller.getListeners(),
       onClick: () => {
         controller.emitEvent("onClick");
       },

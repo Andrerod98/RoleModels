@@ -16,15 +16,7 @@ const HASH_PARTS = Utils.getURLHashParts(HASH);
 const PROJECT_NAME = HASH_PARTS["project"];
 const IP = window.location.hostname;
 let dataObjectStarted = false;
-/*
-ReactDOM.render(
-  <ChakraProvider resetCSS>
-    <InteractionsTab />
-  </ChakraProvider>,
 
-  document.getElementById("content")
-);
-*/
 
 if (PROJECT_NAME === undefined) {
   ReactDOM.render(
@@ -32,9 +24,9 @@ if (PROJECT_NAME === undefined) {
       <LandingPage
         ip={IP}
         onCreate={(name: string) => {
-          const application = new CrossDeviceApplication(IP, name, true);
+          const application = new CrossDeviceApplication(IP, name);
           application
-            .start()
+            .start(true)
             .catch((e) => {
               console.error(e);
 
@@ -51,7 +43,7 @@ if (PROJECT_NAME === undefined) {
               );
             })
             .then(() => {
-              window.location.href = application.getFullHost();
+              window.location.href = application.getFullURL();
               window.location.reload();
             });
         }}
@@ -61,10 +53,10 @@ if (PROJECT_NAME === undefined) {
     document.getElementById("content")
   );
 } else {
-  const application = new CrossDeviceApplication(IP, PROJECT_NAME, false);
+  const application = new CrossDeviceApplication(IP, PROJECT_NAME);
 
   application
-    .start()
+    .start(false)
     .catch((e: Error) => {
       // The container does not exist
       console.error(e.message);
@@ -114,7 +106,7 @@ if (PROJECT_NAME === undefined) {
           return;
         }
         console.log("The container is connected.");
-        window.location.href = application.getFullHost();
+        window.location.href = application.getFullURL();
         window.location.reload();
         //application.render(document.getElementById("content"));
       });

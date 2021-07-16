@@ -6,7 +6,6 @@ import { IUIComponent } from "./UIComponentModel";
 import { UIComponentView } from "./UIComponentView";
 
 export class UIComponentController extends EventEmitter {
-  //protected listeners: { [event: string]: (...args) => any };
   parent: UIComponentController;
   children: UIComponentController[];
 
@@ -16,40 +15,12 @@ export class UIComponentController extends EventEmitter {
     parent?: UIComponentController
   ) {
     super();
-    //this.listeners = {};
     this.parent = parent;
     this.children = [];
 
     if (model.children !== undefined) {
       model.children.forEach((child) => this.addChild(child));
     }
-  }
-
-  createController(model: IUIComponent) {
-    const controller = this.factoriesManager.getUIComponent(model);
-    // .new UIComponentController(model, this);
-    return controller;
-  }
-
-  getSnapshot(): IUIComponent {
-    let snapshot = { ...this.model, children: [] };
-
-    this.children.forEach((child) => {
-      snapshot.children.push(child.getSnapshot());
-    });
-
-    return snapshot;
-  }
-
-  
-  toComponentsString(): string[] {
-    let componentsString = [this.model.id];
-
-    for (const child of this.children) {
-      componentsString = [...componentsString, ...child.toComponentsString()];
-    }
-
-    return componentsString;
   }
 
   isRoot() {
@@ -72,12 +43,36 @@ export class UIComponentController extends EventEmitter {
     return this.parent;
   }
 
+  getChildren() {
+    return this.children;
+  }
+
   getRoot(): UIComponentController {
     if (this.parent == null) {
       return this;
     } else {
       return this.getParent().getRoot();
     }
+  }
+
+  getSnapshot(): IUIComponent {
+    let snapshot = { ...this.model, children: [] };
+
+    this.children.forEach((child) => {
+      snapshot.children.push(child.getSnapshot());
+    });
+
+    return snapshot;
+  }
+
+  toComponentsString(): string[] {
+    let componentsString = [this.model.id];
+
+    for (const child of this.children) {
+      componentsString = [...componentsString, ...child.toComponentsString()];
+    }
+
+    return componentsString;
   }
 
   addChild(model: IUIComponent) {
@@ -91,7 +86,7 @@ export class UIComponentController extends EventEmitter {
     return this.searchInNode(this, id);
   }
 
-  public searchInNode(
+  searchInNode(
     element: UIComponentController,
     matchingID: string
   ): UIComponentController | null {
@@ -108,18 +103,15 @@ export class UIComponentController extends EventEmitter {
     return null;
   }
 
-  public deleteEventListeners() {
+  deleteEventListeners() {
     this.removeAllListeners();
     for (const child of this.children) {
       child.deleteEventListeners();
     }
   }
 
-  public emitEvent(eventName: string, ...args) {
+  emitEvent(eventName: string, ...args) {
     this.getRoot().emit("event", eventName, this.get().id, args);
-  }
-  getChildren() {
-    return this.children;
   }
 
   update(model: any) {
@@ -134,39 +126,8 @@ export class UIComponentController extends EventEmitter {
     //TODO: Send change to root
   }
 
-  updateObject(model: any) {
-    this.model = { ...model };
-    this.children = [];
-
-    model.children.forEach((child) => {
-      this.addChild(child);
-    });
-
-    this.getRoot().emit("componentChangedSynced", this.getRoot().getSnapshot());
-    //TODO: Send change to root
-  }
-
-  addEventListener(listener: { [event: string]: (...args) => any }) {
-    //this.listeners = { ...this.listeners, ...listener };
-  }
-
-  removeEventListener() {}
-
-  public toString(): string {
+  toString(): string {
     return JSON.stringify(this.model);
-  }
-
-  public getListeners(): { [event: string]: (...args) => any } {
-    return {};
-    //return this.listeners;
-  }
-
-  public getListener(event: string): (...args) => any {
-    if (this.listeners[event] === undefined) {
-      return () => {};
-    } else {
-      return this.listeners[event];
-    }
   }
 
   generateWidget(): JSX.Element {
