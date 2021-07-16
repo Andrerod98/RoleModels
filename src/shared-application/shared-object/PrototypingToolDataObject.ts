@@ -24,6 +24,7 @@ import {
   EditableFactory,
   SliderFactory,
   InkCanvasFactory,
+  UIComponentController,
 } from "../components";
 import { ThrowableFactory } from "../components/Throwable";
 import { IDevice } from "../devices/IDevice";
@@ -51,6 +52,7 @@ import { ViewsManager } from "../managers/ViewsManager";
 import { ILayoutNode } from "../roles/ILayout";
 import { LayoutNode } from "../roles/Layout";
 import { Logger } from "../Logger";
+import { QRCodeFactory } from "../components/QRCode";
 
 export class PrototypingToolDataObject
   extends DataObject
@@ -89,7 +91,7 @@ export class PrototypingToolDataObject
   private ink: IInk;
 
   private pingCounter: SharedCounter;
-  private audio = new Audio("/public/ping.mp3");
+  private audio;
 
   public static get DataObjectName() {
     return "prototyping_tool";
@@ -113,9 +115,32 @@ export class PrototypingToolDataObject
 
     const configurationsMap = SharedMap.create(this.runtime);
     const currentConfiguration = SharedCell.create(this.runtime);
+
+    /* Creating default roles */
+    const managerRole = SharedCell.create(this.runtime);
+
+    managerRole.set({
+      id: uuid(),
+      name: "manager",
+    } as IRole);
+
+    const designerRole = SharedCell.create(this.runtime);
+
+    designerRole.set({
+      id: uuid(),
+      name: "designer",
+    } as IRole);
+
+    const defaultRole = SharedCell.create(this.runtime);
+    const defaultRoleId = uuid();
+    defaultRole.set({
+      id: defaultRoleId,
+      name: "default",
+    } as IRole);
+
     currentConfiguration.set({
       name: "default",
-      layouts: { default: { id: uuid(), name: "div" } },
+      layouts: { [defaultRoleId]: { id: uuid(), name: "div" } },
     } as IConfiguration);
 
     const primaryConfiguration = SharedCell.create(this.runtime);
@@ -123,34 +148,6 @@ export class PrototypingToolDataObject
       id: uuid(),
       name: "div",
     } as ILayoutNode);
-
-    /* Creating default roles */
-    const managerRole = SharedCell.create(this.runtime);
-
-    managerRole.set({
-      name: "manager",
-      viewsIds: [],
-      combinedViewsIds: [],
-      qrIds: [],
-    } as IRole);
-
-    const designerRole = SharedCell.create(this.runtime);
-
-    designerRole.set({
-      name: "designer",
-      viewsIds: [],
-      combinedViewsIds: [],
-      qrIds: [],
-    } as IRole);
-
-    const defaultRole = SharedCell.create(this.runtime);
-
-    defaultRole.set({
-      name: "default",
-      viewsIds: [],
-      combinedViewsIds: [],
-      qrIds: [],
-    } as IRole);
 
     rolesMap.set("manager", managerRole.handle);
     rolesMap.set("designer", designerRole.handle);
@@ -174,23 +171,18 @@ export class PrototypingToolDataObject
 
   protected async hasInitialized() {
     /* Loading shared objects...*/
-    Logger.getInstance().info("Loading shared objects...");
     await this.loadSharedObjects();
 
     /* Loading managers...*/
-    Logger.getInstance().info("Loading managers...");
     this.loadManagers();
 
     /* Registering factories...*/
-    Logger.getInstance().info("Registering default factories...");
     this.registerDefaultFactories();
 
     /* Creating event listeners...*/
-    Logger.getInstance().info("Creating event listeners...");
     this.createAllEventListeners();
 
     /* Loading combined views...*/
-    Logger.getInstance().info("Loading shared objects into the objects...");
     await Promise.all([
       this.rolesManager.loadRoles(1),
       this.configurationsManager.loadObject(),
@@ -198,7 +190,10 @@ export class PrototypingToolDataObject
       this.viewsManager.loadViews(1),
       this.qrManager.loadQRCodes(),
     ]);
-    Logger.getInstance().info("The application has been loaded with success.");
+
+    Logger.getInstance().success(
+      "The application has been loaded with success."
+    );
   }
 
   private async loadSharedObjects() {
@@ -326,6 +321,10 @@ export class PrototypingToolDataObject
     this.factoriesManager.registerFactory(
       new InkCanvasFactory("ink", this.ink, this.factoriesManager)
     );
+
+    this.factoriesManager.registerFactory(
+      new QRCodeFactory("qrcode", this.factoriesManager)
+    );
   }
 
   public async createAllEventListeners() {
@@ -431,6 +430,10 @@ export class PrototypingToolDataObject
   }
 
   public playSound() {
+    if (!this.audio) {
+      this.audio = new Audio("/public/ping.mp3");
+    }
+
     this.audio.pause();
     this.audio.currentTime = 0;
     this.audio.play();
@@ -518,10 +521,6 @@ export class PrototypingToolDataObject
                 QR Codes Management Functions
    *********************************************************/
 
-  public getMyQRCodes = (): QRCodeController[] => {
-    return this.qrManager.getQRsWithIds(this.getMyRole().getQRIds());
-  };
-
   public getQRCodesWithIds = (qrIDs: string[]): QRCodeController[] => {
     return this.qrManager.getQRsWithIds(qrIDs);
   };
@@ -546,7 +545,9 @@ export class PrototypingToolDataObject
                 View Management Functions
    ******************************************************** */
   public getMyViews = (): View[] => {
-    const viewsIds = this.getMyRole().getViews();
+    const viewsIds = this.getCurrentConfigurationOfRole(
+      this.getMyRole().getId()
+    ).toViewsIds();
     return this.viewsManager.getViewsByIds(viewsIds);
   };
 
@@ -554,25 +555,25 @@ export class PrototypingToolDataObject
     return this.viewsManager.getViews();
   };
 
-  public getViewsFrom = (role: string): View[] => {
-    const viewsIds = this.getRole(role).getViews();
+  public getViewsFrom = (roleId: string): View[] => {
+    const viewsIds = this.getCurrentConfigurationOfRole(roleId).toViewsIds();
     return this.viewsManager.getViewsByIds(viewsIds);
-  };
-
-  public getViewOwners = (viewId: string): Role[] => {
-    const roles = this.rolesManager.getRoles();
-    const owners = [];
-    for (const role of roles) {
-      if (role.hasViewWithId(viewId)) {
-        owners.push(role);
-      }
-    }
-
-    return owners;
   };
 
   public getView = (viewId: string): View => {
     return this.viewsManager.getView(viewId);
+  };
+
+  public getComponentFromAllViews = (
+    componentId: string
+  ): UIComponentController => {
+    const views = this.viewsManager.getViews();
+    for (const view of views) {
+      const component = view.getComponentByID(componentId);
+      if (component) {
+        return component;
+      }
+    }
   };
 
   public getLayoutWithView(viewId: string): LayoutNode {
@@ -581,9 +582,7 @@ export class PrototypingToolDataObject
 
   public migrateView = (view: View, from: string): void => {
     this.configurationsManager.removeViewFromRole(from, view.getId());
-    this.rolesManager.getRole(from).removeView(view.getId());
 
-    this.rolesManager.getRole(this.getMyRole().getName()).addView(view);
     Logger.getInstance().info(
       `The view with id ${view.getId()} from ${from} has been migrated.`
     );
@@ -620,18 +619,16 @@ export class PrototypingToolDataObject
     sharedRole.on("valueChanged", () => {
       this.emit("change");
     });
+    const roleId = uuid();
     sharedRole.set({
+      id: roleId,
       name: role,
-      viewsIds: [],
-      combinedViewsIds: [],
-      qrIds: [],
     } as IRole);
 
     this.rolesManager.addRole(sharedRole);
-    this.configurationsManager.updateCurrent(role, {
+    this.configurationsManager.updateCurrent(roleId, {
       id: uuid(),
       name: "div",
-      viewId: "",
     });
 
     await this.rolesMap.wait<IFluidHandle<SharedCell>>(role);
@@ -705,8 +702,8 @@ export class PrototypingToolDataObject
     this.configurationsManager.renameConfiguration(oldValue, newValue);
   }
 
-  public getCurrentConfigurationOfRole(role: string) {
-    return this.configurationsManager.getCurrentConfigurationOfRole(role);
+  public getCurrentConfigurationOfRole(roleId: string) {
+    return this.configurationsManager.getCurrentConfigurationOfRole(roleId);
   }
 
   public saveConfiguration() {

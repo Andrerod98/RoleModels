@@ -45,6 +45,14 @@ export class Logger extends EventEmitter {
     });
   }
 
+  public success(str: string) {
+    this.logs.push({
+      type: "success",
+      value: str,
+      date: new Date().toLocaleString(),
+    });
+  }
+
   public getLogs(): Log[] {
     return this.logs;
   }

@@ -154,6 +154,7 @@ export function CreateInteractionModal(props: CreateInteractionModalProps) {
                         <MenuItemOption value='onChange'>
                           onChange
                         </MenuItemOption>
+                        <MenuItemOption value='onScan'>onScan</MenuItemOption>
                       </MenuOptionGroup>
                     </MenuList>
                   </Menu>

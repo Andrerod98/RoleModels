@@ -31,7 +31,14 @@ export const ViewComponent: FC<ViewComponentProps> = (
   let qrUrl = "view/" + props.view.getId() + "#from=" + props.role.getName();
 
   return (
-    <Box w={"100%"} h={"100%"} bg={"white"} position={"relative"}>
+    <Box
+      w={"100%"}
+      h={"100%"}
+      borderWidth={"2px"}
+      borderColor={"black"}
+      position={"relative"}
+      key={"view-" + props.view.getId()}
+    >
       {useMemo(() => {
         return props.view.getRoot().generateWidget();
       }, [JSON.stringify(props.view.getRoot().getSnapshot())])}

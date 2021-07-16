@@ -110,6 +110,17 @@ export class LayoutNode extends EventEmitter {
     }
   }
 
+  public toViewsIds(): string[] {
+    let viewsIds = [];
+    if (this.viewId != "") viewsIds = [this.viewId];
+
+    for (const child of this.children) {
+      viewsIds = [...viewsIds, ...child.toViewsIds()];
+    }
+
+    return viewsIds;
+  }
+
   public setParent(node: LayoutNode) {
     this.parent = node;
   }

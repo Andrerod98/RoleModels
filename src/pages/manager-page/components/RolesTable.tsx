@@ -1,4 +1,4 @@
-import { ChevronDownIcon } from "@chakra-ui/icons";
+import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
 import {
   Table,
   TableCaption,
@@ -7,77 +7,97 @@ import {
   Th,
   Tbody,
   Td,
-  Menu,
-  MenuButton,
+  Editable,
+  EditableInput,
+  EditablePreview,
   Button,
-  MenuList,
-  MenuItem,
+  Box,
+  Flex,
+  Spacer,
+  IconButton,
 } from "@chakra-ui/react";
 import React from "react";
 import { CrossDeviceApplication } from "../../../shared-application/CrossDeviceApplication";
-import { IDevice } from "../../../shared-application/devices/IDevice";
 import { Role } from "../../../shared-application/roles/Role";
 
-interface RolesTableProps {
-  devices: IDevice[];
+interface LayoutTableProps {
   readonly app: CrossDeviceApplication;
 }
 
-export function RolesTable(props: RolesTableProps) {
+export function RolesTable(props: LayoutTableProps) {
   const sharedObject = props.app.getSharedObject();
-  return (
-    <Table variant='simple'>
-      <TableCaption>Roles - Devices Mapping</TableCaption>
-      <Thead>
-        <Tr>
-          <Th>Device Id</Th>
-          <Th>Device Type</Th>
-          <Th>Role</Th>
-        </Tr>
-      </Thead>
+  const roles = Array.from(sharedObject.getRoles());
 
-      <Tbody key={"table-body"}>
-        {props.devices.map((device, index) => {
-          return (
-            <Tr key={"table-tr-" + index}>
-              <Td fontSize={{ base: "10px", md: "16px", lg: "16px" }}>
-                {device.id}
-              </Td>
-              <Td fontSize={{ base: "10px", md: "16px", lg: "16px" }}>
-                {device.type}
-              </Td>
-              <Td>
-                <Menu key={"menu-" + index}>
-                  <MenuButton
-                    as={Button}
-                    rightIcon={<ChevronDownIcon />}
-                    fontSize={{ base: "10px", md: "16px", lg: "16px" }}
+  return (
+    <Box>
+      <Flex>
+        <Spacer />
+
+        <Button
+          mr={"40px"}
+          size={"sm"}
+          onClick={() => props.app.getSharedObject().addRole("new")}
+        >
+          <AddIcon />
+        </Button>
+      </Flex>
+      <Table variant='simple'>
+        <TableCaption>Roles Manager</TableCaption>
+        <Thead>
+          <Tr>
+            <Th>Role Name</Th>
+
+            <Th>Load</Th>
+          </Tr>
+        </Thead>
+
+        <Tbody key={"table-body"}>
+          {roles.map((role: Role, index: number) => {
+            return (
+              <Tr
+                key={"table-tr-" + index}
+                bg={
+                  role.getName() === "manager" || role.getName() === "designer"
+                    ? "gray.400"
+                    : ""
+                }
+              >
+                <Td fontSize={{ base: "10px", md: "16px", lg: "16px" }}>
+                  <Editable
+                    isDisabled={
+                      role.getName() === "manager" ||
+                      role.getName() === "designer"
+                    }
+                    defaultValue={role.getName()}
+                    onSubmit={(nextValue: string) => {
+                      sharedObject.renameRole(role.getName(), nextValue);
+                    }}
                   >
-                    {device.role}
-                  </MenuButton>
-                  <MenuList key={"menu-list-" + index}>
-                    {Array.from(sharedObject.getRoles()).map(
-                      (role: Role, index2) => (
-                        <MenuItem
-                          key={"menu-item-" + index2}
-                          onClick={() =>
-                            sharedObject.promoteToRole(
-                              role.getName(),
-                              device.id
-                            )
-                          }
-                        >
-                          {role.getName()}
-                        </MenuItem>
-                      )
-                    )}
-                  </MenuList>
-                </Menu>
-              </Td>
-            </Tr>
-          );
-        })}
-      </Tbody>
-    </Table>
+                    <EditablePreview />
+                    <EditableInput />
+                  </Editable>
+                </Td>
+
+                <Td>
+                  <IconButton
+                    display={
+                      role.getName() === "manager" ||
+                      role.getName() === "designer"
+                        ? "none"
+                        : "block"
+                    }
+                    onClick={() => {
+                      sharedObject.removeRole(role.getName());
+                    }}
+                    aria-label='Delete Role'
+                    icon={<DeleteIcon />}
+                  />
+                </Td>
+              </Tr>
+            );
+          })}
+        </Tbody>
+      </Table>
+    </Box>
   );
 }

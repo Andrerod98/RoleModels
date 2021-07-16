@@ -26,6 +26,7 @@ import {
 import React, { useContext } from "react";
 import { CrossAppContext, CrossAppState } from "../../context/AppContext";
 import { LayoutsTable } from "./components/LayoutsTable";
+import { DevicesTable } from "./components/DevicesTable";
 import { RolesTable } from "./components/RolesTable";
 
 const QRCode = require("qrcode.react");
@@ -72,28 +73,16 @@ export function ManagerPage(props: ManagerPageProps) {
 
       <Tabs variant='enclosed'>
         <TabList pl={"20px"}>
+          <Tab>Devices</Tab>
           <Tab>Roles</Tab>
           <Tab>Workspaces</Tab>
-          <Spacer />
-          <Button
-            mr={"10px"}
-            size={"sm"}
-            colorScheme={"red"}
-            onClick={() => app.getSharedObject().resetConfiguration()}
-          >
-            Reset Workspace
-          </Button>
-          <Button
-            mr={"40px"}
-            size={"sm"}
-            onClick={() => app.getSharedObject().saveConfiguration()}
-          >
-            Save Workspace
-          </Button>
         </TabList>
         <TabPanels>
           <TabPanel>
-            <RolesTable app={app} devices={devices} />
+            <DevicesTable app={app} devices={devices} />
+          </TabPanel>
+          <TabPanel>
+            <RolesTable app={app} />
           </TabPanel>
           <TabPanel>
             <LayoutsTable app={app} />

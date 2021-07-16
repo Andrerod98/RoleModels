@@ -101,6 +101,8 @@ export class ConfigurationsManager extends EventEmitter {
   }
 
   public removeViewFromRole(role: string, viewId: string) {
+    console.log(role);
+    console.log(this.current.layouts);
     const node = this.current.layouts[role].getChildByViewId(viewId);
     if (node) {
       node.removeChild(node.getId());

@@ -1,6 +1,4 @@
 export interface IRole {
+  id: string;
   name: string;
-  viewsIds: string[];
-  combinedViewsIds: string[];
-  qrIds: string[];
 }

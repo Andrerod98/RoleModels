@@ -5,6 +5,7 @@ import EventEmitter from "events";
 import { View } from "../views/View";
 import { InteractionsManager } from "./InteractionsManager";
 import { PrototypingToolDataObject } from "../shared-object/PrototypingToolDataObject";
+import { Logger } from "../Logger";
 
 enum ViewsManagerEvents {
   ChangeState = "changeState",
@@ -58,6 +59,7 @@ export class ViewsManager extends EventEmitter {
     });
 
     this.views = newCVS;
+    Logger.getInstance().info(`${this.viewsSharedMap.size} views loaded.`);
     console.log(this.viewsSharedMap.size + " Views Loaded.");
   }
 
@@ -151,6 +153,7 @@ export class ViewsManager extends EventEmitter {
   public removeView(viewId: string): void {
     this.views.delete(viewId);
     this.viewsSharedMap.delete(viewId);
+    Logger.getInstance().info(`A view with id ${viewId} has been removed.`);
   }
 
   /*
@@ -171,6 +174,8 @@ export class ViewsManager extends EventEmitter {
     const view = View.from(sharedView, this.factoriesManager);
 
     this.views.set(id, view);
+
+    Logger.getInstance().info(`A view with id ${id} has been added.`);
 
     return view;
   }

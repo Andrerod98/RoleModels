@@ -34,6 +34,7 @@ import {
 import { GrCheckbox } from "react-icons/gr";
 import { BsArrowsAngleContract, BsFillGrid3X3GapFill } from "react-icons/bs";
 import { IoTextOutline } from "react-icons/io5";
+import { ImQrcode } from "react-icons/im";
 
 interface SingleTabCatalogBarProps {
   onClick: (element: string) => void;
@@ -44,7 +45,7 @@ export const SingleTabCatalogBar: React.FC<SingleTabCatalogBarProps> = (
 ) => {
   const layout = [
     { title: "View", value: "view", icon: <HiViewGridAdd /> },
-    { title: "Box", value: "box", icon: <GrCheckbox /> },
+    { title: "Box", value: "box", icon: <BiRectangle /> },
     { title: "Flex", value: "flex", icon: <RiLayoutRowLine /> },
     { title: "Column", value: "column", icon: <RiLayoutColumnLine /> },
     { title: "Center", value: "center", icon: <BsArrowsAngleContract /> },
@@ -66,9 +67,10 @@ export const SingleTabCatalogBar: React.FC<SingleTabCatalogBarProps> = (
     { title: "Map", value: "map", icon: <BiMapAlt /> },
     { title: "Radio", value: "radio", icon: <BiRadioCircleMarked /> },
     { title: "Ink canvas", value: "ink", icon: <HiPencilAlt /> },
+    { title: "QR Code", value: "qrcode", icon: <ImQrcode /> },
   ];
   return (
-    <Box px={"10px"} py={3} h={"100%"} w={"200px"} bg={"gray.100"}>
+    <Box px={"10px"} py={8} h={"100%"} w={"200px"} overflowY={"scroll"}>
       <Accordion defaultIndex={[0]} allowMultiple>
         <AccordionItem>
           <AccordionButton>

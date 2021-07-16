@@ -9,8 +9,6 @@ import {
   Table,
   Tbody,
   Td,
-  Th,
-  Thead,
   Tr,
   useColorModeValue,
   Divider,
@@ -51,13 +49,16 @@ export const LoggingWindow = (props: LogginWindowProps) => {
       bg={color}
       h={"25vh"}
       w={"100vw"}
-      overflowY={"scroll"}
       display={props.isOpen ? "block" : "none"}
     >
+      <Text ml={5} my={"5px"}>
+        LOGS
+      </Text>
+
       <IconButton
         position={"absolute"}
-        right={"3"}
-        top={"3"}
+        right={"2"}
+        top={"1"}
         size={"xs"}
         aria-label={"Search database"}
         icon={<CloseIcon />}
@@ -66,42 +67,38 @@ export const LoggingWindow = (props: LogginWindowProps) => {
         }}
       />
       <Divider />
-      <Table variant={"striped"} size={"sm"} mt={3}>
-        <Thead>
-          <Tr>
-            <Th>Logs</Th>
-            <Th></Th>
-          </Tr>
-        </Thead>
-
-        <Tbody>
-          {logs.reverse().map((log, index) => {
-            const colors = {
-              error: "red",
-              warning: "yellow",
-              info: "blue",
-            } as { [type: string]: string };
-            const color = colors[log.type];
-            return (
-              <Tr key={"row-" + index}>
-                <Td>
-                  <Flex>
-                    <Badge colorScheme={color} mr={5}>
-                      {log.type}
-                    </Badge>
-                  </Flex>
-                </Td>
-                <Td>
-                  <Flex w={"90vw"}>
-                    <Text mr={5}>{log.date}</Text>
-                    {log.value}
-                  </Flex>
-                </Td>
-              </Tr>
-            );
-          })}
-        </Tbody>
-      </Table>
+      <Box w={"100%"} h={"80%"} overflowY={"scroll"}>
+        <Table variant={"striped"} size={"sm"}>
+          <Tbody>
+            {logs.map((log, index) => {
+              const colors = {
+                error: "red",
+                warning: "yellow",
+                info: "blue",
+                success: "green",
+              } as { [type: string]: string };
+              const color = colors[log.type];
+              return (
+                <Tr key={"row-" + index}>
+                  <Td>
+                    <Flex>
+                      <Badge colorScheme={color} mr={5}>
+                        {log.type}
+                      </Badge>
+                    </Flex>
+                  </Td>
+                  <Td>
+                    <Flex w={"90vw"}>
+                      <Text mr={5}>{log.date}</Text>
+                      {log.value}
+                    </Flex>
+                  </Td>
+                </Tr>
+              );
+            })}
+          </Tbody>
+        </Table>
+      </Box>
     </Box>
   );
 };

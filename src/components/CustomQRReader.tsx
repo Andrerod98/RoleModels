@@ -3,12 +3,7 @@ import React from "react";
 import QrReader from "react-qr-reader";
 import Utils from "../utils/Utils";
 interface CustomQRReaderProps {
-  onScan: (
-    view: string,
-    combinedView: string,
-    qr: string,
-    from: string
-  ) => void;
+  onScan: (view: string, qr: string, from: string) => void;
   onClose: () => void;
 }
 export function CustomQRReader({ onScan, onClose }: CustomQRReaderProps) {
@@ -41,23 +36,16 @@ export function CustomQRReader({ onScan, onClose }: CustomQRReaderProps) {
                   const subStr = data.substr(5).split("#from=");
                   const value = subStr[0];
                   const from = subStr[1];
+
                   //const view = props.app.getSharedObject().getView(value);
-                  onScan(value, "", "", from);
+
+                  onScan(value, "", from);
                 } else if (data.startsWith("qr/")) {
                   const subStr = data.substr(3).split("#from=");
                   const value = subStr[0];
                   const from = subStr[1];
                   //props.app.getSharedObject().getQRCode(value).scan();
-                  onScan("", "", value, from);
-                } else if (data.startsWith("combined/view/")) {
-                  const subStr = data.substr(14).split("#from=");
-                  const value = subStr[0];
-                  const from = subStr[1];
-                  /*props.app
-                    .getSharedObject()
-                    .getMyRole()
-                    .addCombinedView(value);*/
-                  onScan("", value, "", from);
+                  onScan("", value, from);
                 }
               }
             }

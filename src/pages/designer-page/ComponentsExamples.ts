@@ -18,6 +18,7 @@ import {
   SliderUI,
   InkCanvasUI,
 } from "../../shared-application/components";
+import { QRCodeUI } from "../../shared-application/components/QRCode";
 import { IView } from "../../shared-application/views/IView";
 
 export class ComponentsExamples {
@@ -29,7 +30,6 @@ export class ComponentsExamples {
         name: "button",
         children: [],
       },
-      combinedViewID: "",
     };
   }
   static getImage(): ImageUI {
@@ -197,6 +197,15 @@ export class ComponentsExamples {
     return {
       id: "spacer",
       name: "spacer",
+    };
+  }
+
+  static getQRCode(): QRCodeUI {
+    return {
+      id: "qr-id",
+      name: "qrcode",
+      value: "",
+      nScanned: 0,
     };
   }
 }

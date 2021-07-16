@@ -30,7 +30,7 @@ export function InteractionsTab() {
 
   return (
     <Box>
-      <Flex w='100%'>
+      <Flex w='100%' my={5} pr={5}>
         <Spacer />
         <CreateInteractionModal
           views={Array.from(app.getSharedObject().getAllViews())}
@@ -73,7 +73,7 @@ export function InteractionsTab() {
         <Tbody key={"table-body"}>
           {interactions.map((inter: IInteraction, index: number) => {
             return (
-              <Tr key={"table-tr-" + index} bg={"white"}>
+              <Tr key={"table-tr-" + index}>
                 <Td fontSize={{ base: "10px", md: "16px", lg: "16px" }}>
                   <Editable
                     defaultValue={inter.name}

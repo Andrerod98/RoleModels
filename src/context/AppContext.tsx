@@ -42,7 +42,7 @@ export const CrossAppProvider = ({
       layoutNode = app.getSharedObject().getPrimaryConfiguration();
     } else {
       layoutNode = model.getCurrentConfigurationOfRole(
-        model.getMyRole().getName()
+        model.getMyRole().getId()
       );
     }
 
@@ -57,7 +57,6 @@ export const CrossAppProvider = ({
     return {
       devices: Array.from(model.getDevices()),
       role: model.getMyRole(),
-      views: model.getMyRole().getViews(),
 
       layout: layoutNode,
     };
@@ -88,7 +87,6 @@ export const CrossAppProvider = ({
         devices: state.devices,
         role: state.role,
         layout: state.layout,
-        views: state.views,
         selectedNode: selectedNode,
         setSelectedNode: setSelectedNode,
         isLoggingOpen: isLoggingOpen,

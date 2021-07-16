@@ -10,6 +10,7 @@ import {
 import React, { FC, useContext, useState } from "react";
 import { AiOutlineExpand } from "react-icons/ai";
 import { CrossAppState, CrossAppContext } from "../context/AppContext";
+import { QRCodeController } from "../shared-application/components/QRCode";
 
 import { CrossDeviceInteractionChooser } from "./CrossDeviceInteractionChooser";
 import { CustomQRReader } from "./CustomQRReader";
@@ -39,6 +40,13 @@ export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
         state.view = app.getSharedObject().getView(view);
       } else if (qr != "") {
         state.qr = app.getQRCode(qr);
+        const qrController = app
+          .getSharedObject()
+          .getComponentFromAllViews(qr) as QRCodeController;
+        if (qrController) {
+          qrController.scan();
+        }
+        onClose();
       }
 
       setState(state);
@@ -60,7 +68,6 @@ export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
       e: React.MouseEvent<HTMLButtonElement, MouseEvent>
     ) => {
       e.stopPropagation();
-      app.getMyRole().addView(view);
       //app.mirrorViews(view, view);
       setNewViewId(view.id);
       setLayoutOpen(true);
@@ -72,7 +79,6 @@ export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
       e: React.MouseEvent<HTMLButtonElement, MouseEvent>
     ) => {
       e.stopPropagation();
-      app.getMyRole().addView(view.view);
       //const stitchingCV = app.stitchViews(view.view, view.view);
 
       //stitchingCV.stitchBottom(app.getMyRole().getName(), view.from);

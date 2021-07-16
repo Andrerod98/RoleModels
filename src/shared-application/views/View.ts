@@ -1,5 +1,6 @@
 import { SharedCell } from "@fluidframework/cell";
 import { IUIComponent, UIComponentController } from "../components/UIComponent";
+import { Logger } from "../Logger";
 import { FactoriesManager } from "../managers/FactoriesManager";
 import { IView } from "./IView";
 
@@ -10,7 +11,6 @@ enum ViewEvents {
 export class View {
   protected root: UIComponentController;
   private id: string;
-  private combinedViewID: string;
   constructor(
     protected readonly sharedView: SharedCell,
     private readonly factoriesManager: FactoriesManager
@@ -33,7 +33,6 @@ export class View {
   private loadObject() {
     const view = this.sharedView.get() as IView;
     this.id = view.id;
-    this.combinedViewID = view.combinedViewID;
     this.setRoot(view.root);
   }
 
@@ -55,23 +54,15 @@ export class View {
     return this.root;
   }
 
-  public getCombinedViewID() {
-    return this.combinedViewID;
-  }
-
   public getComponentByID(componentId: string) {
     return this.root.getChildByID(componentId);
   }
 
-  public isCombined() {
-    return this.combinedViewID !== "";
-  }
-
-  public setCombinedViewID(combinedViewId: string) {
-    this.combinedViewID = combinedViewId;
-  }
-
   public setRoot(root: IUIComponent) {
+    if (!root) {
+      Logger.getInstance().error("The root was not set because its undefined.");
+      return;
+    }
     this.root = this.factoriesManager.getUIComponent(root);
     this.root.on("componentChanged", (snapshot) => {
       this.emitChange(snapshot);
@@ -96,7 +87,6 @@ export class View {
 
   public update(object: IView) {
     this.id = object.id;
-    this.combinedViewID = object.combinedViewID;
 
     this.setRoot(object.root);
 
@@ -106,7 +96,6 @@ export class View {
   public toView(): IView {
     return {
       id: this.id,
-      combinedViewID: this.combinedViewID,
       root: this.root.getSnapshot(),
     };
   }

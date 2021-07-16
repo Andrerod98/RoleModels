@@ -121,13 +121,6 @@ export class CrossDeviceApplication {
     return await this.sharedObject.addRole(role);
   }
 
-  public addQRCode(id: string, qrcode: IQRCode, ...roles): QRCodeController {
-    roles.forEach((r: Role) => {
-      r.addQRCode(id);
-    });
-    return this.sharedObject.addQRCode(id, qrcode);
-  }
-
   public getQRCode(id: string): QRCodeController {
     return this.sharedObject.getQRCode(id);
   }

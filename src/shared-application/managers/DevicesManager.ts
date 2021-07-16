@@ -163,6 +163,10 @@ export class DevicesManager {
     this.clearDisconnectedDevices();
 
     const details = this.runtime.getQuorum().getMember(clientId);
+    if (!details) {
+      //Error
+      return;
+    }
     const interactive = details.client.details.capabilities.interactive;
 
     this.deviceId = clientId;

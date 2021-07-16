@@ -124,13 +124,14 @@ export function PageLayout(props: PageLayoutProps) {
   const primaryLayout = app.getSharedObject().getPrimaryConfiguration();
   let currentLayout = app
     .getSharedObject()
-    .getCurrentConfigurationOfRole(role.getName());
+    .getCurrentConfigurationOfRole(role.getId());
   if (role.getName() === "designer") {
     currentLayout = app.getSharedObject().getLayoutWithView(selectedNode);
     if (!currentLayout) {
+      const firstRole = Array.from(app.getSharedObject().getRoles())[0];
       currentLayout = app
         .getSharedObject()
-        .getCurrentConfigurationOfRole("default");
+        .getCurrentConfigurationOfRole(firstRole.getId());
     }
   }
   /*const layout = app
@@ -138,8 +139,7 @@ export function PageLayout(props: PageLayoutProps) {
     .getCurrentConfigurationOfRole(role.getName());*/
 
   return (
-    <Box position={"relative"} h={"100%"}>
-      {props.children}
+    <>
       <Box zIndex={1000} position={"absolute"} top={0} left={0} h={"100%"}>
         <Header
           app={app}
@@ -158,6 +158,7 @@ export function PageLayout(props: PageLayoutProps) {
           onLoggingOpen={handleLoggingOpen}
         />
       </Box>
+      {props.children}
       <LayoutModal
         layout={currentLayout}
         newViewId={newViewId}
@@ -171,6 +172,6 @@ export function PageLayout(props: PageLayoutProps) {
         selectedNode={selectedNode}
       />
       <LoggingWindow isOpen={isLoggingOpen} onClose={handleLoggingClose} />
-    </Box>
+    </>
   );
 }

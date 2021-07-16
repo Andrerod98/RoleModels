@@ -145,6 +145,9 @@ export function RoleTab(props: RoleTabProps) {
       case "grid":
         object = ComponentsExamples.getGrid();
         break;
+      case "qrcode":
+        object = ComponentsExamples.getQRCode();
+        break;
 
       default:
         object = ComponentsExamples.getBasic();
@@ -214,11 +217,11 @@ export function RoleTab(props: RoleTabProps) {
     });
   };*/
   return (
-    <Box h={"100%"} bg={"gray.100"}>
-      <Flex h={"100%"} bg={"gray.100"}>
+    <Box h={"100%"}>
+      <Flex h={"100%"}>
         <SingleTabCatalogBar onClick={(element) => addUIComponent(element)} />
 
-        <Box flex={"1"} py={3} overflow={"hidden"} bg={"gray.100"} mb={"30px"}>
+        <Box flex={"1"} py={3} overflow={"hidden"} mb={"30px"}>
           <Heading
             as={"h5"}
             px={5}
@@ -272,7 +275,7 @@ export function RoleTab(props: RoleTabProps) {
           ) : (
             <></>
           )}
-          <Box h={"100%"} py={3} width={"400px"} bg={"gray.100"} mb={"20px"}>
+          <Box h={"100%"} py={3} width={"400px"} mb={"20px"}>
             <Heading
               as={"h5"}
               px={5}

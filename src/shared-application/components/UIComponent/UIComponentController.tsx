@@ -41,6 +41,7 @@ export class UIComponentController extends EventEmitter {
     return snapshot;
   }
 
+  
   toComponentsString(): string[] {
     let componentsString = [this.model.id];
 

@@ -13,7 +13,7 @@ interface SingleTabProps {}
 export const DesignerPage = (props: SingleTabProps) => {
   return (
     <Box h={"100%"} overflow={"hidden"}>
-      <Tabs size={"sm"} variant={"enclosed"} h={"100%"} mt={"5px"}>
+      <Tabs size={"sm"} variant={"enclosed"} h={"100%"} mt={"15px"}>
         <Box>
           <TabList pl={10}>
             <Tab

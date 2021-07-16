@@ -12,7 +12,6 @@ export function RolePage(props: RoleProps) {
     useContext<CrossAppState>(CrossAppContext);
   const model = app.getSharedObject();
   //const views = props.app.getViewsOrCombinedViews(props.role.getName());
-  const qrs = app.getSharedObject().getMyQRCodes();
 
   const generateWidget = (node: ILayoutNode): JSX.Element => {
     switch (node.name) {
@@ -23,6 +22,7 @@ export function RolePage(props: RoleProps) {
             maxH={"100%"}
             w={"100%"}
             h={"100%"}
+            key={model.getDeviceRole() + "-div-" + node.id}
             direction={"column"}
           >
             {node.children.map((child) => {
@@ -37,6 +37,7 @@ export function RolePage(props: RoleProps) {
             maxH={"100%"}
             w={"100%"}
             h={"100%"}
+            key={model.getDeviceRole() + "-flex-" + node.id}
             grow={1}
             direction={"row"}
           >
@@ -58,13 +59,14 @@ export function RolePage(props: RoleProps) {
             h={"100%"}
             maxW={"100%"}
             maxH={"100%"}
+            key={model.getDeviceRole() + "-box-view-" + node.viewId}
             position={"relative"}
             onClick={() => {
               setSelectedNode(node.viewId);
             }}
           >
             <ViewComponent
-              key={model.getDeviceRole() + "_view_" + node.viewId}
+              key={model.getDeviceRole() + "-view-" + node.viewId}
               view={view}
               role={role}
             />
@@ -94,14 +96,6 @@ export function RolePage(props: RoleProps) {
   return (
     <Box h={"100%"} w={"100%"}>
       {generateWidget(layout.toLayout())}
-
-      {qrs.map((qr: QRCodeController, index: number) => {
-        return (
-          <Box key={"new_qr" + index} p={5}>
-            {qr.generate()}
-          </Box>
-        );
-      })}
     </Box>
   );
 }
