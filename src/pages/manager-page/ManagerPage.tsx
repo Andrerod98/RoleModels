@@ -59,10 +59,15 @@ export function ManagerPage(props: ManagerPageProps) {
         </Link>
         <Button
           onClick={() => {
-            app.downloadCertificate();
+            alert("https://" + app.getServerURL() + ":8080");
+            window.location.href = "https://" + app.getServerURL() + ":8080/#";
+            window.location.replace(
+              "https://" + app.getServerURL() + ":8080/#"
+            );
+            window.location.reload();
           }}
         >
-          Download Certificate
+          Create new project
         </Button>
         <Spacer />
         <Stat key='stat'>
