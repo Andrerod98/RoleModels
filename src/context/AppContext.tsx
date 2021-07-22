@@ -3,6 +3,7 @@ import { CrossDeviceApplication } from "../shared-application/CrossDeviceApplica
 import { IDevice } from "../shared-application/devices/IDevice";
 import { LayoutNode } from "../shared-application/roles/Layout";
 import { Role } from "../shared-application/roles/Role";
+import { QuickInteraction } from "../shared-application/shared-object/IQuickInteraction";
 import { View } from "../shared-application/views/View";
 
 export const CrossAppContext = createContext(undefined);
@@ -19,8 +20,13 @@ export interface CrossAppState {
   setLoggingOpen: any;
   isLayoutOpen: boolean;
   setLayoutOpen: any;
+  isHeaderOpen: boolean;
+  setHeaderOpen: any;
+  isQuickInteractionOpen: boolean;
+  setQuickInteractionOpen: any;
   newViewId: string;
   setNewViewId: any;
+  quickInteraction: QuickInteraction;
 }
 
 export const CrossAppProvider = ({
@@ -34,7 +40,9 @@ export const CrossAppProvider = ({
   const [selectedNode, setSelectedNode] = useState("");
   const [isLoggingOpen, setLoggingOpen] = useState(false);
   const [isLayoutOpen, setLayoutOpen] = useState(false);
+  const [isHeaderOpen, setHeaderOpen] = useState(false);
   const [newViewId, setNewViewId] = useState("");
+  const [isQuickInteractionOpen, setQuickInteractionOpen] = useState(false);
   const generateState = () => {
     let layoutNode;
 
@@ -57,7 +65,7 @@ export const CrossAppProvider = ({
     return {
       devices: Array.from(model.getDevices()),
       role: model.getMyRole(),
-
+      quickInteraction: model.getQuickInteraction(),
       layout: layoutNode,
     };
   };
@@ -69,6 +77,13 @@ export const CrossAppProvider = ({
     };
     model.on("change", (type) => {
       if (debug) console.log(type);
+
+      if (type === "qi") {
+        const qi = model.getQuickInteraction();
+        if (qi && qi.from !== model.getMyRole().getName())
+          setQuickInteractionOpen(true);
+      }
+
       onChange();
     });
 
@@ -87,12 +102,17 @@ export const CrossAppProvider = ({
         devices: state.devices,
         role: state.role,
         layout: state.layout,
+        quickInteraction: state.quickInteraction,
         selectedNode: selectedNode,
         setSelectedNode: setSelectedNode,
         isLoggingOpen: isLoggingOpen,
         setLoggingOpen: setLoggingOpen,
+        isHeaderOpen: isHeaderOpen,
+        setHeaderOpen: setHeaderOpen,
         isLayoutOpen: isLayoutOpen,
         setLayoutOpen: setLayoutOpen,
+        isQuickInteractionOpen: isQuickInteractionOpen,
+        setQuickInteractionOpen: setQuickInteractionOpen,
         newViewId: newViewId,
         setNewViewId: setNewViewId,
       }}

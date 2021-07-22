@@ -15,7 +15,8 @@ import {
 import React, { useMemo } from "react";
 import { FC } from "react";
 // import { UIComponentFactory } from "../components/UIComponentFactory";
-import { ImQrcode } from "react-icons/im";
+import { ImAccessibility, ImQrcode } from "react-icons/im";
+import { GiFastArrow } from "react-icons/gi";
 import { Role } from "../roles/Role";
 import { View } from "./View";
 const QRCode = require("qrcode.react");
@@ -23,6 +24,7 @@ const QRCode = require("qrcode.react");
 interface ViewComponentProps {
   view: View;
   role: Role;
+  onBroadcast?: (viewId: string, from: string) => void;
 }
 
 export const ViewComponent: FC<ViewComponentProps> = (
@@ -43,6 +45,14 @@ export const ViewComponent: FC<ViewComponentProps> = (
         return props.view.getRoot().generateWidget();
       }, [JSON.stringify(props.view.getRoot().getSnapshot())])}
       <Box position={"absolute"} top={"0px"} right={"0px"}>
+        <IconButton
+          size={"sm"}
+          aria-label={"QRCode"}
+          onClick={() => {
+            props.onBroadcast(props.view.getId(), props.role.getName());
+          }}
+          icon={<Icon as={GiFastArrow} />}
+        />
         <Popover>
           <PopoverTrigger>
             <IconButton

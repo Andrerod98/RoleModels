@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 
 import { Box, Flex } from "@chakra-ui/react";
 import { ViewComponent } from "../../shared-application/views/ViewComponent";
-import { ILayoutNode } from "../../shared-application/roles/ILayout";
+import { ILayoutNode } from "../../shared-application/roles/ILayoutNode";
 import { CrossAppState, CrossAppContext } from "../../context/AppContext";
 interface RoleProps {}
 
@@ -68,8 +68,11 @@ export function RolePage(props: RoleProps) {
               key={model.getDeviceRole() + "-view-" + node.viewId}
               view={view}
               role={role}
+              onBroadcast={(viewId: string, from: string) => {
+                model.setQuickInteraction(viewId, from);
+              }}
             />
-            );
+
             <Box
               _hover={{ bg: "rgba(17, 99, 245,0.4)" }}
               bg={

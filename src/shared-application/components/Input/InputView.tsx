@@ -11,8 +11,9 @@ export function InputView({ controller }: { controller: InputController }) {
       {...component}
       value={component.value}
       onChange={(nextValue) => {
-        controller.emitEvent("onChange", nextValue);
-        controller.update({ ...component, value: nextValue });
+        const value = nextValue.target.value;
+        controller.update({ ...component, value: value, children: [] });
+        controller.emitEvent("onChange", value);
       }}
     />
   );

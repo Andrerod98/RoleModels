@@ -46,10 +46,11 @@ import { View } from "../views/View";
 import { ButtonFactory } from "../components/Button";
 import { uuid } from "uuidv4";
 import { ViewsManager } from "../managers/ViewsManager";
-import { ILayoutNode } from "../roles/ILayout";
+import { ILayoutNode } from "../roles/ILayoutNode";
 import { LayoutNode } from "../roles/Layout";
 import { Logger } from "../Logger";
 import { QRCodeFactory } from "../components/QRCode";
+import { QuickInteraction } from "./IQuickInteraction";
 
 export class PrototypingToolDataObject
   extends DataObject
@@ -76,6 +77,8 @@ export class PrototypingToolDataObject
   /* The Map with the interactions */
   private interactionsMap: SharedMap;
   private interactionsManager: InteractionsManager;
+
+  private quickInteraction: SharedCell;
 
   /* The Manager responsible for rendering components */
   private factoriesManager: FactoriesManager;
@@ -142,6 +145,14 @@ export class PrototypingToolDataObject
       name: "div",
     } as ILayoutNode);
 
+    const quickInteraction = SharedCell.create(this.runtime);
+
+    quickInteraction.set({
+      viewId: "",
+      from: "",
+      fulfilled: false,
+    } as QuickInteraction);
+
     rolesMap.set(managerRoleId, managerRole.handle);
     rolesMap.set(designerRoleId, designerRole.handle);
     rolesMap.set(defaultRoleId, defaultRole.handle);
@@ -157,7 +168,7 @@ export class PrototypingToolDataObject
     this.root.set("current-configuration", currentConfiguration.handle);
     this.root.set("primary-configuration", primaryConfiguration.handle);
     this.root.set("interactions", interactionsMap.handle);
-
+    this.root.set("quick-interaction", quickInteraction.handle);
     Logger.getInstance().info("The application has been setup with success.");
   }
 
@@ -201,6 +212,7 @@ export class PrototypingToolDataObject
       this.root.get<IFluidHandle<SharedCounter>>("ping").get(),
       this.root.get<IFluidHandle<SharedCell>>("current-configuration").get(),
       this.root.get<IFluidHandle<SharedCell>>("primary-configuration").get(),
+      this.root.get<IFluidHandle<SharedCell>>("quick-interaction").get(),
       this.root.wait<IFluidHandle<IInk>>("ink"),
     ]);
 
@@ -213,7 +225,8 @@ export class PrototypingToolDataObject
     this.pingCounter = sharedObjects[0];
     this.currentConfiguration = sharedObjects[1];
     this.primaryConfiguration = sharedObjects[2];
-    this.ink = await sharedObjects[3].get();
+    this.quickInteraction = sharedObjects[3];
+    this.ink = await sharedObjects[4].get();
   }
 
   private loadManagers() {
@@ -318,6 +331,10 @@ export class PrototypingToolDataObject
       this.emit("connected");
     });
 
+    this.quickInteraction.on("valueChanged", () => {
+      this.emit("change", "qi");
+    });
+
     this.devicesMap.on("valueChanged", () => {
       this.emit("change", "Devices map changed");
     });
@@ -392,6 +409,18 @@ export class PrototypingToolDataObject
       });
     }
   }*/
+
+  public setQuickInteraction(viewId: string, from: string) {
+    this.quickInteraction.set({
+      viewId: viewId,
+      from: from,
+      fulfilled: false,
+    });
+  }
+
+  public getQuickInteraction() {
+    return this.quickInteraction.get();
+  }
 
   public pingAll() {
     this.pingCounter.increment(1);

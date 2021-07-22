@@ -14,7 +14,7 @@ export function ErrorPage(props: ErrorPageProps) {
     if (props.reconnect) {
       const time = setTimeout(() => {
         if (timer === 1) {
-          window.location.href = props.application.getFullHost();
+          window.location.href = props.application.getFullURL();
           window.location.reload();
         } else {
           setTimer(timer - 1);

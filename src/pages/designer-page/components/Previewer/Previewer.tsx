@@ -6,13 +6,15 @@ import { IoRefresh } from "react-icons/io5";
 import React, { useMemo } from "react";
 import { Preview } from "./Preview";
 import { CrossDeviceApplication } from "../../../../shared-application/CrossDeviceApplication";
-import { ILayoutNode } from "../../../../shared-application/roles/ILayout";
+import { ILayoutNode } from "../../../../shared-application/roles/ILayoutNode";
+import { HiViewGridAdd } from "react-icons/hi";
 interface PreviewerProps {
   layout: ILayoutNode;
   app: CrossDeviceApplication;
 
   isOpenLayoutModal: boolean;
   handleClick: () => void;
+  handleViewClick: () => void;
   selectedNode: string;
   setSelected: (newSelected: string) => void;
 }
@@ -27,9 +29,17 @@ export const Previewer = (props: PreviewerProps) => {
           <IconButton
             aria-label={"Search database"}
             size={"sm"}
+            onClick={props.handleViewClick}
+            mb={2}
+            icon={<HiViewGridAdd />}
+          />
+          <IconButton
+            aria-label={"Search database"}
+            size={"sm"}
+            ml={2}
             onClick={props.handleClick}
             mb={2}
-            icon={<IoRefresh></IoRefresh>}
+            icon={<IoRefresh />}
           />
           <Spacer></Spacer>
         </Flex>
@@ -40,6 +50,7 @@ export const Previewer = (props: PreviewerProps) => {
           bg={colorMode === "light" ? "white" : "gray.700"}
           overflow={"hidden"}
           position={"relative"}
+          zIndex={1000}
         >
           {useMemo(() => {
             return (

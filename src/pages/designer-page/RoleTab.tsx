@@ -11,7 +11,7 @@ import {
 import React, { useContext, useState } from "react";
 import { uuid } from "uuidv4";
 import { CrossAppState, CrossAppContext } from "../../context/AppContext";
-import { ILayoutNode } from "../../shared-application/roles/ILayout";
+import { ILayoutNode } from "../../shared-application/roles/ILayoutNode";
 import Utils from "../../utils/Utils";
 import { SingleTabCatalogBar } from "./CatalogBar";
 import { CodeEditor } from "./components/CodeEditor";
@@ -245,6 +245,9 @@ export function RoleTab(props: RoleTabProps) {
               }
               app={app}
               isOpenLayoutModal={isLayoutOpen}
+              handleViewClick={() => {
+                addUIComponent("view");
+              }}
               handleClick={() => {
                 preview();
               }}

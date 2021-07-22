@@ -21,7 +21,7 @@ interface CrossDeviceInteractionModalProps {
 export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
   (props: CrossDeviceInteractionModalProps) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const { app, setLayoutOpen, setNewViewId } =
+    const { app, setLayoutOpen, setNewViewId, setHeaderOpen } =
       useContext<CrossAppState>(CrossAppContext);
 
     const [{ view, from }, setState] = useState({
@@ -60,6 +60,7 @@ export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
       setLayoutOpen(true);
 
       props.onViewChange(view.id);
+      setHeaderOpen(false);
       onClose();
     };
 
@@ -71,6 +72,7 @@ export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
       setNewViewId(view.id);
       setLayoutOpen(true);
       props.onViewChange(view.id);
+      setHeaderOpen(false);
       onClose();
     };
 

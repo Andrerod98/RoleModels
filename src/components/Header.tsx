@@ -21,14 +21,14 @@ import {
   Tag,
   TagLabel,
   useColorMode,
-  useDisclosure,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useContext } from "react";
 import { RiFileListLine, RiMusicLine } from "react-icons/ri";
 import { FaPencilRuler } from "react-icons/fa";
 import { CrossDeviceInteractionModal } from "./CrossDeviceInteractionModal";
 import { CrossDeviceApplication } from "../shared-application/CrossDeviceApplication";
 import { Logger } from "../shared-application/Logger";
+import { CrossAppState, CrossAppContext } from "../context/AppContext";
 
 interface HeaderProps {
   app: CrossDeviceApplication;
@@ -40,7 +40,8 @@ interface HeaderProps {
 }
 
 export function Header(props: HeaderProps) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isHeaderOpen, setHeaderOpen } =
+    useContext<CrossAppState>(CrossAppContext);
   const { colorMode, toggleColorMode } = useColorMode();
   const btnRef = React.useRef();
 
@@ -50,13 +51,17 @@ export function Header(props: HeaderProps) {
         ref={btnRef}
         boxShadow={"xl"}
         aria-label={"Open header"}
-        onClick={onOpen}
+        onClick={() => {
+          setHeaderOpen(true);
+        }}
         icon={<ChevronDownIcon />}
       />
       <Drawer
-        isOpen={isOpen}
+        isOpen={isHeaderOpen}
         placement={"top"}
-        onClose={onClose}
+        onClose={() => {
+          setHeaderOpen(false);
+        }}
         finalFocusRef={btnRef}
       >
         <DrawerContent>

@@ -43,7 +43,7 @@ export const SingleTabCatalogBar: React.FC<SingleTabCatalogBarProps> = (
   props: SingleTabCatalogBarProps
 ) => {
   const layout = [
-    { title: "View", value: "view", icon: <HiViewGridAdd /> },
+
     { title: "Box", value: "box", icon: <BiRectangle /> },
     { title: "Flex", value: "flex", icon: <RiLayoutRowLine /> },
     { title: "Column", value: "column", icon: <RiLayoutColumnLine /> },

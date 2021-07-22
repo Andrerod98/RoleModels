@@ -45,16 +45,16 @@ export function ManagerPage(props: ManagerPageProps) {
         justify={["center", "space-between", "flex-end", "flex-end"]}
         direction={["column", "column", "row", "row"]}
       >
-        <QRCode key='qr' value={app.getFullHost()} />
+        <QRCode key='qr' value={app.getFullURL()} />
 
         <Link
           target={"_blank"}
-          href={app.getFullHost()}
+          href={app.getFullURL()}
           rel='noreferrer'
           isExternal
         >
           <Text fontSize={{ base: "10px", md: "16px", lg: "24px" }}>
-            {app.getFullHost()}
+            {app.getFullURL()}
           </Text>
         </Link>
         <Button

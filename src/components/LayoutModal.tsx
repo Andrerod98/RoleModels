@@ -1,4 +1,11 @@
-import { Box, Grid, GridItem, Icon, IconButton } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Grid,
+  GridItem,
+  Icon,
+  IconButton,
+} from "@chakra-ui/react";
 import React from "react";
 import {
   BiDockTop,
@@ -21,18 +28,25 @@ interface LayoutModalProps {
   setSelected: (newSelected: string) => void;
   onButtonClick: (buttonName: string) => void;
   newViewId: string;
+  isDesigner: boolean;
 }
 export function LayoutModal(props: LayoutModalProps) {
+  
   return (
     <Box
-      m={0}
-      bg={"transparent"}
+      bg={"blackAlpha.600"}
       position={"absolute"}
       top={0}
-      left={20}
-      h={"100vh"}
-      w={"20vw"}
-      zIndex={1000}
+      left={0}
+      right={props.isDesigner ? undefined : 0}
+      bottom={props.isDesigner ? undefined : 0}
+      marginLeft={"auto"}
+      marginRight={"auto"}
+      marginTop={"auto"}
+      marginBottom={"auto"}
+      h={props.isDesigner ? "100vh" : "305px"}
+      w={props.isDesigner ? "100vw" : "305px"}
+      zIndex={500}
       display={props.isOpen ? "block" : "none"}
     >
       <Grid
@@ -43,8 +57,8 @@ export function LayoutModal(props: LayoutModalProps) {
         marginRight={"auto"}
         marginTop={"auto"}
         marginBottom={"auto"}
-        left={"0"}
-        right={"0"}
+        left={props.isDesigner ? undefined : "0"}
+        right={props.isDesigner ? "10" : "0"}
         top={"0"}
         bottom={"0"}
         templateRows='repeat(5, 1fr)'
@@ -108,17 +122,20 @@ export function LayoutModal(props: LayoutModalProps) {
           />
         </GridItem>
         <GridItem rowSpan={1} colSpan={1} bg='gray.400'>
-          <IconButton
+          <Button
             aria-label={"Focus"}
-            size={"lg"}
-            mx={"5px"}
+            mx={"4px"}
             my={"5px"}
+            fontSize={"10px"}
+            width={"50px"}
+            height={"50px"}
             onClick={() => {
               props.onButtonClick("C");
             }}
             icon={<Icon fontSize={"30px"} as={BiRectangle} />}
-          />
-          Replace
+          >
+            Replace
+          </Button>
         </GridItem>
         <GridItem rowSpan={1} colSpan={1} bg='gray.400'>
           <IconButton

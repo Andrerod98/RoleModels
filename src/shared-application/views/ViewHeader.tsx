@@ -21,7 +21,7 @@ const QRCode = require("qrcode.react");
 
 interface ViewHeaderProps {
   qrURL: string;
-  onUnlink?: () => void;
+  onBroadcast?: () => void;
 }
 
 export const ViewHeader = (props: ViewHeaderProps) => {
@@ -30,9 +30,8 @@ export const ViewHeader = (props: ViewHeaderProps) => {
       <IconButton
         w={"40px"}
         mx={"5px"}
-        display={props.onUnlink === undefined ? "none" : "box"}
         aria-label={"QRCode"}
-        onClick={props.onUnlink}
+        onClick={props.onBroadcast}
         icon={<Icon as={GrUnlink} />}
       />
 

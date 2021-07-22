@@ -6,7 +6,8 @@ import { Header } from "../components/header";
 import { LayoutModal } from "../components/LayoutModal";
 import { CrossAppState, CrossAppContext } from "../context/AppContext";
 import { uuid } from "uuidv4";
-import { ILayoutNode } from "../shared-application/roles/ILayout";
+import { ILayoutNode } from "../shared-application/roles/ILayoutNode";
+import { QuickInteractionModal } from "../components/QuickInteractionModal";
 
 interface PageLayoutProps {
   readonly children: JSX.Element;
@@ -141,7 +142,7 @@ export function PageLayout(props: PageLayoutProps) {
 
   return (
     <>
-      <Box zIndex={1000} position={"absolute"} top={0} left={0} h={"100%"}>
+      <Box zIndex={1000} position={"absolute"} top={0} left={0}>
         <Header
           app={app}
           myRole={model.getDeviceRole()}
@@ -169,9 +170,11 @@ export function PageLayout(props: PageLayoutProps) {
         setSelected={(newSelected: string) => {
           setSelectedNode(newSelected);
         }}
+        isDesigner={role.getName() === "designer"}
         onButtonClick={handleButtonClick}
         selectedNode={selectedNode}
       />
+      <QuickInteractionModal />
       <LoggingWindow isOpen={isLoggingOpen} onClose={handleLoggingClose} />
     </>
   );
