@@ -17,14 +17,20 @@ import {
   Link,
 } from "@chakra-ui/react";
 import React, { useMemo, useState } from "react";
+import Utils from "../../utils/Utils";
 import { TemplateItem } from "./components/TemplateItem";
 export interface TemplateSelectorProps {
   onCreate: (name: string) => void;
   ip: string;
 }
 
-const fs = window.require("fs");
-const pathModule = window.require("path");
+let fs;
+let pathModule;
+if (Utils.isElectron()) {
+  fs = window.require("fs");
+  pathModule = window.require("path");
+}
+
 /*var context = require.context(
   "/var/tmp/tinylicious/tinylicious/.git/refs/heads",
   false
@@ -42,27 +48,29 @@ export const LandingPage: React.FC<TemplateSelectorProps> = (
   const [path, setPath] = useState(
     "/var/tmp/tinylicious/tinylicious/.git/refs/heads"
   );
-
-  const files = useMemo(
-    () =>
-      fs
-        .readdirSync(path)
-        .map((file) => {
-          const stats = fs.statSync(pathModule.join(path, file));
-          return {
-            name: file,
-            directory: stats.isDirectory(),
-          };
-        })
-        .sort((a, b) => {
-          if (a.directory === b.directory) {
-            return a.name.localeCompare(b.name);
-          }
-          return a.directory ? -1 : 1;
-        })
-        .filter((file) => !file.name.startsWith(".")),
-    [path]
-  );
+  let files = [];
+  if (Utils.isElectron()) {
+    files = useMemo(
+      () =>
+        fs
+          .readdirSync(path)
+          .map((file) => {
+            const stats = fs.statSync(pathModule.join(path, file));
+            return {
+              name: file,
+              directory: stats.isDirectory(),
+            };
+          })
+          .sort((a, b) => {
+            if (a.directory === b.directory) {
+              return a.name.localeCompare(b.name);
+            }
+            return a.directory ? -1 : 1;
+          })
+          .filter((file) => !file.name.startsWith(".")),
+      [path]
+    );
+  }
 
   return (
     <Container maxW={"container.xl"}>

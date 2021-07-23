@@ -24,6 +24,7 @@ export const Preview = (props: PreviewProps) => {
             maxH={"100%"}
             w={"100%"}
             h={"100%"}
+            overflow={"hidden"}
             key={
               props.app.getSharedObject().getMyRole().getName() +
               "-div-" +
@@ -43,6 +44,7 @@ export const Preview = (props: PreviewProps) => {
             maxH={"100%"}
             w={"100%"}
             h={"100%"}
+            overflow={"hidden"}
             grow={1}
             key={
               props.app.getSharedObject().getMyRole().getName() +
@@ -74,6 +76,7 @@ export const Preview = (props: PreviewProps) => {
             h={"100%"}
             maxW={"100%"}
             maxH={"100%"}
+            overflow={"hidden"}
             position={"relative"}
             onClick={() => {
               if (props.isOpenLayoutModal) {

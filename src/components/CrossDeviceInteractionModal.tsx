@@ -69,6 +69,7 @@ export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
     ) => {
       e.stopPropagation();
       //app.mirrorViews(view, view);
+
       setNewViewId(view.id);
       setLayoutOpen(true);
       props.onViewChange(view.id);

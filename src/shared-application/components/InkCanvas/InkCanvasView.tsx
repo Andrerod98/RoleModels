@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React from "react";
+import React, { useState } from "react";
 import { InkCanvasController } from ".";
 import { Box } from "@chakra-ui/react";
 import { InkCanvasUI } from "./InkCanvasModel";
@@ -23,10 +23,26 @@ export function InkCanvasView({
 }: {
   controller: InkCanvasController;
 }) {
+  const component = controller.get() as InkCanvasUI;
+  const { color, thickness, ...props } = component;
+  const [isFirst, setFirst] = useState(true);
   useEffect(() => {
     const { color, thickness } = controller.get() as InkCanvasUI;
-    const canvas = document.getElementById("ink-canvas") as HTMLCanvasElement;
-    controller.setInkCanvas(canvas);
+    if (isFirst) {
+      window.removeEventListener("resize", () => {
+        controller.sizeCanvas();
+      });
+      window.addEventListener("resize", () => {
+        controller.sizeCanvas();
+      });
+      setFirst(false);
+    }
+
+    if (controller.getInkCanvas() === undefined) {
+      const canvas = document.getElementById("ink-canvas") as HTMLCanvasElement;
+      controller.setInkCanvas(canvas);
+    }
+
     if (thickness) controller.setStroke(thickness);
     if (color) {
       controller.setColor(color);
@@ -37,17 +53,10 @@ export function InkCanvasView({
       controller.removeEventListeners();
     };
     //controller.sizeCanvas(100, 100);
-
-    /*window.addEventListener("resize", () => {
-      controller.sizeCanvas();
-    });*/
-  });
-
-  const component = controller.get() as InkCanvasUI;
-  const { color, thickness, ...props } = component;
+  }, [color, thickness]);
 
   return (
-    <Box {...props} key={"ink-surface-" + component.id}>
+    <Box {...props} key={"ink-surface-" + component.id} overflow={"hidden"}>
       <canvas id={"ink-canvas"} style={{ width: "100%", height: "100%" }} />
     </Box>
   );

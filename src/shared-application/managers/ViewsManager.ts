@@ -91,9 +91,7 @@ export class ViewsManager extends EventEmitter {
           const app = this.app;
           const view = this.getView(sharedView.get().id);
           const component = view.getRoot().getChildByID(componentId);
-          console.log(app);
-          console.log(view);
-          console.log(component);
+
           eval(interaction.code);
         }
       }
@@ -109,9 +107,7 @@ export class ViewsManager extends EventEmitter {
           const app = this.app;
           const view = this.getView(sharedView.get().id);
           const component = view!.getRoot().getChildByID(componentId);
-          console.log(app);
-          console.log(view);
-          console.log(component);
+
           eval(interaction.code);
         }
       }
@@ -140,10 +136,10 @@ export class ViewsManager extends EventEmitter {
   /* Get a combined view by id */
   public getView(viewId: string): View {
     const view = this.views.get(viewId);
-    if(!view){
+    if (!view) {
       Logger.getInstance().error(`The view with id ${viewId} was not found.`);
     }
-    
+
     return view;
   }
 

@@ -21,6 +21,10 @@ export class InkCanvasController extends UIComponentController {
     return this.ink;
   }
 
+  getInkCanvas() {
+    return this.inkCanvas;
+  }
+
   setColor(color: IColor): void {
     this.inkCanvas.setPenColor(color);
   }
@@ -31,9 +35,11 @@ export class InkCanvasController extends UIComponentController {
 
   public setInkCanvas(canvasElement: HTMLCanvasElement) {
     if (this.inkCanvas) {
+      console.log("Setting ink canvas");
       this.inkCanvas.removeEventListeners();
       this.inkCanvas.setCanvas(canvasElement);
     } else {
+      console.log("Creating a new ink canvas");
       this.inkCanvas = new InkCanvas(canvasElement, this.getInk());
     }
   }

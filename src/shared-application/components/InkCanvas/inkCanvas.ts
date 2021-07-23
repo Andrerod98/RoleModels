@@ -132,8 +132,8 @@ export class InkCanvas {
   private currentPen: IPen;
 
   constructor(private canvas: HTMLCanvasElement, private readonly model: IInk) {
-    this.model.on("clear", this.redraw.bind(this));
-    this.model.on("stylus", this.handleStylus.bind(this));
+    this.model.on("clear", this.redraw);
+    this.model.on("stylus", this.handleStylus);
 
     this.setCanvas(canvas);
     this.currentPen = {
@@ -147,9 +147,9 @@ export class InkCanvas {
   public setCanvas(canvas: HTMLCanvasElement) {
     canvas.style.touchAction = "none";
 
-    canvas.addEventListener("pointerdown", this.handlePointerDown.bind(this));
-    canvas.addEventListener("pointermove", this.handlePointerMove.bind(this));
-    canvas.addEventListener("pointerup", this.handlePointerUp.bind(this));
+    canvas.addEventListener("pointerdown", this.handlePointerDown);
+    canvas.addEventListener("pointermove", this.handlePointerMove);
+    canvas.addEventListener("pointerup", this.handlePointerUp);
 
     const context = canvas.getContext("2d");
     if (context === null) {
@@ -170,21 +170,11 @@ export class InkCanvas {
   }
 
   public removeEventListeners() {
-    this.model.off("clear", this.redraw.bind(this));
-    this.model.off("stylus", this.handleStylus.bind(this));
-
-    this.canvas.removeEventListener(
-      "pointerdown",
-      this.handlePointerDown.bind(this)
-    );
-    this.canvas.removeEventListener(
-      "pointermove",
-      this.handlePointerMove.bind(this)
-    );
-    this.canvas.removeEventListener(
-      "pointerup",
-      this.handlePointerUp.bind(this)
-    );
+    this.model.off("clear", this.redraw);
+    this.model.off("stylus", this.handleStylus);
+    this.canvas.removeEventListener("pointerdown", this.handlePointerDown);
+    this.canvas.removeEventListener("pointermove", this.handlePointerMove);
+    this.canvas.removeEventListener("pointerup", this.handlePointerUp);
   }
 
   public setPenColor(color: IColor) {
@@ -193,6 +183,7 @@ export class InkCanvas {
 
   public setPenThickness(thickness: number) {
     this.currentPen.thickness = thickness;
+    this.context.lineWidth = thickness;
   }
 
   public replay() {
@@ -226,7 +217,7 @@ export class InkCanvas {
     this.redraw();
   }
 
-  private handlePointerDown(evt: PointerEvent) {
+  handlePointerDown = (evt: PointerEvent) => {
     // We will accept pen down or mouse left down as the start of a stroke.
     if (
       evt.pointerType === "pen" ||
@@ -239,9 +230,9 @@ export class InkCanvas {
 
       evt.preventDefault();
     }
-  }
+  };
 
-  private handlePointerMove(evt: PointerEvent) {
+  handlePointerMove = (evt: PointerEvent) => {
     if (this.localActiveStrokeMap.has(evt.pointerId)) {
       const evts =
         (evt as any)?.getCoalescedEvents() ?? ([evt] as PointerEvent[]);
@@ -249,14 +240,14 @@ export class InkCanvas {
         this.appendPointerEventToStroke(e);
       }
     }
-  }
+  };
 
-  private handlePointerUp(evt: PointerEvent) {
+  handlePointerUp = (evt: PointerEvent) => {
     if (this.localActiveStrokeMap.has(evt.pointerId)) {
       this.appendPointerEventToStroke(evt);
       this.localActiveStrokeMap.delete(evt.pointerId);
     }
-  }
+  };
 
   private appendPointerEventToStroke(evt: PointerEvent) {
     const strokeId = this.localActiveStrokeMap.get(evt.pointerId);
@@ -302,7 +293,7 @@ export class InkCanvas {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
-  private redraw() {
+  redraw = () => {
     this.clearCanvas();
 
     const strokes = this.model.getStrokes();
@@ -314,7 +305,7 @@ export class InkCanvas {
         previous = current;
       }
     }
-  }
+  };
 
   private drawStrokeSegment(
     pen: IPen,
@@ -323,12 +314,12 @@ export class InkCanvas {
   ) {
     // TODO Consider save/restore context
     // TODO Consider half-pixel offset
-
+    this.context.lineWidth = pen.thickness;
     this.context.fillStyle = `rgb(${pen.color.r}, ${pen.color.g}, ${pen.color.b})`;
     drawShapes(this.context, previous, current, pen);
   }
 
-  private handleStylus(operation: IStylusOperation) {
+  handleStylus = (operation: IStylusOperation) => {
     // Render the dirty stroke
     const dirtyStrokeId = operation.id;
     const stroke = this.model.getStroke(dirtyStrokeId);
@@ -336,5 +327,5 @@ export class InkCanvas {
     const prevPoint =
       stroke.points[stroke.points.length - (stroke.points.length >= 2 ? 2 : 1)];
     this.drawStrokeSegment(stroke.pen, prevPoint, operation.point);
-  }
+  };
 }

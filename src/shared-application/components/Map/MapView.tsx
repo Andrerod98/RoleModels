@@ -3,6 +3,7 @@ import GoogleMapReact from "google-map-react";
 import React from "react";
 import { Box } from "@chakra-ui/react";
 import { MapController } from "./MapController";
+import { UIComponentController } from "..";
 
 export function MapView({ controller }: { controller: MapController }) {
   const { children, ...component } = controller.get() as MapUI;
@@ -17,7 +18,7 @@ export function MapView({ controller }: { controller: MapController }) {
             ...component,
             center: center,
             zoom: zoom,
-            children: [],
+            children: children,
           });
         }}
         bootstrapURLKeys={{ key: "" }}
@@ -33,7 +34,13 @@ export function MapView({ controller }: { controller: MapController }) {
         })}
         defaultZoom={component.zoom}
         zoom={component.zoom}
-      />
+      >
+        {controller.getChildren().map((component: any) => (
+          <Box lat={component.get().lat} lng={component.get().lng}>
+            {component.generateWidget()}
+          </Box>
+        ))}
+      </GoogleMapReact>
     </Box>
   );
 }
