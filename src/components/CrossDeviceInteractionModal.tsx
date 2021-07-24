@@ -10,7 +10,7 @@ import {
 import React, { FC, useContext, useState } from "react";
 import { AiOutlineExpand } from "react-icons/ai";
 import { CrossAppState, CrossAppContext } from "../context/AppContext";
-import { QRCodeController } from "../shared-application/components/QRCode";
+import { QRCodeController } from "../shared-components/QRCode";
 
 import { CrossDeviceInteractionChooser } from "./CrossDeviceInteractionChooser";
 import { CustomQRReader } from "./CustomQRReader";

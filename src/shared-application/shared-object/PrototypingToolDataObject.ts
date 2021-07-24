@@ -8,25 +8,8 @@ import { IInk, Ink } from "@fluidframework/ink";
 import { IPrototypingToolDataModel } from "..";
 import {
   UIComponentFactory,
-  RadioFactory,
-  ListFactory,
-  LinkFactory,
-  InputFactory,
-  ImageFactory,
-  FlexFactory,
-  MapFactory,
-  CenterFactory,
-  SpacerFactory,
-  BoxFactory,
-  StackFactory,
-  GridFactory,
-  CheckboxFactory,
-  EditableFactory,
-  SliderFactory,
-  InkCanvasFactory,
   UIComponentController,
-} from "../components";
-import { ThrowableFactory } from "../components/Throwable";
+} from "../../shared-components";
 import { IDevice } from "../devices/IDevice";
 import {
   ConfigurationsManager,
@@ -43,13 +26,11 @@ import { IRole } from "../roles/IRole";
 import { Role } from "../roles/Role";
 import { IView } from "../views/IView";
 import { View } from "../views/View";
-import { ButtonFactory } from "../components/Button";
 import { uuid } from "uuidv4";
 import { ViewsManager } from "../managers/ViewsManager";
 import { ILayoutNode } from "../roles/ILayoutNode";
 import { LayoutNode } from "../roles/Layout";
 import { Logger } from "../Logger";
-import { QRCodeFactory } from "../components/QRCode";
 import { QuickInteraction } from "./IQuickInteraction";
 
 export class PrototypingToolDataObject
@@ -259,70 +240,7 @@ export class PrototypingToolDataObject
 
   private registerDefaultFactories() {
     this.factoriesManager.registerFactory(
-      new UIComponentFactory("uicomponent", this.factoriesManager)
-    );
-    this.factoriesManager.registerFactory(
-      new RadioFactory("radio", this.factoriesManager)
-    );
-    this.factoriesManager.registerFactory(
-      new MapFactory("map", this.factoriesManager)
-    );
-    this.factoriesManager.registerFactory(
-      new ListFactory("list", this.factoriesManager)
-    );
-    this.factoriesManager.registerFactory(
-      new LinkFactory("link", this.factoriesManager)
-    );
-    this.factoriesManager.registerFactory(
-      new InputFactory("input", this.factoriesManager)
-    );
-    this.factoriesManager.registerFactory(
-      new ImageFactory("image", this.factoriesManager)
-    );
-    this.factoriesManager.registerFactory(
-      new FlexFactory("flex", this.factoriesManager)
-    );
-    this.factoriesManager.registerFactory(
-      new CenterFactory("column", this.factoriesManager)
-    );
-    this.factoriesManager.registerFactory(
-      new SpacerFactory("spacer", this.factoriesManager)
-    );
-    this.factoriesManager.registerFactory(
-      new BoxFactory("box", this.factoriesManager)
-    );
-    this.factoriesManager.registerFactory(
-      new CenterFactory("center", this.factoriesManager)
-    );
-    this.factoriesManager.registerFactory(
-      new StackFactory("stack", this.factoriesManager)
-    );
-    this.factoriesManager.registerFactory(
-      new GridFactory("grid", this.factoriesManager)
-    );
-    this.factoriesManager.registerFactory(
-      new CheckboxFactory("checkbox", this.factoriesManager)
-    );
-    this.factoriesManager.registerFactory(
-      new EditableFactory("editable", this.factoriesManager)
-    );
-    this.factoriesManager.registerFactory(
-      new SliderFactory("slider", this.factoriesManager)
-    );
-
-    this.factoriesManager.registerFactory(
-      new ThrowableFactory("throwable", this.factoriesManager)
-    );
-
-    this.factoriesManager.registerFactory(
-      new ButtonFactory("button", this.factoriesManager)
-    );
-    this.factoriesManager.registerFactory(
-      new InkCanvasFactory("ink", this.ink, this.factoriesManager)
-    );
-
-    this.factoriesManager.registerFactory(
-      new QRCodeFactory("qrcode", this.factoriesManager)
+      new UIComponentFactory(this.factoriesManager)
     );
   }
 
@@ -642,6 +560,18 @@ export class PrototypingToolDataObject
    ******************************************************** */
   public registerFactory(factory: UIComponentFactory) {
     this.factoriesManager.registerFactory(factory);
+  }
+
+  public getFactory(name: string) {
+    return this.factoriesManager.getFactory(name);
+  }
+
+  public getFactories() {
+    return this.factoriesManager.getFactories();
+  }
+
+  public getFactoriesManager() {
+    return this.factoriesManager;
   }
 
   /* ******************************************************** 

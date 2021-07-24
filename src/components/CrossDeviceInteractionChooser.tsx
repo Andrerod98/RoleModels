@@ -1,9 +1,3 @@
-import {
-  ChevronUpIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  ChevronDownIcon,
-} from "@chakra-ui/icons";
 import { Flex, Button, Box, Text } from "@chakra-ui/react";
 import React from "react";
 import { CgArrowsExpandDownRight, CgScreenMirror } from "react-icons/cg";

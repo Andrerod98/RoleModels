@@ -1,5 +1,8 @@
 import { SharedCell } from "@fluidframework/cell";
-import { IUIComponent, UIComponentController } from "../components/UIComponent";
+import {
+  IUIComponent,
+  UIComponentController,
+} from "../../shared-components/UIComponent";
 import { Logger } from "../Logger";
 import { FactoriesManager } from "../managers/FactoriesManager";
 import { IView } from "./IView";

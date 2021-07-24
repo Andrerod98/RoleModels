@@ -2,7 +2,7 @@ import {
   IUIComponent,
   UIComponentController,
   UIComponentFactory,
-} from "../components/UIComponent";
+} from "../../shared-components/UIComponent";
 
 export class FactoriesManager {
   private factories: Map<string, UIComponentFactory>;
@@ -13,6 +13,14 @@ export class FactoriesManager {
 
   public registerFactory(factory: UIComponentFactory) {
     this.factories.set(factory.name, factory);
+  }
+
+  public getFactory(name: string) {
+    return this.factories.get(name);
+  }
+
+  public getFactories() {
+    return this.factories.values();
   }
 
   public getUIComponent(

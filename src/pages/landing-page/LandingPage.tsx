@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
 import {
-  Box,
   Button,
-  Center,
   Container,
   FormControl,
   FormHelperText,
@@ -10,15 +8,12 @@ import {
   Heading,
   HStack,
   Input,
-  SimpleGrid,
-  Text,
   Spacer,
   VStack,
   Link,
 } from "@chakra-ui/react";
 import React, { useMemo, useState } from "react";
 import Utils from "../../utils/Utils";
-import { TemplateItem } from "./components/TemplateItem";
 export interface TemplateSelectorProps {
   onCreate: (name: string) => void;
   ip: string;
@@ -41,13 +36,9 @@ export const LandingPage: React.FC<TemplateSelectorProps> = (
   props: TemplateSelectorProps
 ) => {
   const [name, setName] = useState("untitled");
-  const [templates] = useState([]);
   const handleChange = (event: any) => setName(event.target.value);
-  const [selected, setSelected] = useState(0);
 
-  const [path, setPath] = useState(
-    "/var/tmp/tinylicious/tinylicious/.git/refs/heads"
-  );
+  const [path] = useState("/var/tmp/tinylicious/tinylicious/.git/refs/heads");
   let files = [];
   if (Utils.isElectron()) {
     files = useMemo(

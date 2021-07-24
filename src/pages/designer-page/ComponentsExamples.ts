@@ -17,8 +17,8 @@ import {
   SpacerUI,
   SliderUI,
   InkCanvasUI,
-} from "../../shared-application/components";
-import { QRCodeUI } from "../../shared-application/components/QRCode";
+} from "../../shared-components";
+import { QRCodeUI } from "../../shared-components/QRCode";
 import { IView } from "../../shared-application/views/IView";
 
 export class ComponentsExamples {

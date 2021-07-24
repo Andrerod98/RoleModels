@@ -15,7 +15,7 @@ import {
 import React, { useMemo } from "react";
 import { FC } from "react";
 // import { UIComponentFactory } from "../components/UIComponentFactory";
-import { ImAccessibility, ImQrcode } from "react-icons/im";
+import { ImQrcode } from "react-icons/im";
 import { GiFastArrow } from "react-icons/gi";
 import { Role } from "../roles/Role";
 import { View } from "./View";

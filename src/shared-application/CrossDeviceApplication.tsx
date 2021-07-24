@@ -7,6 +7,27 @@ import { Container } from "@fluidframework/container-loader";
 import { TinyliciousServiceWithUrl } from "../utils/tinyliciousService";
 import { CrossDeviceApplicationView } from "./CrossDeviceApplicationView";
 import { PrototypingToolDataObject } from "./shared-object/PrototypingToolDataObject";
+import {
+  RadioFactory,
+  MapFactory,
+  ListFactory,
+  LinkFactory,
+  InputFactory,
+  ImageFactory,
+  FlexFactory,
+  SpacerFactory,
+  BoxFactory,
+  CenterFactory,
+  StackFactory,
+  GridFactory,
+  CheckboxFactory,
+  EditableFactory,
+  SliderFactory,
+  InkCanvasFactory,
+} from "../shared-components";
+import { ButtonFactory } from "../shared-components/Button";
+import { QRCodeFactory } from "../shared-components/QRCode";
+import { ThrowableFactory } from "../shared-components/Throwable";
 
 export class CrossDeviceApplication {
   protected sharedObject: PrototypingToolDataObject;
@@ -17,6 +38,72 @@ export class CrossDeviceApplication {
     public readonly projectName: string
   ) {}
 
+  public registerDefaultFactories() {
+    this.sharedObject.registerFactory(
+      new RadioFactory(this.sharedObject.getFactoriesManager())
+    );
+    this.sharedObject.registerFactory(
+      new MapFactory(this.sharedObject.getFactoriesManager())
+    );
+    this.sharedObject.registerFactory(
+      new ListFactory(this.sharedObject.getFactoriesManager())
+    );
+    this.sharedObject.registerFactory(
+      new LinkFactory(this.sharedObject.getFactoriesManager())
+    );
+    this.sharedObject.registerFactory(
+      new InputFactory(this.sharedObject.getFactoriesManager())
+    );
+    this.sharedObject.registerFactory(
+      new ImageFactory(this.sharedObject.getFactoriesManager())
+    );
+    this.sharedObject.registerFactory(
+      new FlexFactory(this.sharedObject.getFactoriesManager())
+    );
+
+    this.sharedObject.registerFactory(
+      new SpacerFactory(this.sharedObject.getFactoriesManager())
+    );
+    this.sharedObject.registerFactory(
+      new BoxFactory(this.sharedObject.getFactoriesManager())
+    );
+    this.sharedObject.registerFactory(
+      new CenterFactory(this.sharedObject.getFactoriesManager())
+    );
+    this.sharedObject.registerFactory(
+      new StackFactory(this.sharedObject.getFactoriesManager())
+    );
+    this.sharedObject.registerFactory(
+      new GridFactory(this.sharedObject.getFactoriesManager())
+    );
+    this.sharedObject.registerFactory(
+      new CheckboxFactory(this.sharedObject.getFactoriesManager())
+    );
+    this.sharedObject.registerFactory(
+      new EditableFactory(this.sharedObject.getFactoriesManager())
+    );
+    this.sharedObject.registerFactory(
+      new SliderFactory(this.sharedObject.getFactoriesManager())
+    );
+
+    this.sharedObject.registerFactory(
+      new ThrowableFactory(this.sharedObject.getFactoriesManager())
+    );
+
+    this.sharedObject.registerFactory(
+      new ButtonFactory(this.sharedObject.getFactoriesManager())
+    );
+    this.sharedObject.registerFactory(
+      new InkCanvasFactory(
+        this.getSharedObject().getInk(),
+        this.sharedObject.getFactoriesManager()
+      )
+    );
+
+    this.sharedObject.registerFactory(
+      new QRCodeFactory(this.sharedObject.getFactoriesManager())
+    );
+  }
   public getServerURL(): string {
     return this.serverUrl;
   }
@@ -65,6 +152,8 @@ export class CrossDeviceApplication {
       await getDefaultObjectFromContainer<PrototypingToolDataObject>(
         this.container
       );
+
+    this.registerDefaultFactories();
 
     window["fluidStarted"] = true;
   }

@@ -1,4 +1,4 @@
-import { IUIComponent } from "../components/UIComponent/UIComponentModel";
+import { IUIComponent } from "../../shared-components/UIComponent/UIComponentModel";
 
 export interface IView {
   id: string;

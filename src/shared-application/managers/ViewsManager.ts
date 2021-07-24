@@ -88,8 +88,10 @@ export class ViewsManager extends EventEmitter {
           sharedView.get().id + "/" + componentId + "/" + eventName
         );
         if (interaction && interaction.active) {
+          // @ts-ignore
           const app = this.app;
           const view = this.getView(sharedView.get().id);
+          // @ts-ignore
           const component = view.getRoot().getChildByID(componentId);
 
           eval(interaction.code);
@@ -104,8 +106,10 @@ export class ViewsManager extends EventEmitter {
           sharedView.get().id + "/" + componentId + "/" + eventName
         );
         if (interaction && interaction.active) {
+          // @ts-ignore
           const app = this.app;
           const view = this.getView(sharedView.get().id);
+          // @ts-ignore
           const component = view!.getRoot().getChildByID(componentId);
 
           eval(interaction.code);

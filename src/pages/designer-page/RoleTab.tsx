@@ -87,74 +87,9 @@ export function RoleTab(props: RoleTabProps) {
 
   const addUIComponent = (name: string) => {
     setAlert(false);
-    let object;
+    const factory = app.getSharedObject().getFactory(name);
 
-    switch (name) {
-      case "view":
-        addViewToEditor();
-
-        return;
-      case "image":
-        object = ComponentsExamples.getImage();
-        break;
-      case "spacer":
-        object = ComponentsExamples.getSpacer();
-        break;
-      case "input":
-        object = ComponentsExamples.getInput();
-        break;
-      case "list":
-        object = ComponentsExamples.getList();
-        break;
-      case "link":
-        object = ComponentsExamples.getLink();
-        break;
-      case "label":
-        object = ComponentsExamples.getText();
-        break;
-      case "map":
-        object = ComponentsExamples.getMap();
-        break;
-      case "radio":
-        object = ComponentsExamples.getRadio();
-        break;
-      case "ink":
-        object = ComponentsExamples.getInk();
-        break;
-      case "stack":
-        object = ComponentsExamples.getStack();
-        break;
-      case "editable":
-        object = ComponentsExamples.getEditable();
-        break;
-      case "slider":
-        object = ComponentsExamples.getSlider();
-        break;
-      case "flex":
-        object = ComponentsExamples.getFlex();
-        break;
-      case "center":
-        object = ComponentsExamples.getCenter();
-        break;
-      case "checkbox":
-        object = ComponentsExamples.getCheckbox();
-        break;
-      case "box":
-        object = ComponentsExamples.getBox();
-        break;
-      case "grid":
-        object = ComponentsExamples.getGrid();
-        break;
-      case "qrcode":
-        object = ComponentsExamples.getQRCode();
-        break;
-
-      default:
-        object = ComponentsExamples.getBasic();
-        break;
-    }
-
-    addUIComponentToEditor(Utils.jsonToString(object));
+    addUIComponentToEditor(Utils.jsonToString(factory.example));
   };
 
   const addUIComponentToEditor = (str: string) => {
@@ -246,7 +181,7 @@ export function RoleTab(props: RoleTabProps) {
               app={app}
               isOpenLayoutModal={isLayoutOpen}
               handleViewClick={() => {
-                addUIComponent("view");
+                addViewToEditor();
               }}
               handleClick={() => {
                 preview();
