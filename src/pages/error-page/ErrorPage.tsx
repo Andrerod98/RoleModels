@@ -5,6 +5,7 @@ import { CrossDeviceApplication } from "../../shared-application/CrossDeviceAppl
 interface ErrorPageProps {
   message?: string;
   reconnect: boolean;
+  toHomePage?: boolean;
   application: CrossDeviceApplication;
 }
 
@@ -14,8 +15,15 @@ export function ErrorPage(props: ErrorPageProps) {
     if (props.reconnect) {
       const time = setTimeout(() => {
         if (timer === 1) {
-          window.location.href = props.application.getFullURL();
-          window.location.reload();
+          console.log(props.toHomePage);
+          if (props.toHomePage) {
+            window.location.href = props.application.getHomepageURL();
+            window.location.replace(props.application.getHomepageURL());
+            console.log("Redirecting to" + props.application.getHomepageURL());
+          } else {
+            window.location.href = props.application.getFullURL();
+            window.location.reload();
+          }
         } else {
           setTimer(timer - 1);
         }

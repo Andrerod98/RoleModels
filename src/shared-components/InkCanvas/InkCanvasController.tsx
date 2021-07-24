@@ -34,13 +34,13 @@ export class InkCanvasController extends UIComponentController {
   }
 
   public setInkCanvas(canvasElement: HTMLCanvasElement) {
-    if (this.inkCanvas) {
-      console.log("Setting ink canvas");
-      this.inkCanvas.removeEventListeners();
-      this.inkCanvas.setCanvas(canvasElement);
-    } else {
-      console.log("Creating a new ink canvas");
-      this.inkCanvas = new InkCanvas(canvasElement, this.getInk());
+    console.log("Creating a new ink canvas");
+
+    this.inkCanvas = new InkCanvas(canvasElement, this.getInk());
+
+    if (this.model.thickness) this.setStroke(this.model.thickness);
+    if (this.model.color) {
+      this.setColor(this.model.color);
     }
   }
 

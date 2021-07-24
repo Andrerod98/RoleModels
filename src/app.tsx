@@ -91,6 +91,7 @@ if (PROJECT_NAME === undefined) {
             <ErrorPage
               application={application}
               reconnect={true}
+              toHomePage={true}
               message={"The container has been closed."}
             />
           </ChakraProvider>,

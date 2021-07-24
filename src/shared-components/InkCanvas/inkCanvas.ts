@@ -183,7 +183,7 @@ export class InkCanvas {
 
   public setPenThickness(thickness: number) {
     this.currentPen.thickness = thickness;
-    this.context.lineWidth = thickness;
+    //this.context.lineWidth = thickness;
   }
 
   public replay() {
@@ -314,7 +314,7 @@ export class InkCanvas {
   ) {
     // TODO Consider save/restore context
     // TODO Consider half-pixel offset
-    this.context.lineWidth = pen.thickness;
+    //this.context.lineWidth = pen.thickness;
     this.context.fillStyle = `rgb(${pen.color.r}, ${pen.color.g}, ${pen.color.b})`;
     drawShapes(this.context, previous, current, pen);
   }

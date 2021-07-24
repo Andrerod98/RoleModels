@@ -9,6 +9,22 @@ import { IPrototypingToolDataModel } from "..";
 import {
   UIComponentFactory,
   UIComponentController,
+  BoxFactory,
+  MapFactory,
+  CenterFactory,
+  CheckboxFactory,
+  EditableFactory,
+  FlexFactory,
+  GridFactory,
+  ImageFactory,
+  InkCanvasFactory,
+  InputFactory,
+  LinkFactory,
+  ListFactory,
+  RadioFactory,
+  SliderFactory,
+  SpacerFactory,
+  StackFactory,
 } from "../../shared-components";
 import { IDevice } from "../devices/IDevice";
 import {
@@ -32,6 +48,10 @@ import { ILayoutNode } from "../roles/ILayoutNode";
 import { LayoutNode } from "../roles/Layout";
 import { Logger } from "../Logger";
 import { QuickInteraction } from "./IQuickInteraction";
+import { ButtonFactory } from "../../shared-components/Button";
+import { PDFReaderFactory } from "../../shared-components/PDFReader";
+import { QRCodeFactory } from "../../shared-components/QRCode";
+import { ThrowableFactory } from "../../shared-components/Throwable";
 
 export class PrototypingToolDataObject
   extends DataObject
@@ -241,6 +261,72 @@ export class PrototypingToolDataObject
   private registerDefaultFactories() {
     this.factoriesManager.registerFactory(
       new UIComponentFactory(this.factoriesManager)
+    );
+
+    this.factoriesManager.registerFactory(
+      new RadioFactory(this.factoriesManager)
+    );
+    this.factoriesManager.registerFactory(
+      new MapFactory(this.factoriesManager)
+    );
+    this.factoriesManager.registerFactory(
+      new ListFactory(this.factoriesManager)
+    );
+    this.factoriesManager.registerFactory(
+      new LinkFactory(this.factoriesManager)
+    );
+    this.factoriesManager.registerFactory(
+      new InputFactory(this.factoriesManager)
+    );
+    this.factoriesManager.registerFactory(
+      new ImageFactory(this.factoriesManager)
+    );
+    this.factoriesManager.registerFactory(
+      new FlexFactory(this.factoriesManager)
+    );
+
+    this.factoriesManager.registerFactory(
+      new SpacerFactory(this.factoriesManager)
+    );
+    this.factoriesManager.registerFactory(
+      new BoxFactory(this.factoriesManager)
+    );
+    this.factoriesManager.registerFactory(
+      new CenterFactory(this.factoriesManager)
+    );
+    this.factoriesManager.registerFactory(
+      new StackFactory(this.factoriesManager)
+    );
+    this.factoriesManager.registerFactory(
+      new GridFactory(this.factoriesManager)
+    );
+    this.factoriesManager.registerFactory(
+      new CheckboxFactory(this.factoriesManager)
+    );
+    this.factoriesManager.registerFactory(
+      new EditableFactory(this.factoriesManager)
+    );
+    this.factoriesManager.registerFactory(
+      new SliderFactory(this.factoriesManager)
+    );
+
+    this.factoriesManager.registerFactory(
+      new ThrowableFactory(this.factoriesManager)
+    );
+
+    this.factoriesManager.registerFactory(
+      new ButtonFactory(this.factoriesManager)
+    );
+    this.factoriesManager.registerFactory(
+      new InkCanvasFactory(this.ink, this.factoriesManager)
+    );
+
+    this.factoriesManager.registerFactory(
+      new QRCodeFactory(this.factoriesManager)
+    );
+
+    this.factoriesManager.registerFactory(
+      new PDFReaderFactory(this.factoriesManager)
     );
   }
 

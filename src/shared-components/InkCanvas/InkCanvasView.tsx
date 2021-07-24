@@ -27,7 +27,6 @@ export function InkCanvasView({
   const { color, thickness, ...props } = component;
   const [isFirst, setFirst] = useState(true);
   useEffect(() => {
-    const { color, thickness } = controller.get() as InkCanvasUI;
     if (isFirst) {
       window.removeEventListener("resize", () => {
         controller.sizeCanvas();
@@ -38,15 +37,8 @@ export function InkCanvasView({
       setFirst(false);
     }
 
-    if (controller.getInkCanvas() === undefined) {
-      const canvas = document.getElementById("ink-canvas") as HTMLCanvasElement;
-      controller.setInkCanvas(canvas);
-    }
-
-    if (thickness) controller.setStroke(thickness);
-    if (color) {
-      controller.setColor(color);
-    }
+    const canvas = document.getElementById("ink-canvas") as HTMLCanvasElement;
+    controller.setInkCanvas(canvas);
 
     return function cleanup() {
       controller.removeAllListeners();
