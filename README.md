@@ -18,7 +18,7 @@ To set up the RoleModels follow the steps below:
 
 5. Install `openssl` https://www.openssl.org/
 
-6. Generate the certificates by running on the terminal `sh generate-certificate.sh`
+6. Generate the certificates by running on the terminal `sh generate-certificate.sh` inside the certificates folder
 
 7. Run `npm install` from the RoleModels folder root
 
