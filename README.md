@@ -6,7 +6,7 @@ To set up the RoleModels follow the steps below:
 
 1. Get the network IPv4 address of your computer `(e.g 192.168.1.72)`
 
-   MacOS: Can be seen in thr network preferences
+   MacOS: Can be seen in the network preferences
 
    Windows: Can be seen by clicking properties of the active WiFi
 
