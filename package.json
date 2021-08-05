@@ -22,7 +22,7 @@
     "build-storybook": "build-storybook -s public",
     "deploy-storybook": "storybook-to-ghpages",
     "storybook": "start-storybook -p 6006 -s public",
-    "electron:start": "concurrently \"yarn start\" \"wait-on https://192.168.1.71:8080 && electron .\""
+    "electron:start": "concurrently \"yarn start\" \"wait-on https://192.168.1.72:8080 && electron .\""
   },
   "dependencies": {
     "@chakra-ui/icons": "^1.0.13",

@@ -12,7 +12,7 @@ const createMainWindow = () => {
       contextIsolation: false,
     },
   });
-  const startURL = "https://192.168.1.71:8080";
+  const startURL = "https://192.168.1.72:8080";
 
   mainWindow.loadURL(startURL);
 
