@@ -7,6 +7,7 @@ To set up the RoleModels follow the steps below:
 1. Get the network IPv4 address of your computer `(e.g 192.168.1.72)`
 
    MacOS: Can be seen in thr network preferences
+
    Windows: Can be seen by clicking properties of the active WiFi
 
 2. Change the `webpack.config.js` `devServer>host` to that ip address
@@ -27,4 +28,4 @@ To set up the RoleModels follow the steps below:
 
 10. Navigate to `https://{your-ip}:8080` in a browser tab
 
-Additional info. To run as a desktop app run `npm run electron:start` to start both the client and server
+Additional info: To run as a desktop app run `npm run electron:start` to start both the client and server
