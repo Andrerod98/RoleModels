@@ -6,7 +6,7 @@ import {
   Icon,
   IconButton,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useContext } from "react";
 import {
   BiDockTop,
   BiDockLeft,
@@ -18,178 +18,242 @@ import {
   BiArrowToRight,
   BiArrowToBottom,
 } from "react-icons/bi";
-import { LayoutNode } from "../shared-application/roles/Layout";
+import { uuid } from "uuidv4";
+import { CrossAppState, CrossAppContext } from "../context/AppContext";
+import { ILayoutNode } from "../shared-application/roles/ILayoutNode";
 interface LayoutModalProps {
-  layout: LayoutNode;
-  selectedNode: string;
   isOpen: boolean;
-  onOpen: () => void;
-  onClose: () => void;
   setSelected: (newSelected: string) => void;
   onButtonClick: (buttonName: string) => void;
-  newViewId: string;
-  isDesigner: boolean;
 }
 export function LayoutModal(props: LayoutModalProps) {
-  
+  const { app, role, setLayoutOpen, selectedNode, setSelectedNode, newViewId } =
+    useContext<CrossAppState>(CrossAppContext);
+  const primaryLayout = app.getSharedObject().getPrimaryConfiguration();
+  let currentLayout = app
+    .getSharedObject()
+    .getCurrentConfigurationOfRole(role.getId());
+  if (role.getName() === "designer") {
+    currentLayout = app.getSharedObject().getLayoutWithView(selectedNode);
+    if (!currentLayout) {
+      const firstRole = Array.from(app.getSharedObject().getRoles())[2];
+
+      currentLayout = app
+        .getSharedObject()
+        .getCurrentConfigurationOfRole(firstRole.getId());
+    }
+  }
+
+  const onButtonClick = (buttonName: string) => {
+    switch (buttonName) {
+      case "ET":
+        if (role.getName() === "designer")
+          primaryLayout
+            .getChildByViewId(selectedNode)
+            .splitTop(newViewId, true);
+        currentLayout.splitTop(newViewId, true);
+        break;
+      case "T":
+        if (role.getName() === "designer")
+          primaryLayout
+            .getChildByViewId(selectedNode)
+            .splitTop(newViewId, false);
+        currentLayout.splitTop(newViewId, false);
+        break;
+      case "EL":
+        if (role.getName() === "designer")
+          primaryLayout
+            .getChildByViewId(selectedNode)
+            .splitLeft(newViewId, true);
+        currentLayout.splitLeft(newViewId, true);
+        break;
+      case "L":
+        if (role.getName() === "designer")
+          primaryLayout
+            .getChildByViewId(selectedNode)
+            .splitLeft(newViewId, false);
+        currentLayout.splitLeft(newViewId, false);
+        break;
+      case "C":
+        if (role.getName() === "designer")
+          primaryLayout.update({
+            id: uuid(),
+            name: "view",
+            viewId: newViewId,
+          } as ILayoutNode);
+        currentLayout.update({
+          id: uuid(),
+          name: "view",
+          viewId: newViewId,
+        } as ILayoutNode);
+        break;
+      case "R":
+        if (role.getName() === "designer")
+          primaryLayout
+            .getChildByViewId(selectedNode)
+            .splitRight(newViewId, false);
+        currentLayout.splitRight(newViewId, false);
+        break;
+      case "ER":
+        if (role.getName() === "designer")
+          primaryLayout
+            .getChildByViewId(selectedNode)
+            .splitRight(newViewId, true);
+        currentLayout.splitRight(newViewId, true);
+        break;
+      case "B":
+        if (role.getName() === "designer")
+          primaryLayout
+            .getChildByViewId(selectedNode)
+            .splitBottom(newViewId, false);
+        currentLayout.splitBottom(newViewId, false);
+        break;
+      case "EB":
+        if (role.getName() === "designer")
+          primaryLayout
+            .getChildByViewId(selectedNode)
+            .splitBottom(newViewId, true);
+        currentLayout.splitBottom(newViewId, true);
+        break;
+      default:
+        break;
+    }
+    setSelectedNode(newViewId);
+    setLayoutOpen(false);
+  };
+
   return (
     <Box
-      bg={"blackAlpha.600"}
-      position={"absolute"}
-      top={0}
-      left={0}
-      right={props.isDesigner ? undefined : 0}
-      bottom={props.isDesigner ? undefined : 0}
-      marginLeft={"auto"}
-      marginRight={"auto"}
-      marginTop={"auto"}
-      marginBottom={"auto"}
-      h={props.isDesigner ? "100vh" : "305px"}
-      w={props.isDesigner ? "100vw" : "305px"}
-      zIndex={500}
+      bg={"transparent"}
+      h={"200px"}
+      w={"200px"}
+      zIndex={300}
       display={props.isOpen ? "block" : "none"}
     >
       <Grid
-        h={"300px"}
-        w={"300px"}
-        position={"absolute"}
-        marginLeft={"auto"}
-        marginRight={"auto"}
-        marginTop={"auto"}
-        marginBottom={"auto"}
-        left={props.isDesigner ? undefined : "0"}
-        right={props.isDesigner ? "10" : "0"}
-        top={"0"}
-        bottom={"0"}
-        templateRows='repeat(5, 1fr)'
-        templateColumns='repeat(5, 1fr)'
-        gap={1}
+        h={"200px"}
+        w={"200px"}
+        templateRows='repeat(5, 40px)'
+        templateColumns='repeat(5, 40px)'
       >
         <GridItem rowSpan={1} colSpan={2} bg='transparent' />
-        <GridItem rowSpan={1} colSpan={1} bg='gray.400'>
+        <GridItem rowSpan={1} colSpan={1} bg='transparent'>
           <IconButton
+            borderWidth={"1px"}
+            borderColor={"black"}
             aria-label={"Focus"}
-            size={"lg"}
-            mx={"5px"}
-            isDisabled={props.selectedNode === ""}
+            isDisabled={selectedNode === ""}
             onClick={() => {
-              props.onButtonClick("ET");
+              onButtonClick("ET");
             }}
-            my={"5px"}
-            icon={<Icon fontSize={"30px"} as={BiArrowToTop} />}
+            icon={<Icon as={BiArrowToTop} />}
           />
         </GridItem>
         <GridItem rowSpan={1} colSpan={2} bg='transparent' />
         <GridItem rowSpan={1} colSpan={2} bg='transparent' />
-        <GridItem rowSpan={1} colSpan={1} bg='gray.400'>
+        <GridItem rowSpan={1} colSpan={1} bg='transparent'>
           <IconButton
             aria-label={"Focus"}
-            size={"lg"}
-            mx={"5px"}
-            my={"5px"}
-            isDisabled={props.selectedNode === ""}
+            borderWidth={"1px"}
+            borderColor={"black"}
+            isDisabled={selectedNode === ""}
             onClick={() => {
-              props.onButtonClick("T");
+              onButtonClick("T");
             }}
-            icon={<Icon fontSize={"30px"} as={BiDockTop} />}
+            icon={<Icon as={BiDockTop} />}
           />
         </GridItem>
         <GridItem rowSpan={1} colSpan={2} bg='transparent' />
-        <GridItem rowSpan={1} colSpan={1} bg='gray.400'>
+        <GridItem rowSpan={1} colSpan={1} bg='transparent'>
           <IconButton
             aria-label={"Focus"}
-            size={"lg"}
-            mx={"5px"}
-            my={"5px"}
-            isDisabled={props.selectedNode === ""}
+            borderWidth={"1px"}
+            borderColor={"black"}
+            isDisabled={selectedNode === ""}
             onClick={() => {
-              props.onButtonClick("EL");
+              onButtonClick("EL");
             }}
-            icon={<Icon fontSize={"30px"} as={BiArrowToLeft} />}
+            icon={<Icon as={BiArrowToLeft} />}
           />{" "}
         </GridItem>
-        <GridItem rowSpan={1} colSpan={1} bg='gray.400'>
+        <GridItem rowSpan={1} colSpan={1} bg='transparent'>
           <IconButton
             aria-label={"Focus"}
-            size={"lg"}
-            mx={"5px"}
-            my={"5px"}
-            isDisabled={props.selectedNode === ""}
+            borderWidth={"1px"}
+            borderColor={"black"}
+            isDisabled={selectedNode === ""}
             onClick={() => {
-              props.onButtonClick("L");
+              onButtonClick("L");
             }}
-            icon={<Icon fontSize={"30px"} as={BiDockLeft} />}
+            icon={<Icon as={BiDockLeft} />}
           />
         </GridItem>
-        <GridItem rowSpan={1} colSpan={1} bg='gray.400'>
+        <GridItem rowSpan={1} colSpan={1} bg='transparent'>
           <Button
             aria-label={"Focus"}
-            mx={"4px"}
-            my={"5px"}
             fontSize={"10px"}
-            width={"50px"}
-            height={"50px"}
+            borderWidth={"1px"}
+            borderColor={"black"}
+            width={"40px"}
+            height={"40px"}
+            borderRadius={"0px"}
             onClick={() => {
-              props.onButtonClick("C");
+              onButtonClick("C");
             }}
-            icon={<Icon fontSize={"30px"} as={BiRectangle} />}
+            icon={<Icon as={BiRectangle} />}
           >
             Replace
           </Button>
         </GridItem>
-        <GridItem rowSpan={1} colSpan={1} bg='gray.400'>
+        <GridItem rowSpan={1} colSpan={1} bg='transparent'>
           <IconButton
             aria-label={"Focus"}
-            size={"lg"}
-            mx={"5px"}
-            my={"5px"}
-            isDisabled={props.selectedNode === ""}
+            borderWidth={"1px"}
+            borderColor={"black"}
+            isDisabled={selectedNode === ""}
             onClick={() => {
-              props.onButtonClick("R");
+              onButtonClick("R");
             }}
-            icon={<Icon fontSize={"30px"} as={BiDockRight} />}
+            icon={<Icon as={BiDockRight} />}
           />
         </GridItem>
-        <GridItem rowSpan={1} colSpan={1} bg='gray.400'>
+        <GridItem rowSpan={1} colSpan={1} bg='transparent'>
           <IconButton
             aria-label={"Focus"}
-            size={"lg"}
-            mx={"5px"}
-            my={"5px"}
-            isDisabled={props.selectedNode === ""}
+            borderWidth={"1px"}
+            borderColor={"black"}
+            isDisabled={selectedNode === ""}
             onClick={() => {
-              props.onButtonClick("ER");
+              onButtonClick("ER");
             }}
-            icon={<Icon fontSize={"30px"} as={BiArrowToRight} />}
+            icon={<Icon as={BiArrowToRight} />}
           />
         </GridItem>
         <GridItem rowSpan={1} colSpan={2} bg='transparent' />
-        <GridItem rowSpan={1} colSpan={1} bg='gray.400'>
+        <GridItem rowSpan={1} colSpan={1} bg='transparent'>
           <IconButton
             aria-label={"Focus"}
-            size={"lg"}
-            mx={"5px"}
-            my={"5px"}
-            isDisabled={props.selectedNode === ""}
+            borderWidth={"1px"}
+            borderColor={"black"}
+            isDisabled={selectedNode === ""}
             onClick={() => {
-              props.onButtonClick("B");
+              onButtonClick("B");
             }}
-            icon={<Icon fontSize={"30px"} as={BiDockBottom} />}
+            icon={<Icon as={BiDockBottom} />}
           />
         </GridItem>
         <GridItem rowSpan={1} colSpan={2} bg='transparent' />
         <GridItem rowSpan={1} colSpan={2} bg='transparent' />
-        <GridItem rowSpan={1} colSpan={1} bg='gray.400'>
+        <GridItem rowSpan={1} colSpan={1} bg='transparent'>
           <IconButton
             aria-label={"Focus"}
-            size={"lg"}
-            mx={"5px"}
-            my={"5px"}
-            isDisabled={props.selectedNode === ""}
+            borderWidth={"1px"}
+            borderColor={"black"}
+            isDisabled={selectedNode === ""}
             onClick={() => {
-              props.onButtonClick("EB");
+              onButtonClick("EB");
             }}
-            icon={<Icon fontSize={"30px"} as={BiArrowToBottom} />}
+            icon={<Icon as={BiArrowToBottom} />}
           />
         </GridItem>
         <GridItem rowSpan={1} colSpan={2} bg='transparent' />

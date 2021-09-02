@@ -36,7 +36,7 @@ export function ErrorPage(props: ErrorPageProps) {
   return (
     <Center h={"100vh"}>
       <Box>
-        <Heading>Error</Heading>
+        <Heading>Redirecting...</Heading>
         <Spinner></Spinner>
         <Text fontSize={"20px"}>Reconnecting in {timer}</Text>
         <Text fontSize={"20px"}>{props.message}</Text>

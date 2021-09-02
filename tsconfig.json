@@ -13,6 +13,7 @@
         "sourceMap": true,
         "inlineSources": true,
         "jsx": "react",
+        "resolveJsonModule": true,
         "types": [
             "react",
             "react-dom",
@@ -22,5 +23,5 @@
      
     },
 
-    "include": ["src/**/*", "test", "certificates", "electron"]
+    "include": ["src/**/*", "test", "certificates", "electron", "backup/Throwable", "backup/PDFReader", "backup/DonutSelector", "backup/StocksApp", "backup/CardsApp"]
 }

@@ -2,13 +2,8 @@ import { MapUI } from "./MapModel";
 import React from "react";
 import { Box } from "@chakra-ui/react";
 import { MapController } from "./MapController";
-import { Map, Marker, Point, ZoomControl } from "pigeon-maps";
-import {
-  osm,
-  stamenTerrain,
-  stamenToner,
-  maptiler,
-} from "pigeon-maps/providers";
+import { Map, Marker, ZoomControl } from "pigeon-maps";
+import { osm, stamenTerrain, stamenToner } from "pigeon-maps/providers";
 export function MapView({ controller }: { controller: MapController }) {
   const { children, ...component } = controller.get() as MapUI;
 

@@ -155,6 +155,12 @@ export function CreateInteractionModal(props: CreateInteractionModalProps) {
                           onChange
                         </MenuItemOption>
                         <MenuItemOption value='onScan'>onScan</MenuItemOption>
+                        <MenuItemOption value='onPlayCard'>
+                          onPlayCard
+                        </MenuItemOption>
+                        <MenuItemOption value='onWithdraw'>
+                          onWithdraw
+                        </MenuItemOption>
                       </MenuOptionGroup>
                     </MenuList>
                   </Menu>

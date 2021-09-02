@@ -71,9 +71,6 @@ export function RolePage(props: RoleProps) {
               key={model.getDeviceRole() + "-view-" + node.viewId}
               view={view}
               role={role}
-              onBroadcast={(viewId: string, from: string) => {
-                model.setQuickInteraction(viewId, from);
-              }}
             />
 
             <Box

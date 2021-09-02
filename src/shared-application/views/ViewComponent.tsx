@@ -1,80 +1,110 @@
-import { Icon } from "@chakra-ui/icons";
-import {
-  Box,
-  Center,
-  IconButton,
-  Popover,
-  PopoverArrow,
-  PopoverBody,
-  PopoverCloseButton,
-  PopoverContent,
-  PopoverHeader,
-  PopoverTrigger,
-  Portal,
-} from "@chakra-ui/react";
-import React, { useMemo } from "react";
+import { Box, Button, Text, Center } from "@chakra-ui/react";
+import React, { useContext, useMemo } from "react";
 import { FC } from "react";
 // import { UIComponentFactory } from "../components/UIComponentFactory";
-import { ImQrcode } from "react-icons/im";
-import { GiFastArrow } from "react-icons/gi";
 import { Role } from "../roles/Role";
 import { View } from "./View";
+import { CrossAppState, CrossAppContext } from "../../context/AppContext";
+import { IoPushOutline } from "react-icons/io5";
+import { LayoutModal } from "../../components/LayoutModal";
 const QRCode = require("qrcode.react");
 
 interface ViewComponentProps {
   view: View;
   role: Role;
-  onBroadcast?: (viewId: string, from: string) => void;
 }
 
 export const ViewComponent: FC<ViewComponentProps> = (
   props: ViewComponentProps
 ) => {
   let qrUrl = "view/" + props.view.getId() + "#from=" + props.role.getId();
-
+  const {
+    isQRMode,
+    selectedNode,
+    isLayoutOpen,
+    setSelectedNode,
+    isSelectMode,
+    setSelectedContainerPush,
+    app,
+    selectedContainerPush,
+  } = useContext<CrossAppState>(CrossAppContext);
+  console.log(isQRMode);
   return (
     <Box
       w={"100%"}
       h={"100%"}
-      borderWidth={"2px"}
-      borderColor={"black"}
+      borderWidth={"10px"}
+      borderColor={"blackAlpha.400"}
+      bg={
+        isQRMode
+          ? "blackAlpha.400"
+          : isLayoutOpen && selectedNode === props.view.getId()
+          ? "rgba(17, 99, 245,0.4)"
+          : undefined
+      }
       position={"relative"}
       key={"view-" + props.view.getId()}
     >
-      {useMemo(() => {
-        return props.view.getRoot().generateWidget();
-      }, [JSON.stringify(props.view.getRoot().getSnapshot())])}
-      <Box position={"absolute"} top={"0px"} right={"0px"}>
-        <IconButton
-          size={"sm"}
-          aria-label={"QRCode"}
-          onClick={() => {
-            props.onBroadcast(props.view.getId(), props.role.getName());
-          }}
-          icon={<Icon as={GiFastArrow} />}
-        />
-        <Popover>
-          <PopoverTrigger>
-            <IconButton
-              size={"sm"}
-              aria-label={"QRCode"}
-              icon={<Icon as={ImQrcode} />}
-            />
-          </PopoverTrigger>
-          <Portal>
-            <PopoverContent>
-              <PopoverArrow />
-              <PopoverCloseButton />
-              <PopoverHeader>QRCode</PopoverHeader>
-              <PopoverBody>
-                <Center>
-                  <QRCode value={qrUrl} />
-                </Center>
-              </PopoverBody>
-            </PopoverContent>
-          </Portal>
-        </Popover>
-      </Box>
+      {isQRMode ? (
+        <Center h={"100%"} w={"100%"}>
+          <Box h={"138px"} w={"138px"} p={"5px"} bg={"white"}>
+            <QRCode value={qrUrl} />
+          </Box>
+        </Center>
+      ) : isLayoutOpen && selectedNode === props.view.getId() ? (
+        <Center h={"100%"} w={"100%"}>
+          <LayoutModal
+            isOpen={isLayoutOpen}
+            setSelected={(newSelected: string) => {
+              setSelectedNode(newSelected);
+            }}
+            onButtonClick={(name: string) => {}}
+          />
+        </Center>
+      ) : isSelectMode && selectedContainerPush.view === props.view.getId() ? (
+        <Center h={"100%"} w={"100%"}>
+          <Button
+            m={"auto"}
+            w={["70%", "40%"]}
+            h={["30%", "40%"]}
+            onClick={() => {
+              app
+                .getSharedObject()
+                .setQuickInteraction(props.view.getId(), props.role.getName());
+            }}
+          >
+            <Box align={"center"}>
+              <Text fontSize={"40px"}>Push</Text>
+
+              <IoPushOutline fontSize={"60px"} />
+            </Box>
+          </Button>
+        </Center>
+      ) : isSelectMode ? (
+        <Box w={"100%"} h={"100%"} position={"relative"}>
+          {useMemo(() => {
+            return props.view.getRoot().generateWidget();
+          }, [JSON.stringify(props.view.getRoot().getSnapshot())])}
+          <Box
+            w={"100%"}
+            h={"100%"}
+            position={"absolute"}
+            left={0}
+            top={0}
+            _hover={{ bg: "rgba(17, 99, 245,0.4)" }}
+            onClick={() => {
+              setSelectedContainerPush({
+                view: props.view.getId(),
+                from: props.role.getName(),
+              });
+            }}
+          ></Box>
+        </Box>
+      ) : (
+        useMemo(() => {
+          return props.view.getRoot().generateWidget();
+        }, [JSON.stringify(props.view.getRoot().getSnapshot())])
+      )}
     </Box>
   );
 };

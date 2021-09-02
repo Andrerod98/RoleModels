@@ -49,9 +49,13 @@ import { LayoutNode } from "../roles/Layout";
 import { Logger } from "../Logger";
 import { QuickInteraction } from "./IQuickInteraction";
 import { ButtonFactory } from "../../shared-components/Button";
-import { PDFReaderFactory } from "../../shared-components/PDFReader";
 import { QRCodeFactory } from "../../shared-components/QRCode";
-import { ThrowableFactory } from "../../shared-components/Throwable";
+import { AreaChartFactory } from "../../shared-components/AreaChart";
+import { XYChartFactory } from "../../shared-components/XYChart";
+import { BoardFactory } from "../../shared-components/Board";
+import { HandFactory } from "../../shared-components/Hand";
+import { TextFactory } from "../../shared-components/Text";
+import { StockDetailsFactory } from "../../shared-components/StockDetails";
 
 export class PrototypingToolDataObject
   extends DataObject
@@ -80,6 +84,7 @@ export class PrototypingToolDataObject
   private interactionsManager: InteractionsManager;
 
   private quickInteraction: SharedCell;
+  private qrMode: SharedCell;
 
   /* The Manager responsible for rendering components */
   private factoriesManager: FactoriesManager;
@@ -154,6 +159,10 @@ export class PrototypingToolDataObject
       fulfilled: false,
     } as QuickInteraction);
 
+    const qrMode = SharedCell.create(this.runtime);
+
+    qrMode.set(false);
+
     rolesMap.set(managerRoleId, managerRole.handle);
     rolesMap.set(designerRoleId, designerRole.handle);
     rolesMap.set(defaultRoleId, defaultRole.handle);
@@ -170,6 +179,7 @@ export class PrototypingToolDataObject
     this.root.set("primary-configuration", primaryConfiguration.handle);
     this.root.set("interactions", interactionsMap.handle);
     this.root.set("quick-interaction", quickInteraction.handle);
+    this.root.set("qr-mode", qrMode.handle);
     Logger.getInstance().info("The application has been setup with success.");
   }
 
@@ -215,6 +225,7 @@ export class PrototypingToolDataObject
       this.root.get<IFluidHandle<SharedCell>>("primary-configuration").get(),
       this.root.get<IFluidHandle<SharedCell>>("quick-interaction").get(),
       this.root.wait<IFluidHandle<IInk>>("ink"),
+      this.root.get<IFluidHandle<SharedCell>>("qr-mode").get(),
     ]);
 
     this.devicesMap = sharedMaps[0];
@@ -228,6 +239,7 @@ export class PrototypingToolDataObject
     this.primaryConfiguration = sharedObjects[2];
     this.quickInteraction = sharedObjects[3];
     this.ink = await sharedObjects[4].get();
+    this.qrMode = sharedObjects[5];
   }
 
   private loadManagers() {
@@ -311,10 +323,6 @@ export class PrototypingToolDataObject
     );
 
     this.factoriesManager.registerFactory(
-      new ThrowableFactory(this.factoriesManager)
-    );
-
-    this.factoriesManager.registerFactory(
       new ButtonFactory(this.factoriesManager)
     );
     this.factoriesManager.registerFactory(
@@ -326,7 +334,27 @@ export class PrototypingToolDataObject
     );
 
     this.factoriesManager.registerFactory(
-      new PDFReaderFactory(this.factoriesManager)
+      new AreaChartFactory(this.factoriesManager)
+    );
+
+    this.factoriesManager.registerFactory(
+      new XYChartFactory(this.factoriesManager)
+    );
+
+    this.factoriesManager.registerFactory(
+      new BoardFactory(this.factoriesManager)
+    );
+
+    this.factoriesManager.registerFactory(
+      new HandFactory(this.factoriesManager)
+    );
+
+    this.factoriesManager.registerFactory(
+      new TextFactory(this.factoriesManager)
+    );
+
+    this.factoriesManager.registerFactory(
+      new StockDetailsFactory(this.factoriesManager)
     );
   }
 
@@ -337,6 +365,10 @@ export class PrototypingToolDataObject
 
     this.quickInteraction.on("valueChanged", () => {
       this.emit("change", "qi");
+    });
+
+    this.qrMode.on("valueChanged", () => {
+      this.emit("change", "qr-mode");
     });
 
     this.devicesMap.on("valueChanged", () => {
@@ -424,6 +456,14 @@ export class PrototypingToolDataObject
 
   public getQuickInteraction() {
     return this.quickInteraction.get();
+  }
+
+  public setQRMode(value: boolean) {
+    this.qrMode.set(value);
+  }
+
+  public getQRMode() {
+    return this.qrMode.get();
   }
 
   public pingAll() {

@@ -20,8 +20,15 @@ export interface CrossAppState {
   setLoggingOpen: any;
   isLayoutOpen: boolean;
   setLayoutOpen: any;
+  isSelectMode: boolean;
+  setSelectMode: any;
+  selectedContainerPush: { view: string; from: string };
+  setSelectedContainerPush: any;
+  isCrossDeviceInteractionOpen: boolean;
+  setCrossDeviceInteractionOpen: any;
   isHeaderOpen: boolean;
   setHeaderOpen: any;
+  isQRMode: boolean;
   isQuickInteractionOpen: boolean;
   setQuickInteractionOpen: any;
   newViewId: string;
@@ -41,8 +48,16 @@ export const CrossAppProvider = ({
   const [isLoggingOpen, setLoggingOpen] = useState(false);
   const [isLayoutOpen, setLayoutOpen] = useState(false);
   const [isHeaderOpen, setHeaderOpen] = useState(false);
+  const [isSelectMode, setSelectMode] = useState(false);
+  const [selectedContainerPush, setSelectedContainerPush] = useState({
+    view: "",
+    from: "",
+  });
   const [newViewId, setNewViewId] = useState("");
   const [isQuickInteractionOpen, setQuickInteractionOpen] = useState(false);
+  const [isCrossDeviceInteractionOpen, setCrossDeviceInteractionOpen] =
+    useState(false);
+
   const generateState = () => {
     let layoutNode;
 
@@ -66,6 +81,7 @@ export const CrossAppProvider = ({
       devices: Array.from(model.getDevices()),
       role: model.getMyRole(),
       quickInteraction: model.getQuickInteraction(),
+      isQRMode: model.getQRMode(),
       layout: layoutNode,
     };
   };
@@ -80,8 +96,11 @@ export const CrossAppProvider = ({
 
       if (type === "qi") {
         const qi = model.getQuickInteraction();
-        if (qi && qi.from !== model.getMyRole().getName())
+
+        if (qi && qi.from !== model.getMyRole().getName()) {
+          setSelectedContainerPush({ view: qi.viewId, from: qi.from });
           setQuickInteractionOpen(true);
+        }
       }
 
       onChange();
@@ -103,14 +122,21 @@ export const CrossAppProvider = ({
         role: state.role,
         layout: state.layout,
         quickInteraction: state.quickInteraction,
+        isQRMode: state.isQRMode,
         selectedNode: selectedNode,
         setSelectedNode: setSelectedNode,
+        selectedContainerPush: selectedContainerPush,
+        setSelectedContainerPush: setSelectedContainerPush,
         isLoggingOpen: isLoggingOpen,
         setLoggingOpen: setLoggingOpen,
         isHeaderOpen: isHeaderOpen,
         setHeaderOpen: setHeaderOpen,
+        isSelectMode: isSelectMode,
+        setSelectMode: setSelectMode,
         isLayoutOpen: isLayoutOpen,
         setLayoutOpen: setLayoutOpen,
+        isCrossDeviceInteractionOpen: isCrossDeviceInteractionOpen,
+        setCrossDeviceInteractionOpen: setCrossDeviceInteractionOpen,
         isQuickInteractionOpen: isQuickInteractionOpen,
         setQuickInteractionOpen: setQuickInteractionOpen,
         newViewId: newViewId,

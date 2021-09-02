@@ -97,10 +97,10 @@ export const Preview = (props: PreviewProps) => {
               _hover={
                 props.isOpenLayoutModal ? { bg: "rgba(17, 99, 245,0.4)" } : {}
               }
-              bg={
-                props.selectedNode === node.viewId && props.isOpenLayoutModal
-                  ? "rgba(17, 99, 245,0.4)"
-                  : "transparent"
+              display={
+                props.isOpenLayoutModal && props.selectedNode !== node.viewId
+                  ? "block"
+                  : "none"
               }
               w={"100%"}
               h={"100%"}

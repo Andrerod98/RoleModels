@@ -1,6 +1,6 @@
 import { Flex, Button, Box, Text } from "@chakra-ui/react";
 import React from "react";
-import { CgArrowsExpandDownRight, CgScreenMirror } from "react-icons/cg";
+import { CgArrowsExpandDownRight, CgEye, CgScreenMirror } from "react-icons/cg";
 
 interface CrossDeviceInteractionChooserProps {
   onMirror: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
@@ -9,11 +9,16 @@ interface CrossDeviceInteractionChooserProps {
     side: string
   ) => void;
   onClose: () => void;
+
+  onQuickInteraction: (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => void;
   onMigrate: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 }
 export function CrossDeviceInteractionChooser({
   onMirror,
   onStitch,
+  onQuickInteraction,
   onClose,
   onMigrate,
 }: CrossDeviceInteractionChooserProps) {
@@ -31,7 +36,8 @@ export function CrossDeviceInteractionChooser({
         justifyContent={"space-around"}
       >
         <Button
-          m={"auto"}
+          mx={"20px"}
+          my={"auto"}
           w={["70%", "40%"]}
           h={["30%", "40%"]}
           onClick={onMigrate}
@@ -43,15 +49,29 @@ export function CrossDeviceInteractionChooser({
           </Box>
         </Button>
         <Button
-          m={"auto"}
+          mx={"20px"}
+          my={"auto"}
           w={["70%", "40%"]}
           h={["30%", "40%"]}
           onClick={onMirror}
         >
           <Box align={"center"}>
-            <Text fontSize={"40px"}> Mirror</Text>
+            <Text fontSize={"40px"}>Mirror</Text>
 
             <CgScreenMirror fontSize={"60px"} />
+          </Box>
+        </Button>
+        <Button
+          mx={"20px"}
+          my={"auto"}
+          w={["70%", "40%"]}
+          h={["30%", "40%"]}
+          onClick={onQuickInteraction}
+        >
+          <Box align={"center"}>
+            <Text fontSize={"40px"}>Quick Interaction</Text>
+
+            <CgEye fontSize={"60px"} />
           </Box>
         </Button>
       </Flex>

@@ -1,67 +1,82 @@
 import {
-  Icon,
-  IconButton,
   Modal,
   ModalCloseButton,
   ModalContent,
   ModalOverlay,
-  useDisclosure,
 } from "@chakra-ui/react";
-import React, { FC, useContext, useState } from "react";
-import { AiOutlineExpand } from "react-icons/ai";
+import React, { FC, useContext } from "react";
+import { uuid } from "uuidv4";
 import { CrossAppState, CrossAppContext } from "../context/AppContext";
-import { QRCodeController } from "../shared-components/QRCode";
+import { ILayoutNode } from "../shared-application/roles/ILayoutNode";
 
 import { CrossDeviceInteractionChooser } from "./CrossDeviceInteractionChooser";
-import { CustomQRReader } from "./CustomQRReader";
 
 interface CrossDeviceInteractionModalProps {
   onViewChange: (nvid: string) => void;
 }
 export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
   (props: CrossDeviceInteractionModalProps) => {
-    const { isOpen, onOpen, onClose } = useDisclosure();
-    const { app, setLayoutOpen, setNewViewId, setHeaderOpen } =
-      useContext<CrossAppState>(CrossAppContext);
+    const {
+      app,
+      setLayoutOpen,
+      setCrossDeviceInteractionOpen,
+      isCrossDeviceInteractionOpen,
+      selectedContainerPush,
+      role,
+      setNewViewId,
+      setSelectedNode,
+      setHeaderOpen,
+    } = useContext<CrossAppState>(CrossAppContext);
 
-    const [{ view, from }, setState] = useState({
-      view: undefined,
-      qr: undefined,
-      from: "",
-    });
+    const view = app.getSharedObject().getView(selectedContainerPush.view);
+    const from = selectedContainerPush.from;
 
-    const handleScan = (view: string, qr: string, from: string) => {
-      const state = {
-        view: undefined,
-        qr: undefined,
-        from: from,
-      };
-      if (view != "") {
-        state.view = app.getSharedObject().getView(view);
-      } else if (qr != "") {
-        const qrController = app
-          .getSharedObject()
-          .getComponentFromAllViews(qr) as QRCodeController;
-        if (qrController) {
-          qrController.scan();
-        }
-        onClose();
-      }
+    const primaryLayout = app.getSharedObject().getPrimaryConfiguration();
+    const currentLayout = app
+      .getSharedObject()
+      .getCurrentConfigurationOfRole(role.getId());
 
-      setState(state);
-    };
+    console.log({ currentLayoutTest: currentLayout });
 
     const handleMigrate = (
       e: React.MouseEvent<HTMLButtonElement, MouseEvent>
     ) => {
       e.stopPropagation();
       app.getSharedObject().migrateView(view, from);
-      setNewViewId(view.id);
-      setLayoutOpen(true);
 
-      props.onViewChange(view.id);
+      console.log(app.getSharedObject().getMyViews());
+      const length = app.getSharedObject().getMyViews().length;
+      if (length === 0) {
+        if (role.getName() === "designer") {
+          primaryLayout.update({
+            id: uuid(),
+            name: "view",
+            viewId: view.getId(),
+          } as ILayoutNode);
+          setSelectedNode(view.getId());
+        } else {
+          app
+            .getSharedObject()
+            .getCurrentConfigurationOfRole(role.getId())
+            .update({
+              id: uuid(),
+              name: "view",
+              viewId: view.getId(),
+            } as ILayoutNode);
+        }
+        setSelectedNode(view.getId());
+        console.log(
+          app.getSharedObject().getCurrentConfigurationOfRole(role.getId())
+        );
+      } else {
+        setNewViewId(view.getId());
+        setLayoutOpen(true);
+      }
+
+      props.onViewChange(view.getId());
       setHeaderOpen(false);
-      onClose();
+      app.getSharedObject().setQRMode(false);
+      setCrossDeviceInteractionOpen(false);
     };
 
     const handleMirror = (
@@ -70,11 +85,32 @@ export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
       e.stopPropagation();
       //app.mirrorViews(view, view);
 
-      setNewViewId(view.id);
-      setLayoutOpen(true);
-      props.onViewChange(view.id);
+      const length = app.getSharedObject().getMyViews().length;
+      if (length === 0) {
+        if (role.getName() === "designer") {
+          primaryLayout.update({
+            id: uuid(),
+            name: "view",
+            viewId: view.getId(),
+          } as ILayoutNode);
+          setSelectedNode(view.getId());
+        } else {
+          currentLayout.update({
+            id: uuid(),
+            name: "view",
+            viewId: view.getId(),
+          } as ILayoutNode);
+          setSelectedNode(view.getId());
+        }
+      } else {
+        setNewViewId(view.getId());
+        setLayoutOpen(true);
+        setSelectedNode(view.getId());
+      }
+      props.onViewChange(view.getId());
       setHeaderOpen(false);
-      onClose();
+      app.getSharedObject().setQRMode(false);
+      setCrossDeviceInteractionOpen(false);
     };
 
     const handleStitch = (
@@ -84,49 +120,41 @@ export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
       //const stitchingCV = app.stitchViews(view.view, view.view);
 
       //stitchingCV.stitchBottom(app.getMyRole().getName(), view.from);
-      onClose();
+      app.getSharedObject().setQRMode(false);
+      setCrossDeviceInteractionOpen(false);
+    };
+
+    const handleQuickInteraction = (
+      e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    ) => {
+      app.getSharedObject().setQuickInteraction(view.getId(), from);
+      setCrossDeviceInteractionOpen(false);
+    };
+
+    const handleClose = () => {
+      setCrossDeviceInteractionOpen(false);
+      app.getSharedObject().setQRMode(false);
     };
 
     return (
-      <>
-        <IconButton
-          aria-label={"Focus"}
-          size={"sm"}
-          ml={"10px"}
-          my={"5px"}
-          icon={<Icon as={AiOutlineExpand} />}
-          onClick={() => {
-            onOpen();
-            setState({
-              view: undefined,
-              qr: undefined,
-              from: "",
-            });
-          }}
-        />
-        <Modal isOpen={isOpen} onClose={onClose} size={"full"}>
-          <ModalOverlay />
-          <ModalContent
-            m={0}
-            bg={"transparent"}
-            position={"relative"}
-            h={"100%"}
-          >
-            {view ? (
-              <>
-                <CrossDeviceInteractionChooser
-                  onClose={onClose}
-                  onMigrate={handleMigrate}
-                  onMirror={handleMirror}
-                  onStitch={handleStitch}
-                />
-                <ModalCloseButton />
-              </>
-            ) : (
-              <CustomQRReader onClose={onClose} onScan={handleScan} />
-            )}
-          </ModalContent>
-        </Modal>
-      </>
+      <Modal
+        isOpen={isCrossDeviceInteractionOpen}
+        onClose={handleClose}
+        size={"full"}
+      >
+        <ModalOverlay />
+        <ModalContent m={0} bg={"transparent"} position={"relative"} h={"100%"}>
+          <>
+            <CrossDeviceInteractionChooser
+              onClose={handleClose}
+              onMigrate={handleMigrate}
+              onMirror={handleMirror}
+              onStitch={handleStitch}
+              onQuickInteraction={handleQuickInteraction}
+            />
+            <ModalCloseButton />
+          </>
+        </ModalContent>
+      </Modal>
     );
   };

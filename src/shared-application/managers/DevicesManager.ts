@@ -58,8 +58,7 @@ export class DevicesManager {
 
   /* Getters */
   /*
-   * Get an array of all devices objects for the devices
-   * who have joined the session (even if they have left).
+   * Get an array of all connected devices.
    */
   public getDevices(): IterableIterator<IDevice> {
     return this.devicesMap.values();
@@ -109,7 +108,7 @@ export class DevicesManager {
   }
 
   /*
-   * Promoted a certain device to a role. In case the device ID is not specified
+   * Promotes a certain device to a role. In case the device ID is not specified
    * it updates the current device
    */
   public promoteToRole(role: string, deviceId?: string) {
@@ -133,7 +132,7 @@ export class DevicesManager {
   }
 
   /*
-   * Promotes the current device to manager
+   * Promotes the current device to designer
    */
   public promoteToDesigner(): void {
     this.promoteToRole(DefaultRoles.Designer);
@@ -194,7 +193,9 @@ export class DevicesManager {
    */
   private memberRemoved(clientId: string) {
     if (this.devicesMap.has(clientId)) {
-      Logger.getInstance().warning(`This device with id ${clientId} has been removed.`);
+      Logger.getInstance().warning(
+        `This device with id ${clientId} has been removed.`
+      );
       this.devicesMap.delete(clientId);
     }
   }

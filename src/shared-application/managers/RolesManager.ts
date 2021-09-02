@@ -117,7 +117,7 @@ export class RolesManager extends EventEmitter {
   }
 
   /*
-   * Gets a roles
+   * Gets all the roles
    */
   public getRoles = (): IterableIterator<Role> => this.roles.values();
 

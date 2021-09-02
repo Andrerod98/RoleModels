@@ -28,9 +28,14 @@ export function RoleTab(props: RoleTabProps) {
     setNewViewId,
     isLayoutOpen,
     setLayoutOpen,
+    role,
   } = useContext<CrossAppState>(CrossAppContext);
   const views = Array.from(app.getSharedObject().getAllViews());
-  const layout = app.getSharedObject().getPrimaryConfiguration();
+
+  const primaryLayout = app.getSharedObject().getPrimaryConfiguration();
+  let currentLayout = app
+    .getSharedObject()
+    .getCurrentConfigurationOfRole(role.getId());
 
   const [codeState, setCodeState] = useState({
     value: Utils.jsonToString(views.map((v) => v.toView())),
@@ -81,8 +86,31 @@ export function RoleTab(props: RoleTabProps) {
     const newValueAsString = Utils.jsonToString(valueAsJson);
     setCodeState({ ...codeState, value: newValueAsString });
     preview(newValueAsString);
-    setNewViewId(newView.id);
-    setLayoutOpen(true);
+
+    const length = views.length;
+    const id = uuid();
+    if (length === 0) {
+      if (role.getName() === "designer") {
+        primaryLayout.update({
+          id: id,
+          name: "view",
+          viewId: newView.id,
+        } as ILayoutNode);
+        setSelectedNode(newView.id);
+        console.log("ADDED:" + newView.id);
+      } else {
+        currentLayout.update({
+          id: id,
+          name: "view",
+          viewId: newView.id,
+        } as ILayoutNode);
+        setSelectedNode(newView.id);
+      }
+    } else {
+      setNewViewId(newView.id);
+
+      setLayoutOpen(true);
+    }
   };
 
   const addUIComponent = (name: string) => {
@@ -169,8 +197,8 @@ export function RoleTab(props: RoleTabProps) {
           <Center h={"100%"} bg={"gray.700"} w={"100%"}>
             <Previewer
               layout={
-                layout
-                  ? layout.getRoot().toLayout()
+                primaryLayout
+                  ? primaryLayout.getRoot().toLayout()
                   : ({
                       id: uuid(),
                       name: "div",
@@ -187,6 +215,7 @@ export function RoleTab(props: RoleTabProps) {
                 preview();
               }}
               setSelected={(newSelected: string) => {
+                console.log("SELECTED:" + newSelected);
                 setSelectedNode(newSelected);
               }}
               selectedNode={selectedNode}

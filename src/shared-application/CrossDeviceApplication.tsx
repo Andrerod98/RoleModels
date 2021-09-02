@@ -7,28 +7,6 @@ import { Container } from "@fluidframework/container-loader";
 import { TinyliciousServiceWithUrl } from "../utils/tinyliciousService";
 import { CrossDeviceApplicationView } from "./CrossDeviceApplicationView";
 import { PrototypingToolDataObject } from "./shared-object/PrototypingToolDataObject";
-import {
-  RadioFactory,
-  MapFactory,
-  ListFactory,
-  LinkFactory,
-  InputFactory,
-  ImageFactory,
-  FlexFactory,
-  SpacerFactory,
-  BoxFactory,
-  CenterFactory,
-  StackFactory,
-  GridFactory,
-  CheckboxFactory,
-  EditableFactory,
-  SliderFactory,
-  InkCanvasFactory,
-} from "../shared-components";
-import { ButtonFactory } from "../shared-components/Button";
-import { QRCodeFactory } from "../shared-components/QRCode";
-import { ThrowableFactory } from "../shared-components/Throwable";
-import { PDFReaderFactory } from "../shared-components/PDFReader";
 
 export class CrossDeviceApplication {
   protected sharedObject: PrototypingToolDataObject;
@@ -39,9 +17,7 @@ export class CrossDeviceApplication {
     public readonly projectName: string
   ) {}
 
-  public registerDefaultFactories() {
-    
-  }
+  public registerDefaultFactories() {}
   public getServerURL(): string {
     return this.serverUrl;
   }

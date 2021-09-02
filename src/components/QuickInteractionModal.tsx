@@ -1,16 +1,8 @@
 import {
-  AlertDialog,
-  AlertDialogOverlay,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogBody,
-  AlertDialogFooter,
-  Button,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
-  ModalFooter,
   ModalHeader,
   ModalOverlay,
 } from "@chakra-ui/react";
@@ -19,23 +11,19 @@ import { CrossAppState, CrossAppContext } from "../context/AppContext";
 import { ViewComponent } from "../shared-application/views/ViewComponent";
 
 export function QuickInteractionModal() {
-  const cancelRef = React.useRef();
-
-  const [isAccepted, setAccepted] = React.useState(false);
-
   const {
     app,
     isQuickInteractionOpen,
     setQuickInteractionOpen,
-    quickInteraction,
+    selectedContainerPush,
+    role,
   } = useContext<CrossAppState>(CrossAppContext);
-  const model = app.getSharedObject();
 
-  const view = model.getView(quickInteraction.viewId);
-  const role = model.getRoleByName(quickInteraction.from);
+  const view = app.getSharedObject().getView(selectedContainerPush.view);
+
   return (
     <>
-      <AlertDialog
+      {/* <AlertDialog
         isOpen={isQuickInteractionOpen}
         leastDestructiveRef={cancelRef}
         onClose={() => {
@@ -66,7 +54,7 @@ export function QuickInteractionModal() {
                 colorScheme='green'
                 onClick={() => {
                   setQuickInteractionOpen(false);
-                  setAccepted(true);
+                  setCrossDeviceInteractionOpen(true);
                 }}
                 ml={3}
               >
@@ -75,11 +63,11 @@ export function QuickInteractionModal() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialogOverlay>
-      </AlertDialog>
+              </AlertDialog> */}
       <Modal
-        isOpen={isAccepted}
+        isOpen={isQuickInteractionOpen}
         onClose={() => {
-          setAccepted(false);
+          setQuickInteractionOpen(false);
         }}
       >
         <ModalOverlay />
@@ -89,18 +77,6 @@ export function QuickInteractionModal() {
           <ModalBody>
             <ViewComponent view={view} role={role} />
           </ModalBody>
-
-          <ModalFooter>
-            <Button
-              colorScheme='blue'
-              mr={3}
-              onClick={() => {
-                setAccepted(false);
-              }}
-            >
-              Done
-            </Button>
-          </ModalFooter>
         </ModalContent>
       </Modal>
     </>

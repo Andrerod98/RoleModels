@@ -34,7 +34,7 @@ module.exports = (env) => {
         zlib: require.resolve("browserify-zlib"),
         constants: require.resolve("constants-browserify")
       },
-      extensions: ['.ts', '.tsx', '.js']
+      extensions: ['.ts', '.tsx', '.js', '.json']
     },
     module: {
       rules: [
