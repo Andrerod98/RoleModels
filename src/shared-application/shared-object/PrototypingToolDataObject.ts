@@ -47,7 +47,7 @@ import { ViewsManager } from "../managers/ViewsManager";
 import { ILayoutNode } from "../roles/ILayoutNode";
 import { LayoutNode } from "../roles/Layout";
 import { Logger } from "../Logger";
-import { QuickInteraction } from "./IQuickInteraction";
+import { PushInteraction } from "./IPushInteraction";
 import { ButtonFactory } from "../../shared-components/Button";
 import { QRCodeFactory } from "../../shared-components/QRCode";
 import { AreaChartFactory } from "../../shared-components/AreaChart";
@@ -83,7 +83,7 @@ export class PrototypingToolDataObject
   private interactionsMap: SharedMap;
   private interactionsManager: InteractionsManager;
 
-  private quickInteraction: SharedCell;
+  private pushInteraction: SharedCell;
   private qrMode: SharedCell;
 
   /* The Manager responsible for rendering components */
@@ -151,13 +151,13 @@ export class PrototypingToolDataObject
       name: "div",
     } as ILayoutNode);
 
-    const quickInteraction = SharedCell.create(this.runtime);
+    const pushInteraction = SharedCell.create(this.runtime);
 
-    quickInteraction.set({
+    pushInteraction.set({
       viewId: "",
       from: "",
       fulfilled: false,
-    } as QuickInteraction);
+    } as PushInteraction);
 
     const qrMode = SharedCell.create(this.runtime);
 
@@ -178,7 +178,7 @@ export class PrototypingToolDataObject
     this.root.set("current-configuration", currentConfiguration.handle);
     this.root.set("primary-configuration", primaryConfiguration.handle);
     this.root.set("interactions", interactionsMap.handle);
-    this.root.set("quick-interaction", quickInteraction.handle);
+    this.root.set("push-interaction", pushInteraction.handle);
     this.root.set("qr-mode", qrMode.handle);
     Logger.getInstance().info("The application has been setup with success.");
   }
@@ -223,7 +223,7 @@ export class PrototypingToolDataObject
       this.root.get<IFluidHandle<SharedCounter>>("ping").get(),
       this.root.get<IFluidHandle<SharedCell>>("current-configuration").get(),
       this.root.get<IFluidHandle<SharedCell>>("primary-configuration").get(),
-      this.root.get<IFluidHandle<SharedCell>>("quick-interaction").get(),
+      this.root.get<IFluidHandle<SharedCell>>("push-interaction").get(),
       this.root.wait<IFluidHandle<IInk>>("ink"),
       this.root.get<IFluidHandle<SharedCell>>("qr-mode").get(),
     ]);
@@ -237,7 +237,7 @@ export class PrototypingToolDataObject
     this.pingCounter = sharedObjects[0];
     this.currentConfiguration = sharedObjects[1];
     this.primaryConfiguration = sharedObjects[2];
-    this.quickInteraction = sharedObjects[3];
+    this.pushInteraction = sharedObjects[3];
     this.ink = await sharedObjects[4].get();
     this.qrMode = sharedObjects[5];
   }
@@ -363,7 +363,7 @@ export class PrototypingToolDataObject
       this.emit("connected");
     });
 
-    this.quickInteraction.on("valueChanged", () => {
+    this.pushInteraction.on("valueChanged", () => {
       this.emit("change", "qi");
     });
 
@@ -446,16 +446,16 @@ export class PrototypingToolDataObject
     }
   }*/
 
-  public setQuickInteraction(viewId: string, from: string) {
-    this.quickInteraction.set({
+  public setPushInteraction(viewId: string, from: string) {
+    this.pushInteraction.set({
       viewId: viewId,
       from: from,
       fulfilled: false,
     });
   }
 
-  public getQuickInteraction() {
-    return this.quickInteraction.get();
+  public getPushInteraction() {
+    return this.pushInteraction.get();
   }
 
   public setQRMode(value: boolean) {

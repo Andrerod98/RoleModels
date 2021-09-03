@@ -3,7 +3,7 @@ import { CrossDeviceApplication } from "../shared-application/CrossDeviceApplica
 import { IDevice } from "../shared-application/devices/IDevice";
 import { LayoutNode } from "../shared-application/roles/Layout";
 import { Role } from "../shared-application/roles/Role";
-import { QuickInteraction } from "../shared-application/shared-object/IQuickInteraction";
+import { PushInteraction } from "../shared-application/shared-object/IPushInteraction";
 import { View } from "../shared-application/views/View";
 
 export const CrossAppContext = createContext(undefined);
@@ -26,14 +26,16 @@ export interface CrossAppState {
   setSelectedContainerPush: any;
   isCrossDeviceInteractionOpen: boolean;
   setCrossDeviceInteractionOpen: any;
+  isQuickInteractionOpen: boolean;
+  setQuickInteractionOpen: any;
   isHeaderOpen: boolean;
   setHeaderOpen: any;
   isQRMode: boolean;
-  isQuickInteractionOpen: boolean;
-  setQuickInteractionOpen: any;
+  isPushInteractionOpen: boolean;
+  setPushInteractionOpen: any;
   newViewId: string;
   setNewViewId: any;
-  quickInteraction: QuickInteraction;
+  pushInteraction: PushInteraction;
 }
 
 export const CrossAppProvider = ({
@@ -54,6 +56,7 @@ export const CrossAppProvider = ({
     from: "",
   });
   const [newViewId, setNewViewId] = useState("");
+  const [isPushInteractionOpen, setPushInteractionOpen] = useState(false);
   const [isQuickInteractionOpen, setQuickInteractionOpen] = useState(false);
   const [isCrossDeviceInteractionOpen, setCrossDeviceInteractionOpen] =
     useState(false);
@@ -80,7 +83,7 @@ export const CrossAppProvider = ({
     return {
       devices: Array.from(model.getDevices()),
       role: model.getMyRole(),
-      quickInteraction: model.getQuickInteraction(),
+      pushInteraction: model.getPushInteraction(),
       isQRMode: model.getQRMode(),
       layout: layoutNode,
     };
@@ -95,11 +98,11 @@ export const CrossAppProvider = ({
       if (debug) console.log(type);
 
       if (type === "qi") {
-        const qi = model.getQuickInteraction();
+        const qi = model.getPushInteraction();
 
-        if (qi && qi.from !== model.getMyRole().getName()) {
+        if (qi && qi.from !== model.getMyRole().getId()) {
           setSelectedContainerPush({ view: qi.viewId, from: qi.from });
-          setQuickInteractionOpen(true);
+          setPushInteractionOpen(true);
         }
       }
 
@@ -121,7 +124,7 @@ export const CrossAppProvider = ({
         devices: state.devices,
         role: state.role,
         layout: state.layout,
-        quickInteraction: state.quickInteraction,
+        pushInteraction: state.pushInteraction,
         isQRMode: state.isQRMode,
         selectedNode: selectedNode,
         setSelectedNode: setSelectedNode,
@@ -139,6 +142,8 @@ export const CrossAppProvider = ({
         setCrossDeviceInteractionOpen: setCrossDeviceInteractionOpen,
         isQuickInteractionOpen: isQuickInteractionOpen,
         setQuickInteractionOpen: setQuickInteractionOpen,
+        isPushInteractionOpen: isPushInteractionOpen,
+        setPushInteractionOpen: setPushInteractionOpen,
         newViewId: newViewId,
         setNewViewId: setNewViewId,
       }}

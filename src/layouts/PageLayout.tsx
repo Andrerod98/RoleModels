@@ -6,6 +6,7 @@ import { Header } from "../components/header";
 import { CrossAppState, CrossAppContext } from "../context/AppContext";
 import { QuickInteractionModal } from "../components/QuickInteractionModal";
 import { CrossDeviceInteractionModal } from "../components/CrossDeviceInteractionModal";
+import { PushInteractionDialog } from "../components/PushInteractionDialog";
 
 interface PageLayoutProps {
   readonly children: JSX.Element;
@@ -53,6 +54,7 @@ export function PageLayout(props: PageLayoutProps) {
       </Box>
       {props.children}
 
+      <PushInteractionDialog />
       <QuickInteractionModal />
       <CrossDeviceInteractionModal
         onViewChange={(newViewId: string) => {

@@ -22,6 +22,7 @@ export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
       setCrossDeviceInteractionOpen,
       isCrossDeviceInteractionOpen,
       selectedContainerPush,
+      setQuickInteractionOpen,
       role,
       setNewViewId,
       setSelectedNode,
@@ -42,6 +43,9 @@ export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
       e: React.MouseEvent<HTMLButtonElement, MouseEvent>
     ) => {
       e.stopPropagation();
+      const view = app.getSharedObject().getView(selectedContainerPush.view);
+      const from = selectedContainerPush.from;
+      alert("View " + view.getId() + " coming from " + from);
       app.getSharedObject().migrateView(view, from);
 
       console.log(app.getSharedObject().getMyViews());
@@ -127,7 +131,7 @@ export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
     const handleQuickInteraction = (
       e: React.MouseEvent<HTMLButtonElement, MouseEvent>
     ) => {
-      app.getSharedObject().setQuickInteraction(view.getId(), from);
+      setQuickInteractionOpen(true);
       setCrossDeviceInteractionOpen(false);
     };
 

@@ -106,10 +106,14 @@ export class ConfigurationsManager extends EventEmitter {
   }
 
   public removeViewFromRole(roleId: string, viewId: string) {
-    const node = this.current.layouts[roleId].getChildByViewId(viewId);
-    if (node) {
-      node.removeChild(node.getId());
-    }
+    console.log(this.current.layouts);
+    const containerId = this.current.layouts[roleId]
+      .getChildByViewId(viewId)
+      .getId();
+    let test = this.current.layouts[roleId];
+    test.removeChild(containerId);
+    console.log(test.toLayout());
+    this.updateCurrent(roleId, test.toLayout());
   }
   /* GETTERS */
   public getLayoutWithView(viewId: string): LayoutNode {

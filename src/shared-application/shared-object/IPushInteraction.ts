@@ -1,4 +1,4 @@
-export interface QuickInteraction {
+export interface PushInteraction {
   viewId: string;
   from: string;
   fulfilled: boolean;

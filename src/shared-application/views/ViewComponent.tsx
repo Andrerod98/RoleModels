@@ -70,7 +70,7 @@ export const ViewComponent: FC<ViewComponentProps> = (
             onClick={() => {
               app
                 .getSharedObject()
-                .setQuickInteraction(props.view.getId(), props.role.getName());
+                .setPushInteraction(props.view.getId(), props.role.getId());
             }}
           >
             <Box align={"center"}>
@@ -95,7 +95,7 @@ export const ViewComponent: FC<ViewComponentProps> = (
             onClick={() => {
               setSelectedContainerPush({
                 view: props.view.getId(),
-                from: props.role.getName(),
+                from: props.role.getId(),
               });
             }}
           ></Box>

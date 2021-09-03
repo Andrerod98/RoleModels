@@ -95,7 +95,27 @@ export class LayoutNode extends EventEmitter {
   }
 
   removeChild(childId: string) {
-    if (this.id === childId) {
+    const index = this.children.findIndex((c) => c.getId() === childId);
+    console.log("Removing child");
+    console.log(index);
+    console.log(this.children);
+    if (index == -1) {
+      this.children.forEach((child) => {
+        child.removeChild(childId);
+      });
+    } else {
+      this.children.splice(index, 1);
+
+      if (this.children.length === 0) {
+        if (this.parent) {
+          this.parent.removeChild(this.getId());
+        }
+      } else {
+        this.getRoot().emit("change", this.getRoot().toLayout());
+      }
+    }
+
+    /*if (this.id === childId) {
       if (this.parent) {
         this.parent.removeChild(childId);
       } else {
@@ -107,21 +127,7 @@ export class LayoutNode extends EventEmitter {
         });
       }
       return;
-    }
-    const index = this.children.findIndex((c) => c.getId() === childId);
-    if (index == -1) {
-      this.children.forEach((child) => {
-        child.removeChild(childId);
-      });
-    } else {
-      this.children[index].setParent(undefined);
-      this.children.splice(index, 1);
-      if (this.children.length === 0) {
-        this.parent.removeChild(this.getId());
-      } else {
-        this.getRoot().emit("change", this.getRoot().toLayout());
-      }
-    }
+    }*/
   }
 
   public setParent(node: LayoutNode) {
