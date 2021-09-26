@@ -27,14 +27,6 @@ export class UIComponentController extends EventEmitter {
     return this.parent == undefined;
   }
 
-  getWidth() {
-    return 0;
-  }
-
-  getHeight() {
-    return 0;
-  }
-
   get() {
     return this.model;
   }

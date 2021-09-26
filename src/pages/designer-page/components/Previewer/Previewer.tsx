@@ -45,7 +45,7 @@ export const Previewer = (props: PreviewerProps) => {
         </Flex>
         <Box
           w={"100%"}
-          h={"500px"}
+          h={"90%"}
           boxShadow={"xs"}
           bg={colorMode === "light" ? "white" : "gray.700"}
           overflow={"hidden"}
@@ -56,7 +56,7 @@ export const Previewer = (props: PreviewerProps) => {
             return (
               <Preview
                 width={"100%"}
-                height={"500px"}
+                height={"100%"}
                 layout={props.layout}
                 app={props.app}
                 selectedNode={props.selectedNode}

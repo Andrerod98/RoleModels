@@ -26,10 +26,12 @@ export class ComponentsExamples {
     return {
       id: uuid(),
       root: {
-        id: "button",
-        name: "button",
+        id: "box-id",
+        name: "box",
+        w: "100%",
+        h: "100%",
         children: [],
-      },
+      } as IUIComponent,
     };
   }
   static getImage(): ImageUI {

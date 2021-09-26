@@ -17,7 +17,7 @@ export function HandView({ controller }: { controller: HandController }) {
             <Card
               isBack={component.flipped}
               value={c}
-              height={"60%"}
+              height={"200px"}
               onClick={() => {
                 if (selected === c) {
                   controller.playCard(c);

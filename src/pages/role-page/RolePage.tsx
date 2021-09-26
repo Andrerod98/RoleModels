@@ -21,6 +21,7 @@ export function RolePage(props: RoleProps) {
             maxH={"100%"}
             w={"100%"}
             h={"100%"}
+            flexWrap={"wrap"}
             overflow={"hidden"}
             key={model.getDeviceRole() + "-div-" + node.id}
             direction={"column"}
@@ -39,7 +40,7 @@ export function RolePage(props: RoleProps) {
             h={"100%"}
             overflow={"hidden"}
             key={model.getDeviceRole() + "-flex-" + node.id}
-            grow={1}
+            flexWrap={"wrap"}
             direction={"row"}
           >
             {node.children.map((child) => {
@@ -60,6 +61,7 @@ export function RolePage(props: RoleProps) {
             h={"100%"}
             maxW={"100%"}
             maxH={"100%"}
+            flexGrow={node.flexGrow ? 1 : 0}
             overflow={"hidden"}
             key={model.getDeviceRole() + "-box-view-" + node.viewId}
             position={"relative"}

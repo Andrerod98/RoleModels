@@ -45,7 +45,6 @@ export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
       e.stopPropagation();
       const view = app.getSharedObject().getView(selectedContainerPush.view);
       const from = selectedContainerPush.from;
-      alert("View " + view.getId() + " coming from " + from);
       app.getSharedObject().migrateView(view, from);
 
       console.log(app.getSharedObject().getMyViews());
@@ -56,6 +55,7 @@ export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
             id: uuid(),
             name: "view",
             viewId: view.getId(),
+            flexGrow: true,
           } as ILayoutNode);
           setSelectedNode(view.getId());
         } else {
@@ -66,6 +66,7 @@ export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
               id: uuid(),
               name: "view",
               viewId: view.getId(),
+              flexGrow: true,
             } as ILayoutNode);
         }
         setSelectedNode(view.getId());
@@ -96,6 +97,7 @@ export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
             id: uuid(),
             name: "view",
             viewId: view.getId(),
+            flexGrow: true,
           } as ILayoutNode);
           setSelectedNode(view.getId());
         } else {
@@ -103,6 +105,7 @@ export const CrossDeviceInteractionModal: FC<CrossDeviceInteractionModalProps> =
             id: uuid(),
             name: "view",
             viewId: view.getId(),
+            flexGrow: true,
           } as ILayoutNode);
           setSelectedNode(view.getId());
         }

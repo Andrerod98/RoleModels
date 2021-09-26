@@ -136,7 +136,7 @@ export class PrototypingToolDataObject
     const defaultRoleId = uuid();
     defaultRole.set({
       id: defaultRoleId,
-      name: "default",
+      name: "role1",
     } as IRole);
 
     currentConfiguration.set({
@@ -644,6 +644,7 @@ export class PrototypingToolDataObject
     this.configurationsManager.updateCurrent(roleId, {
       id: uuid(),
       name: "div",
+      flexGrow: false,
     });
 
     Logger.getInstance().info(`The role ${role} has been added.`);

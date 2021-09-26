@@ -95,6 +95,7 @@ export function RoleTab(props: RoleTabProps) {
           id: id,
           name: "view",
           viewId: newView.id,
+          flexGrow: true,
         } as ILayoutNode);
         setSelectedNode(newView.id);
         console.log("ADDED:" + newView.id);
@@ -103,6 +104,7 @@ export function RoleTab(props: RoleTabProps) {
           id: id,
           name: "view",
           viewId: newView.id,
+          flexGrow: true,
         } as ILayoutNode);
         setSelectedNode(newView.id);
       }

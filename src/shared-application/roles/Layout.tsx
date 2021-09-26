@@ -8,6 +8,7 @@ export class LayoutNode extends EventEmitter {
   viewId: string;
   parent: LayoutNode;
   children: LayoutNode[];
+  flexGrow: boolean;
 
   constructor(model: ILayoutNode, parent?: LayoutNode) {
     super();
@@ -15,6 +16,7 @@ export class LayoutNode extends EventEmitter {
     this.id = model.id;
     this.name = model.name;
     this.viewId = model.viewId;
+    this.flexGrow = model.flexGrow;
     this.parent = parent;
     this.children = [];
     if (model.children) {
@@ -32,6 +34,10 @@ export class LayoutNode extends EventEmitter {
 
   getViewId() {
     return this.viewId;
+  }
+
+  getFlexGrow() {
+    return this.flexGrow;
   }
 
   getChildren() {
@@ -138,6 +144,7 @@ export class LayoutNode extends EventEmitter {
     this.id = model.id;
     this.name = model.name;
     this.viewId = model.viewId;
+    this.flexGrow = model.flexGrow;
 
     this.children.forEach((child) => child.setParent(undefined));
     this.children.length = 0;
@@ -167,13 +174,14 @@ export class LayoutNode extends EventEmitter {
     }
   }
 
-  public splitRight(viewId: string, isExtreme: boolean) {
+  public splitRight(viewId: string, isExtreme: boolean, flexGrow: boolean) {
     // if the parent is a flex then add view to parent right next to it
     // if the parent is a div then add flex with view
     const newView = {
       id: uuid(),
       name: "view",
       viewId: viewId,
+      flexGrow: flexGrow,
     } as ILayoutNode;
 
     if (this.parent) {
@@ -199,11 +207,12 @@ export class LayoutNode extends EventEmitter {
     }
   }
 
-  public splitLeft(viewId: string, isExtreme: boolean) {
+  public splitLeft(viewId: string, isExtreme: boolean, flexGrow: boolean) {
     const newView = {
       id: uuid(),
       name: "view",
       viewId: viewId,
+      flexGrow: flexGrow,
     } as ILayoutNode;
 
     if (this.parent) {
@@ -231,11 +240,12 @@ export class LayoutNode extends EventEmitter {
     }
   }
 
-  public splitTop(viewId: string, isExtreme: boolean) {
+  public splitTop(viewId: string, isExtreme: boolean, flexGrow: boolean) {
     const newView = {
       id: uuid(),
       name: "view",
       viewId: viewId,
+      flexGrow: flexGrow,
     } as ILayoutNode;
 
     if (this.parent) {
@@ -263,11 +273,12 @@ export class LayoutNode extends EventEmitter {
     }
   }
 
-  public splitBottom(viewId: string, isExtreme: boolean) {
+  public splitBottom(viewId: string, isExtreme: boolean, flexGrow: boolean) {
     const newView = {
       id: uuid(),
       name: "view",
       viewId: viewId,
+      flexGrow: flexGrow,
     } as ILayoutNode;
 
     if (this.parent) {
@@ -300,6 +311,7 @@ export class LayoutNode extends EventEmitter {
       id: this.id,
       name: this.name,
       viewId: this.viewId,
+      flexGrow: this.flexGrow,
       children: this.children.map((child) => child.toLayout()),
     };
   }

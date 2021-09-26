@@ -59,7 +59,6 @@ export function ManagerPage(props: ManagerPageProps) {
         </Link>
         <Button
           onClick={() => {
-            alert("https://" + app.getServerURL() + ":8080");
             window.location.href = "https://" + app.getServerURL() + ":8080/#";
             window.location.replace(
               "https://" + app.getServerURL() + ":8080/#"

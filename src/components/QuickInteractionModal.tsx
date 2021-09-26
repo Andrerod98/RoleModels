@@ -1,4 +1,5 @@
 import {
+  Box,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -23,9 +24,9 @@ export function QuickInteractionModal() {
 
   return (
     <>
-  
       <Modal
         isOpen={isQuickInteractionOpen}
+        size={"xl"}
         onClose={() => {
           setQuickInteractionOpen(false);
         }}
@@ -35,7 +36,9 @@ export function QuickInteractionModal() {
           <ModalHeader>Quick Interaction</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <ViewComponent view={view} role={role} />
+            <Box h={"600px"}>
+              <ViewComponent view={view} role={role} />
+            </Box>
           </ModalBody>
         </ModalContent>
       </Modal>

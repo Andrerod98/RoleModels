@@ -50,29 +50,29 @@ export function LayoutModal(props: LayoutModalProps) {
         if (role.getName() === "designer")
           primaryLayout
             .getChildByViewId(selectedNode)
-            .splitTop(newViewId, true);
-        currentLayout.splitTop(newViewId, true);
+            .splitTop(newViewId, true, true);
+        currentLayout.splitTop(newViewId, true, true);
         break;
       case "T":
         if (role.getName() === "designer")
           primaryLayout
             .getChildByViewId(selectedNode)
-            .splitTop(newViewId, false);
-        currentLayout.splitTop(newViewId, false);
+            .splitTop(newViewId, false, true);
+        currentLayout.splitTop(newViewId, false, true);
         break;
       case "EL":
         if (role.getName() === "designer")
           primaryLayout
             .getChildByViewId(selectedNode)
-            .splitLeft(newViewId, true);
-        currentLayout.splitLeft(newViewId, true);
+            .splitLeft(newViewId, true, true);
+        currentLayout.splitLeft(newViewId, true, true);
         break;
       case "L":
         if (role.getName() === "designer")
           primaryLayout
             .getChildByViewId(selectedNode)
-            .splitLeft(newViewId, false);
-        currentLayout.splitLeft(newViewId, false);
+            .splitLeft(newViewId, false, true);
+        currentLayout.splitLeft(newViewId, false, true);
         break;
       case "C":
         if (role.getName() === "designer")
@@ -80,40 +80,42 @@ export function LayoutModal(props: LayoutModalProps) {
             id: uuid(),
             name: "view",
             viewId: newViewId,
+            flexGrow: true,
           } as ILayoutNode);
         currentLayout.update({
           id: uuid(),
           name: "view",
           viewId: newViewId,
+          flexGrow: true,
         } as ILayoutNode);
         break;
       case "R":
         if (role.getName() === "designer")
           primaryLayout
             .getChildByViewId(selectedNode)
-            .splitRight(newViewId, false);
-        currentLayout.splitRight(newViewId, false);
+            .splitRight(newViewId, false, true);
+        currentLayout.splitRight(newViewId, false, true);
         break;
       case "ER":
         if (role.getName() === "designer")
           primaryLayout
             .getChildByViewId(selectedNode)
-            .splitRight(newViewId, true);
-        currentLayout.splitRight(newViewId, true);
+            .splitRight(newViewId, true, true);
+        currentLayout.splitRight(newViewId, true, true);
         break;
       case "B":
         if (role.getName() === "designer")
           primaryLayout
             .getChildByViewId(selectedNode)
-            .splitBottom(newViewId, false);
-        currentLayout.splitBottom(newViewId, false);
+            .splitBottom(newViewId, false, true);
+        currentLayout.splitBottom(newViewId, false, true);
         break;
       case "EB":
         if (role.getName() === "designer")
           primaryLayout
             .getChildByViewId(selectedNode)
-            .splitBottom(newViewId, true);
-        currentLayout.splitBottom(newViewId, true);
+            .splitBottom(newViewId, true, true);
+        currentLayout.splitBottom(newViewId, true, true);
         break;
       default:
         break;

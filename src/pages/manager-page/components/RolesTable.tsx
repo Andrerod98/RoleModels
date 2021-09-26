@@ -36,7 +36,9 @@ export function RolesTable(props: LayoutTableProps) {
         <Button
           mr={"40px"}
           size={"sm"}
-          onClick={() => props.app.getSharedObject().addRole("new")}
+          onClick={() =>
+            props.app.getSharedObject().addRole("role" + roles.length)
+          }
         >
           <AddIcon />
         </Button>

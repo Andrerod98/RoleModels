@@ -135,7 +135,9 @@ export function Header(props: HeaderProps) {
           <Button
             ml={"5px"}
             key={"header-button-add"}
-            onClick={() => props.app.getSharedObject().addRole("new")}
+            onClick={() =>
+              props.app.getSharedObject().addRole("role" + props.roles.length)
+            }
           >
             <AddIcon />
           </Button>
@@ -171,7 +173,7 @@ export function Header(props: HeaderProps) {
             onClick={props.onLoggingOpen}
             icon={<RiFileListLine />}
           />
-          <IconButton
+          {/*<IconButton
             aria-label={"Focus"}
             icon={<Icon as={RiMusicLine} />}
             ml={"10px"}
@@ -180,7 +182,7 @@ export function Header(props: HeaderProps) {
             onClick={() => {
               props.app.getSharedObject().pingAll();
             }}
-          />
+          />*/}
           <IconButton
             aria-label={"Focus"}
             icon={<Icon as={IoPushOutline} />}
