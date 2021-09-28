@@ -25,25 +25,25 @@ export const ViewComponent: FC<ViewComponentProps> = (
     setSelectedNode,
     isSelectMode,
     setSelectedContainerPush,
+
     app,
     selectedContainerPush,
   } = useContext<CrossAppState>(CrossAppContext);
-  console.log(isQRMode);
   return (
     <Box
       w={"100%"}
       h={"100%"}
-      borderWidth={"10px"}
-      borderColor={"blackAlpha.400"}
+      borderWidth={"2px"}
+      borderColor={"black"}
+      position={"relative"}
+      key={"view-" + props.view.getId()}
       bg={
         isQRMode
           ? "blackAlpha.400"
           : isLayoutOpen && selectedNode === props.view.getId()
           ? "rgba(17, 99, 245,0.4)"
-          : undefined
+          : "white"
       }
-      position={"relative"}
-      key={"view-" + props.view.getId()}
     >
       {isQRMode ? (
         <Center h={"100%"} w={"100%"}>
@@ -105,6 +105,18 @@ export const ViewComponent: FC<ViewComponentProps> = (
           return props.view.getRoot().generateWidget();
         }, [JSON.stringify(props.view.getRoot().getSnapshot())])
       )}
+      <Box
+        _hover={isLayoutOpen ? { bg: "rgba(17, 99, 245,0.4)" } : {}}
+        display={
+          isLayoutOpen && selectedNode !== props.view.getId() ? "block" : "none"
+        }
+        w={"100%"}
+        h={"100%"}
+        position={"absolute"}
+        top={0}
+        left={0}
+        zIndex={200}
+      />
     </Box>
   );
 };

@@ -30,6 +30,8 @@ export interface CrossAppState {
   setQuickInteractionOpen: any;
   isHeaderOpen: boolean;
   setHeaderOpen: any;
+  isMaxFill: boolean;
+  setMaxFill: any;
   isQRMode: boolean;
   isPushInteractionOpen: boolean;
   setPushInteractionOpen: any;
@@ -51,6 +53,7 @@ export const CrossAppProvider = ({
   const [isLayoutOpen, setLayoutOpen] = useState(false);
   const [isHeaderOpen, setHeaderOpen] = useState(false);
   const [isSelectMode, setSelectMode] = useState(false);
+  const [isMaxFill, setMaxFill] = useState(false);
   const [selectedContainerPush, setSelectedContainerPush] = useState({
     view: "",
     from: "",
@@ -146,6 +149,8 @@ export const CrossAppProvider = ({
         setPushInteractionOpen: setPushInteractionOpen,
         newViewId: newViewId,
         setNewViewId: setNewViewId,
+        isMaxFill: isMaxFill,
+        setMaxFill: setMaxFill
       }}
     >
       {children}
