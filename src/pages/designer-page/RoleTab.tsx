@@ -11,7 +11,7 @@ import {
 import React, { useContext, useState } from "react";
 import { uuid } from "uuidv4";
 import { CrossAppState, CrossAppContext } from "../../context/AppContext";
-import { ILayoutNode } from "../../shared-application/roles/ILayoutNode";
+import { ILayoutNode } from "../../shared-application/workspaces/ILayoutNode";
 import Utils from "../../utils/Utils";
 import { SingleTabCatalogBar } from "./CatalogBar";
 import { CodeEditor } from "./components/CodeEditor";
@@ -22,23 +22,19 @@ interface RoleTabProps {}
 
 export function RoleTab(props: RoleTabProps) {
   const {
-    app,
+    roleModels,
     selectedNode,
     setSelectedNode,
-    setNewViewId,
-    isLayoutOpen,
-    setLayoutOpen,
-    role,
+    containers,
+    setLocalMode,
+    localMode,
+    primaryWorkspace,
   } = useContext<CrossAppState>(CrossAppContext);
-  const views = Array.from(app.getSharedObject().getAllViews());
 
-  const primaryLayout = app.getSharedObject().getPrimaryConfiguration();
-  let currentLayout = app
-    .getSharedObject()
-    .getCurrentConfigurationOfRole(role.getId());
+  let currentLayout = primaryWorkspace.getFirstLayout().getLayout();
 
   const [codeState, setCodeState] = useState({
-    value: Utils.jsonToString(views.map((v) => v.toView())),
+    value: Utils.jsonToString(containers.map((c) => c.toView())),
     position: { row: 0, column: 0 },
   });
 
@@ -65,7 +61,7 @@ export function RoleTab(props: RoleTabProps) {
     }
 
     //props.role.updateIViews(iviews);
-    app.getSharedObject().updateIViews(iviews);
+    roleModels.updateIViews(iviews);
 
     //setLayoutSnapshot({ ...layout.toLayout() });
   };
@@ -87,37 +83,27 @@ export function RoleTab(props: RoleTabProps) {
     setCodeState({ ...codeState, value: newValueAsString });
     preview(newValueAsString);
 
-    const length = views.length;
+    const length = containers.length;
     const id = uuid();
     if (length === 0) {
-      if (role.getName() === "designer") {
-        primaryLayout.update({
-          id: id,
-          name: "view",
-          viewId: newView.id,
-          flexGrow: true,
-        } as ILayoutNode);
-        setSelectedNode(newView.id);
-        console.log("ADDED:" + newView.id);
-      } else {
-        currentLayout.update({
-          id: id,
-          name: "view",
-          viewId: newView.id,
-          flexGrow: true,
-        } as ILayoutNode);
-        setSelectedNode(newView.id);
-      }
+      currentLayout.update({
+        id: id,
+        name: "view",
+        viewId: newView.id,
+        flexGrow: true,
+      } as ILayoutNode);
+      setSelectedNode(newView.id);
     } else {
-      setNewViewId(newView.id);
-
-      setLayoutOpen(true);
+      setLocalMode({
+        mode: "ContainerPosition",
+        properties: { containerID: newView.id },
+      });
     }
   };
 
   const addUIComponent = (name: string) => {
     setAlert(false);
-    const factory = app.getSharedObject().getFactory(name);
+    const factory = roleModels.getFactory(name);
 
     addUIComponentToEditor(Utils.jsonToString(factory.example));
   };
@@ -199,8 +185,8 @@ export function RoleTab(props: RoleTabProps) {
           <Center h={"100%"} bg={"gray.700"} w={"100%"}>
             <Previewer
               layout={
-                primaryLayout
-                  ? primaryLayout.getRoot().toLayout()
+                currentLayout
+                  ? currentLayout.getRoot().toLayout()
                   : ({
                       id: uuid(),
                       name: "div",
@@ -208,8 +194,7 @@ export function RoleTab(props: RoleTabProps) {
                       children: [],
                     } as ILayoutNode)
               }
-              app={app}
-              isOpenLayoutModal={isLayoutOpen}
+              isOpenLayoutModal={localMode.mode === "ContainerPosition"}
               handleViewClick={() => {
                 addViewToEditor();
               }}

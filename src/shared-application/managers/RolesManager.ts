@@ -178,6 +178,18 @@ export class RolesManager extends EventEmitter {
     }
   }
 
+  /*
+   * Resets roles
+   */
+  public resetRoles(): void {
+    const rolesValues = this.roles.values();
+    for (const role of rolesValues) {
+      if (role.getName() !== "manager" && role.getName() !== "designer") {
+        this.removeRole(role.getId());
+      }
+    }
+  }
+
   /* Callback functions */
   private emitChange(message?: string) {
     this.emit(RolesManagerEvents.ChangeState, message);

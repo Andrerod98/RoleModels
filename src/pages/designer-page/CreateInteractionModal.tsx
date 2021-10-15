@@ -18,15 +18,14 @@ import {
   Divider,
   Flex,
 } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
-import { CrossDeviceApplication } from "../../shared-application/CrossDeviceApplication";
+import React, { useContext, useEffect, useState } from "react";
 import { IInteraction } from "../../shared-application/managers/InteractionsManager";
-import { View } from "../../shared-application/views/View";
+import { Container } from "../../shared-application/containers/Container";
 import { CodeEditor } from "./components/CodeEditor";
+import { CrossAppState, CrossAppContext } from "../../context/AppContext";
 
 interface CreateInteractionModalProps {
-  views: View[];
-  app: CrossDeviceApplication;
+  views: Container[];
   isOpen: boolean;
   onOpen: () => void;
   onClose: () => void;
@@ -40,6 +39,7 @@ interface CreateInteractionModalProps {
 }
 
 export function CreateInteractionModal(props: CreateInteractionModalProps) {
+  const { roleModels } = useContext<CrossAppState>(CrossAppContext);
   useEffect(() => {
     if (props.interaction) {
       const { name, code } = props.interaction;
@@ -67,7 +67,7 @@ export function CreateInteractionModal(props: CreateInteractionModalProps) {
 
   const [selectedEvent, setSelectedEvent] = useState("onClick");
 
-  const selectedView = props.app.getSharedObject().getView(selectedViewId);
+  const selectedView = roleModels.getContainer(selectedViewId);
   let components = [];
   if (selectedView) components = selectedView.getRoot().toComponentsString();
 

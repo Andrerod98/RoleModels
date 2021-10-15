@@ -2,6 +2,7 @@ export interface IDevice {
   id: string;
   type: string;
   role: string;
+
   // capabilities: ICapabilities;
   // affordances: IAffordances;
 }

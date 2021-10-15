@@ -1,2 +1,2 @@
-export * from "./container";
-export * from "./shared-object/IPrototypingToolDataModel";
+export * from "./RoleModelsContainer";
+export * from "./shared-object/IRoleModelsDataModel";

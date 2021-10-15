@@ -20,8 +20,8 @@ import { IInteraction } from "../../shared-application/managers/InteractionsMana
 import { CreateInteractionModal } from "./CreateInteractionModal";
 
 export function InteractionsTab() {
-  const { app } = useContext<CrossAppState>(CrossAppContext);
-  const interactions = Array.from(app.getSharedObject().getInteractions());
+  const { roleModels } = useContext<CrossAppState>(CrossAppContext);
+  const interactions = Array.from(roleModels.getInteractions());
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [interaction, setInteraction] = useState(undefined);
 
@@ -30,8 +30,7 @@ export function InteractionsTab() {
       <Flex w='100%' my={5} pr={5}>
         <Spacer />
         <CreateInteractionModal
-          views={Array.from(app.getSharedObject().getAllViews())}
-          app={app}
+          views={Array.from(roleModels.getContainers())}
           isOpen={isOpen}
           onOpen={onOpen}
           onClose={onClose}
@@ -50,7 +49,7 @@ export function InteractionsTab() {
                 active: true,
                 code: code,
               } as IInteraction;
-              app.getSharedObject().setInteraction(name, object);
+              roleModels.setInteraction(name, object);
             });
           }}
         />
@@ -90,7 +89,7 @@ export function InteractionsTab() {
                   />
                   <IconButton
                     onClick={() => {
-                      app.getSharedObject().deleteInteraction(inter.name);
+                      roleModels.deleteInteraction(inter.name);
                     }}
                     aria-label='Search database'
                     icon={<DeleteIcon />}

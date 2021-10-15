@@ -2,14 +2,14 @@ import { getContainer } from "@fluid-experimental/get-container";
 import { getDefaultObjectFromContainer } from "@fluidframework/aqueduct";
 import React from "react";
 import ReactDOM from "react-dom";
-import { PrototypingToolContainerFactory } from "./container";
+import { RoleModelsContainerFactory } from "./RoleModelsContainer";
 import { Container } from "@fluidframework/container-loader";
 import { TinyliciousServiceWithUrl } from "../utils/tinyliciousService";
 import { CrossDeviceApplicationView } from "./CrossDeviceApplicationView";
-import { PrototypingToolDataObject } from "./shared-object/PrototypingToolDataObject";
+import { RoleModelsDataObject } from "./shared-object/RoleModelsDataObject";
 
 export class CrossDeviceApplication {
-  protected sharedObject: PrototypingToolDataObject;
+  protected sharedObject: RoleModelsDataObject;
   protected container: Container;
 
   constructor(
@@ -34,7 +34,7 @@ export class CrossDeviceApplication {
     return "https://" + this.serverUrl + ":8080/#project=" + this.projectName;
   }
 
-  public getSharedObject(): PrototypingToolDataObject {
+  public getSharedObject(): RoleModelsDataObject {
     return this.sharedObject;
   }
 
@@ -61,15 +61,13 @@ export class CrossDeviceApplication {
     this.container = await getContainer(
       serviceTiny,
       this.projectName,
-      PrototypingToolContainerFactory,
+      RoleModelsContainerFactory,
       isFirst
     );
 
     // Get the Default Object from the Container
     this.sharedObject =
-      await getDefaultObjectFromContainer<PrototypingToolDataObject>(
-        this.container
-      );
+      await getDefaultObjectFromContainer<RoleModelsDataObject>(this.container);
 
     this.registerDefaultFactories();
 

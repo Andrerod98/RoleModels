@@ -21,15 +21,16 @@ import {
   useColorMode,
 } from "@chakra-ui/react";
 import React, { useContext } from "react";
-import { RiFileListLine, RiMusicLine } from "react-icons/ri";
+import { RiFileListLine } from "react-icons/ri";
 import { FaPencilRuler } from "react-icons/fa";
-import { CrossDeviceApplication } from "../shared-application/CrossDeviceApplication";
 import { CrossAppState, CrossAppContext } from "../context/AppContext";
 import { QRReaderModal } from "./QRReaderModal";
 import { IoPushOutline } from "react-icons/io5";
+import { MdContentCopy } from "react-icons/md";
+import { BiSave } from "react-icons/bi";
+import { GrPowerReset } from "react-icons/gr";
 
 interface HeaderProps {
-  app: CrossDeviceApplication;
   roles: string[];
   myRole: string;
   onRoleClick: (role: string) => void;
@@ -37,8 +38,9 @@ interface HeaderProps {
 }
 
 export function Header(props: HeaderProps) {
-  const { isSelectMode, setSelectMode } =
+  const { roleModels, localMode, setLocalMode, mode, setOpen, isOpen } =
     useContext<CrossAppState>(CrossAppContext);
+
   const { colorMode, toggleColorMode } = useColorMode();
   //const btnRef = React.useRef();
 
@@ -135,9 +137,7 @@ export function Header(props: HeaderProps) {
           <Button
             ml={"5px"}
             key={"header-button-add"}
-            onClick={() =>
-              props.app.getSharedObject().addRole("role" + props.roles.length)
-            }
+            onClick={() => roleModels.addRole("role" + props.roles.length)}
           >
             <AddIcon />
           </Button>
@@ -185,13 +185,54 @@ export function Header(props: HeaderProps) {
           />*/}
           <IconButton
             aria-label={"Focus"}
+            icon={<Icon as={BiSave} />}
+            ml={"10px"}
+            my={"5px"}
+            size={"sm"}
+            onClick={() => {
+              setOpen({ ...isOpen, saveWorkspaceModal: true });
+            }}
+          />
+          <IconButton
+            aria-label={"Focus"}
+            icon={<Icon as={GrPowerReset} />}
+            ml={"10px"}
+            my={"5px"}
+            size={"sm"}
+            color={"white"}
+            colorScheme={mode.mode === "CP" ? undefined : "blue"}
+            onClick={() => {
+              roleModels.resetWorkspace();
+            }}
+          />
+          <IconButton
+            aria-label={"Focus"}
+            icon={<Icon as={MdContentCopy} />}
+            ml={"10px"}
+            my={"5px"}
+            size={"sm"}
+            colorScheme={mode.mode === "CP" ? undefined : "blue"}
+            onClick={() => {
+              if (mode.mode === "CP") {
+                app.getSharedObject().setMode("CP");
+              } else {
+                app.getSharedObject().setMode("CP");
+              }
+            }}
+          />
+          <IconButton
+            aria-label={"Focus"}
             icon={<Icon as={IoPushOutline} />}
             ml={"10px"}
             my={"5px"}
             size={"sm"}
-            colorScheme={isSelectMode ? undefined : "blue"}
+            colorScheme={localMode.mode === "PUSH" ? undefined : "blue"}
             onClick={() => {
-              setSelectMode(!isSelectMode);
+              if (localMode.mode === "PUSH") {
+                setLocalMode({ mode: "", properties: {} });
+              } else {
+                setLocalMode({ mode: "PUSH", properties: {} });
+              }
             }}
           />
           <QRReaderModal />

@@ -19,10 +19,10 @@ import {
   InkCanvasUI,
 } from "../../shared-components";
 import { QRCodeUI } from "../../shared-components/QRCode";
-import { IView } from "../../shared-application/views/IView";
+import { IContainer } from "../../shared-application/containers/IContainer";
 
 export class ComponentsExamples {
-  static getView(): IView {
+  static getView(): IContainer {
     return {
       id: uuid(),
       root: {

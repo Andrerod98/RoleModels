@@ -146,6 +146,28 @@ export class DevicesManager {
     return this.getMyDevice().role === DefaultRoles.Designer;
   }
 
+  public getDevicesRolesTypes(): { [role: string]: string } {
+    const devicesTypes = {};
+    for (const device of this.getDevices()) {
+      devicesTypes[device.role] = device.type;
+    }
+
+    return devicesTypes;
+  }
+
+  public getDeviceTypeOfRole(role: string): string {
+    const devices = Array.from(this.getDevices());
+    console.log(role);
+    console.log(devices);
+    const filteredDevices = devices.filter((device) => device.role === role);
+    console.log(filteredDevices);
+    if (filteredDevices.length > 0) {
+      return filteredDevices[0].type;
+    } else {
+      return "unknown";
+    }
+  }
+
   /*
    * Extracts the properties of the current device
    */

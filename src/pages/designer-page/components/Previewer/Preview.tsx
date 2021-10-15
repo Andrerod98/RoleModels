@@ -9,10 +9,6 @@ import {
 } from "@chakra-ui/react";
 import React, { useContext } from "react";
 import {
-  BiArrowToBottom,
-  BiArrowToLeft,
-  BiArrowToRight,
-  BiArrowToTop,
   BiDockBottom,
   BiDockLeft,
   BiDockRight,
@@ -25,15 +21,13 @@ import {
   RiLayoutTopLine,
 } from "react-icons/ri";
 import { CrossAppState, CrossAppContext } from "../../../../context/AppContext";
-import { CrossDeviceApplication } from "../../../../shared-application/CrossDeviceApplication";
-import { ILayoutNode } from "../../../../shared-application/roles/ILayoutNode";
-import { ViewComponent } from "../../../../shared-application/views/ViewComponent";
+import { ViewComponent } from "../../../../components/ViewComponent";
+import { ILayoutNode } from "../../../../shared-application/workspaces/ILayoutNode";
 
 interface PreviewProps {
   layout: ILayoutNode;
   width: string;
   height: string;
-  app: CrossDeviceApplication;
 
   selectedNode: string;
   isOpenLayoutModal: boolean;
@@ -42,29 +36,30 @@ interface PreviewProps {
 }
 export const Preview = (props: PreviewProps) => {
   const {
-    app,
+    roleModels,
     setMaxFill,
     isMaxFill,
     role,
     selectedNode,
-    newViewId,
     setSelectedNode,
-    setLayoutOpen,
+    primaryWorkspace,
+    localMode,
+    setLocalMode,
   } = useContext<CrossAppState>(CrossAppContext);
-  const primaryLayout = app.getSharedObject().getPrimaryConfiguration();
-  let currentLayout = app
-    .getSharedObject()
-    .getCurrentConfigurationOfRole(role.getId());
-  if (role.getName() === "designer") {
-    currentLayout = app.getSharedObject().getLayoutWithView(selectedNode);
-    if (!currentLayout) {
-      const firstRole = Array.from(app.getSharedObject().getRoles())[2] as any;
+  let currentLayout = primaryWorkspace.getFirstLayout().getLayout();
 
-      currentLayout = app
-        .getSharedObject()
-        .getCurrentConfigurationOfRole(firstRole.getId());
-    }
+  const isOpenLayoutModal = localMode.mode === "ContainerPosition";
+  let containerID = "";
+  if (isOpenLayoutModal) {
+    containerID = localMode.properties.containerID;
   }
+
+  /*currentLayout = roleModels.getLayoutWithContainer(selectedNode);
+  if (!currentLayout) {
+    const firstRole = Array.from(roleModels.getRoles())[2] as any;
+
+    currentLayout = roleModels.getCurrentConfigurationOfRole(firstRole.getId());
+  }*/
 
   const generateWidget = (node: ILayoutNode): JSX.Element => {
     switch (node.name) {
@@ -76,11 +71,7 @@ export const Preview = (props: PreviewProps) => {
             w={"100%"}
             h={"100%"}
             overflow={"hidden"}
-            key={
-              props.app.getSharedObject().getMyRole().getName() +
-              "-div-" +
-              node.id
-            }
+            key={roleModels.getMyRole().getName() + "-div-" + node.id}
             direction={"column"}
           >
             {node.children.map((child) => {
@@ -96,11 +87,7 @@ export const Preview = (props: PreviewProps) => {
             w={"100%"}
             h={"100%"}
             overflow={"hidden"}
-            key={
-              props.app.getSharedObject().getMyRole().getName() +
-              "-flex-" +
-              node.id
-            }
+            key={roleModels.getMyRole().getName() + "-flex-" + node.id}
             direction={"row"}
           >
             {node.children.map((child) => {
@@ -109,7 +96,7 @@ export const Preview = (props: PreviewProps) => {
           </Flex>
         );
       case "view":
-        const view = props.app.getSharedObject().getView(node.viewId);
+        const view = roleModels.getContainer(node.viewId);
 
         if (!view) {
           return <></>;
@@ -117,11 +104,7 @@ export const Preview = (props: PreviewProps) => {
 
         return (
           <Box
-            key={
-              props.app.getSharedObject().getMyRole().getName() +
-              "-box-" +
-              node.viewId
-            }
+            key={roleModels.getMyRole().getName() + "-box-" + node.viewId}
             h={node.flexGrow ? "100%" : undefined}
             w={node.flexGrow ? "100%" : undefined}
             flex={(node.flexGrow ? "1 1" : "0 0") + " auto"}
@@ -140,12 +123,12 @@ export const Preview = (props: PreviewProps) => {
           >
             <ViewComponent
               key={
-                props.app.getSharedObject().getMyRole().getName() +
+                roleModels.getMyRole().getName() +
                 "-preview-view-" +
                 node.viewId
               }
               view={view}
-              role={props.app.getSharedObject().getMyRole()}
+              role={roleModels.getMyRole()}
             />
           </Box>
         );
@@ -169,10 +152,10 @@ export const Preview = (props: PreviewProps) => {
         top={"0"}
         zIndex={"2000"}
         onClick={() => {
-          primaryLayout.splitTop(newViewId, false, isMaxFill);
-          currentLayout.splitTop(newViewId, false, isMaxFill);
-          setSelectedNode(newViewId);
-          setLayoutOpen(false);
+          //primaryWorkspace.splitTop(containerID, false, isMaxFill);
+          currentLayout.splitTop(containerID, false, isMaxFill);
+          setSelectedNode(containerID);
+          setLocalMode({ mode: "" });
         }}
         icon={<Icon as={isMaxFill ? RiLayoutBottomLine : BiDockTop} />}
       />
@@ -188,10 +171,10 @@ export const Preview = (props: PreviewProps) => {
         bottom={"0"}
         zIndex={"2000"}
         onClick={() => {
-          primaryLayout.splitBottom(newViewId, false, isMaxFill);
-          currentLayout.splitBottom(newViewId, false, isMaxFill);
-          setSelectedNode(newViewId);
-          setLayoutOpen(false);
+          //primaryWorkspace.splitBottom(containerID, false, isMaxFill);
+          currentLayout.splitBottom(containerID, false, isMaxFill);
+          setSelectedNode(containerID);
+          setLocalMode({ mode: "" });
         }}
         icon={<Icon as={isMaxFill ? RiLayoutTopLine : BiDockBottom} />}
       />
@@ -207,10 +190,10 @@ export const Preview = (props: PreviewProps) => {
         bottom={"0"}
         zIndex={"2000"}
         onClick={() => {
-          primaryLayout.splitLeft(newViewId, false, isMaxFill);
-          currentLayout.splitLeft(newViewId, false, isMaxFill);
-          setSelectedNode(newViewId);
-          setLayoutOpen(false);
+          //primaryWorkspace.splitLeft(containerID, false, isMaxFill);
+          currentLayout.splitLeft(containerID, false, isMaxFill);
+          setSelectedNode(containerID);
+          setLocalMode({ mode: "" });
         }}
         icon={<Icon as={isMaxFill ? RiLayoutRightLine : BiDockLeft} />}
       />
@@ -226,10 +209,10 @@ export const Preview = (props: PreviewProps) => {
         bottom={"0"}
         zIndex={"2000"}
         onClick={() => {
-          primaryLayout.splitRight(newViewId, false, isMaxFill);
-          currentLayout.splitRight(newViewId, false, isMaxFill);
-          setSelectedNode(newViewId);
-          setLayoutOpen(false);
+          //primaryWorkspace.splitRight(containerID, false, isMaxFill);
+          currentLayout.splitRight(containerID, false, isMaxFill);
+          setSelectedNode(containerID);
+          setLocalMode({ mode: "" });
         }}
         icon={<Icon as={isMaxFill ? RiLayoutLeftLine : BiDockRight} />}
       />

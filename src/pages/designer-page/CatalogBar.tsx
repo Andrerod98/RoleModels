@@ -36,8 +36,8 @@ export const SingleTabCatalogBar: React.FC<SingleTabCatalogBarProps> = (
     { title: "Ink canvas", value: "ink", icon: <HiPencilAlt /> },
     { title: "QR Code", value: "qrcode", icon: <ImQrcode /> },
   ];*/
-  const { app } = useContext<CrossAppState>(CrossAppContext);
-  const factories = Array.from(app.getSharedObject().getFactories());
+  const { roleModels } = useContext<CrossAppState>(CrossAppContext);
+  const factories = Array.from(roleModels.getFactories());
   return (
     <Box px={"10px"} py={3} h={"100%"} w={"200px"} overflowY={"scroll"}>
       <Heading as={"h5"} fontSize={"12px"} textAlign={"left"} mb={"5px"}>

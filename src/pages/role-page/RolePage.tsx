@@ -9,8 +9,7 @@ import {
   Switch,
   Text,
 } from "@chakra-ui/react";
-import { ViewComponent } from "../../shared-application/views/ViewComponent";
-import { ILayoutNode } from "../../shared-application/roles/ILayoutNode";
+import { ViewComponent } from "../../components/ViewComponent";
 import { CrossAppState, CrossAppContext } from "../../context/AppContext";
 import {
   BiDockTop,
@@ -24,28 +23,37 @@ import {
   RiLayoutRightLine,
   RiLayoutLeftLine,
 } from "react-icons/ri";
+import { ILayoutNode } from "../../shared-application/workspaces/ILayoutNode";
 interface RoleProps {}
 
 export function RolePage(props: RoleProps) {
   const {
-    app,
+    roleModels,
     role,
-    layout,
     isMaxFill,
-    newViewId,
-    setLayoutOpen,
+
     setMaxFill,
     selectedNode,
     setSelectedNode,
-    isLayoutOpen,
+    primaryWorkspace,
+    localMode,
+    setLocalMode,
+    currentWorkspace,
   } = useContext<CrossAppState>(CrossAppContext);
-  const model = app.getSharedObject();
-  //const views = props.app.getViewsOrCombinedViews(props.role.getName());
-  const primaryLayout = app.getSharedObject().getPrimaryConfiguration();
-  let currentLayout = app
-    .getSharedObject()
-    .getCurrentConfigurationOfRole(role.getId());
 
+  let currentLayout = undefined;
+
+  if (currentWorkspace.getRoleLayout(role.getId())) {
+    currentLayout = currentWorkspace.getRoleLayout(role.getId()).getLayout();
+  }
+
+  const isContainerPosition = localMode.mode === "ContainerPosition";
+  let containerID = "";
+  if (isContainerPosition) {
+    containerID = localMode.properties.containerID;
+  }
+
+  const isPUSH = true;
   const generateWidget = (node: ILayoutNode): JSX.Element => {
     switch (node.name) {
       case "div":
@@ -56,7 +64,7 @@ export function RolePage(props: RoleProps) {
             w={"100%"}
             h={"100%"}
             overflow={"hidden"}
-            key={model.getDeviceRole() + "-div-" + node.id}
+            key={roleModels.getDeviceRole() + "-div-" + node.id}
             direction={"column"}
           >
             {node.children.map((child) => {
@@ -72,7 +80,7 @@ export function RolePage(props: RoleProps) {
             w={"100%"}
             h={"100%"}
             overflow={"hidden"}
-            key={model.getDeviceRole() + "-flex-" + node.id}
+            key={roleModels.getDeviceRole() + "-flex-" + node.id}
             direction={"row"}
           >
             {node.children.map((child) => {
@@ -81,7 +89,7 @@ export function RolePage(props: RoleProps) {
           </Flex>
         );
       case "view":
-        const view = app.getSharedObject().getView(node.viewId);
+        const view = roleModels.getContainer(node.viewId);
 
         if (!view) {
           return <></>;
@@ -99,13 +107,13 @@ export function RolePage(props: RoleProps) {
             minW={"40px"}
             overflow={"hidden"}
             position={"relative"}
-            key={model.getDeviceRole() + "-box-view-" + node.viewId}
+            key={roleModels.getDeviceRole() + "-box-view-" + node.viewId}
             onClick={() => {
               setSelectedNode(node.viewId);
             }}
           >
             <ViewComponent
-              key={model.getDeviceRole() + "-view-" + node.viewId}
+              key={roleModels.getDeviceRole() + "-view-" + node.viewId}
               view={view}
               role={role}
             />
@@ -117,7 +125,7 @@ export function RolePage(props: RoleProps) {
                   ? "rgba(17, 99, 245,0.4)"
                   : "transparent"
               }
-              display={isLayoutOpen ? "block" : "none"}
+              display={isContainerPosition ? "block" : "none"}
               w={"100%"}
               h={"100%"}
               position={"absolute"}
@@ -134,7 +142,7 @@ export function RolePage(props: RoleProps) {
 
   return (
     <Box h={"100%"} w={"100%"}>
-      {generateWidget(layout.toLayout())}
+      {currentLayout ? generateWidget(currentLayout.toLayout()) : <></>}
 
       <IconButton
         borderWidth={"1px"}
@@ -142,16 +150,16 @@ export function RolePage(props: RoleProps) {
         aria-label={"Focus"}
         position={"absolute"}
         margin={"auto"}
-        display={isLayoutOpen ? "block" : "none"}
+        display={isContainerPosition ? "block" : "none"}
         left={"0"}
         right={"0"}
         top={"0"}
         zIndex={"2000"}
         onClick={() => {
-          primaryLayout.splitTop(newViewId, false, isMaxFill);
-          currentLayout.splitTop(newViewId, false, isMaxFill);
-          setSelectedNode(newViewId);
-          setLayoutOpen(false);
+          //primaryWorkspace.splitTop(containerID, false, isMaxFill);
+          currentLayout.splitTop(containerID, false, isMaxFill);
+          setSelectedNode(containerID);
+          setLocalMode({ mode: "" });
         }}
         icon={<Icon as={isMaxFill ? RiLayoutBottomLine : BiDockTop} />}
       />
@@ -161,16 +169,16 @@ export function RolePage(props: RoleProps) {
         aria-label={"Focus"}
         position={"absolute"}
         margin={"auto"}
-        display={isLayoutOpen ? "block" : "none"}
+        display={isContainerPosition ? "block" : "none"}
         left={"0"}
         right={"0"}
         bottom={"0"}
         zIndex={"2000"}
         onClick={() => {
-          primaryLayout.splitBottom(newViewId, false, isMaxFill);
-          currentLayout.splitBottom(newViewId, false, isMaxFill);
-          setSelectedNode(newViewId);
-          setLayoutOpen(false);
+          //primaryWorkspace.splitBottom(containerID, false, isMaxFill);
+          currentLayout.splitBottom(containerID, false, isMaxFill);
+          setSelectedNode(containerID);
+          setLocalMode({ mode: "" });
         }}
         icon={<Icon as={isMaxFill ? RiLayoutTopLine : BiDockBottom} />}
       />
@@ -180,16 +188,16 @@ export function RolePage(props: RoleProps) {
         aria-label={"Focus"}
         position={"absolute"}
         margin={"auto"}
-        display={isLayoutOpen ? "block" : "none"}
+        display={isContainerPosition ? "block" : "none"}
         left={"0"}
         top={"0"}
         bottom={"0"}
         zIndex={"2000"}
         onClick={() => {
-          primaryLayout.splitLeft(newViewId, false, isMaxFill);
-          currentLayout.splitLeft(newViewId, false, isMaxFill);
-          setSelectedNode(newViewId);
-          setLayoutOpen(false);
+          //primaryWorkspace.splitLeft(containerID, false, isMaxFill);
+          currentLayout.splitLeft(containerID, false, isMaxFill);
+          setSelectedNode(containerID);
+          setLocalMode({ mode: "" });
         }}
         icon={<Icon as={isMaxFill ? RiLayoutRightLine : BiDockLeft} />}
       />
@@ -199,16 +207,16 @@ export function RolePage(props: RoleProps) {
         aria-label={"Focus"}
         position={"absolute"}
         margin={"auto"}
-        display={isLayoutOpen ? "block" : "none"}
+        display={isContainerPosition ? "block" : "none"}
         right={"0"}
         top={"0"}
         bottom={"0"}
         zIndex={"2000"}
         onClick={() => {
-          primaryLayout.splitRight(newViewId, false, isMaxFill);
-          currentLayout.splitRight(newViewId, false, isMaxFill);
-          setSelectedNode(newViewId);
-          setLayoutOpen(false);
+          //primaryWorkspace.splitRight(containerID, false, isMaxFill);
+          currentLayout.splitRight(containerID, false, isMaxFill);
+          setSelectedNode(containerID);
+          setLocalMode({ mode: "" });
         }}
         icon={<Icon as={isMaxFill ? RiLayoutLeftLine : BiDockRight} />}
       />
@@ -216,7 +224,7 @@ export function RolePage(props: RoleProps) {
       <Flex
         position={"absolute"}
         margin={"auto"}
-        display={isLayoutOpen ? "block" : "none"}
+        display={isContainerPosition ? "block" : "none"}
         right={"0"}
         top={"50"}
         left={"0"}
@@ -240,6 +248,26 @@ export function RolePage(props: RoleProps) {
           </Center>
           <Center w={"100%"} h={"50%"}>
             <Text color={"white"}>Select a container to position it.</Text>
+          </Center>
+        </Box>
+      </Flex>
+      <Flex
+        position={"absolute"}
+        margin={"auto"}
+        display={isPUSH ? "block" : "none"}
+        right={"0"}
+        top={"50"}
+        left={"0"}
+        w={"300px"}
+        h={"70px"}
+        zIndex={3000}
+        bg={"#53565B"}
+      >
+        <Box w={"100%"} h={"100%"}>
+          <Center w={"100%"} h={"100%"}>
+            <Text color={"white"} textAlign={"center"}>
+              Pushing mode is activated on another device.
+            </Text>
           </Center>
         </Box>
       </Flex>

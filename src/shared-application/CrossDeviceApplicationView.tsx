@@ -33,12 +33,12 @@ export function CrossDeviceApplicationView(
 }
 
 function Pages() {
-  const { app } = useContext<CrossAppState>(CrossAppContext);
+  const { roleModels } = useContext<CrossAppState>(CrossAppContext);
   return (
     <PageLayout>
-      {app.getSharedObject().isManager() ? (
+      {roleModels.isManager() ? (
         <ManagerPage />
-      ) : app.getSharedObject().isDesigner() ? (
+      ) : roleModels.isDesigner() ? (
         <DesignerPage />
       ) : (
         <RolePage />

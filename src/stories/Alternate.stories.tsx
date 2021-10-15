@@ -3,8 +3,8 @@ import { Story, Meta } from "@storybook/react";
 
 import { FluidLoader } from "../utils/fluidRendering/fluidLoader";
 import { CrossDeviceApplicationView } from "../shared-application/CrossDeviceApplicationView";
-import { PrototypingToolContainerFactory } from "../shared-application";
-import { PrototypingToolInstantiationFactory } from "../shared-application/shared-object/PrototypingToolDataObject";
+import { RoleModelsContainerFactory } from "../shared-application";
+import { RoleModelsInstantiationFactory } from "../shared-application/shared-object/RoleModelsDataObject";
 
 export default {
   title: "CombinedViews/Alternate",
@@ -13,8 +13,8 @@ export default {
 
 export const Demo: Story<any> = (args) => (
   <FluidLoader
-    factory={PrototypingToolContainerFactory}
-    title={PrototypingToolInstantiationFactory.type}
+    factory={RoleModelsContainerFactory}
+    title={RoleModelsInstantiationFactory.type}
     view={CrossDeviceApplicationView}
     viewType={"react"}
   ></FluidLoader>

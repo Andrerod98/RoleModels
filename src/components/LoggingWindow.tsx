@@ -13,14 +13,17 @@ import {
   useColorModeValue,
   Divider,
 } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { CrossAppState, CrossAppContext } from "../context/AppContext";
 import { Log, Logger } from "../shared-application/Logger";
-interface LogginWindowProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
 
-export const LoggingWindow = (props: LogginWindowProps) => {
+export const LoggingWindow = () => {
+  const { isOpen, setOpen } = useContext<CrossAppState>(CrossAppContext);
+
+  if (!isOpen.logging) {
+    return <></>;
+  }
+
   const [logs, setLogs] = useState<Log[]>([]);
 
   useEffect(() => {
@@ -49,7 +52,6 @@ export const LoggingWindow = (props: LogginWindowProps) => {
       bg={color}
       h={"25vh"}
       w={"100vw"}
-      display={props.isOpen ? "block" : "none"}
     >
       <Text ml={5} my={"5px"}>
         LOGS
@@ -63,7 +65,7 @@ export const LoggingWindow = (props: LogginWindowProps) => {
         aria-label={"Search database"}
         icon={<CloseIcon />}
         onClick={() => {
-          props.onClose();
+          setOpen({ ...isOpen, logging: true });
         }}
       />
       <Divider />

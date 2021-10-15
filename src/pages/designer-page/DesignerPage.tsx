@@ -8,9 +8,8 @@ import React from "react";
 import { InteractionsTab } from "./InteractionsTab";
 
 import { RoleTab } from "./RoleTab";
-interface SingleTabProps {}
 
-export const DesignerPage = (props: SingleTabProps) => {
+export const DesignerPage = () => {
   return (
     <Box h={"100%"} overflow={"hidden"}>
       <Tabs size={"sm"} variant={"enclosed"} h={"100%"} mt={"15px"}>

@@ -17,29 +17,31 @@ interface CrossDeviceInteractionModalProps {}
 export const QRReaderModal: FC<CrossDeviceInteractionModalProps> = (
   props: CrossDeviceInteractionModalProps
 ) => {
-  const {
-    app,
-    setCrossDeviceInteractionOpen,
-    setSelectedContainerPush,
-
-    isQRMode,
-  } = useContext<CrossAppState>(CrossAppContext);
+  const { roleModels, mode, setLocalMode } =
+    useContext<CrossAppState>(CrossAppContext);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const handleScan = (view: string, qr: string, from: string) => {
-    if (view != "") {
-      setSelectedContainerPush({ view: view, from: from });
-      setCrossDeviceInteractionOpen(true);
-      onClose();
+  const onCloseModal = () => {
+    roleModels.setMode("");
+    onClose();
+  };
+
+  const handleScan = (containerID: string, qr: string, from: string) => {
+    if (containerID != "") {
+      setLocalMode({
+        mode: "ContainerTransfer",
+        properties: { containerID: containerID, from: from },
+      });
+      onCloseModal();
     } else if (qr != "") {
-      const qrController = app
-        .getSharedObject()
-        .getComponentFromAllViews(qr) as QRCodeController;
+      const qrController = roleModels.getComponentFromAllViews(
+        qr
+      ) as QRCodeController;
       if (qrController) {
         qrController.scan();
       }
-      onClose();
+      onCloseModal();
     }
   };
 
@@ -50,17 +52,17 @@ export const QRReaderModal: FC<CrossDeviceInteractionModalProps> = (
         size={"sm"}
         ml={"10px"}
         my={"5px"}
-        colorScheme={isQRMode ? undefined : "blue"}
+        colorScheme={mode.mode === "PULL" ? undefined : "blue"}
         icon={<Icon as={AiOutlineExpand} />}
         onClick={() => {
-          app.getSharedObject().setQRMode(true);
+          roleModels.setMode("PULL");
           onOpen();
         }}
       />
-      <Modal isOpen={isOpen} onClose={onClose} size={"full"}>
+      <Modal isOpen={isOpen} onClose={onCloseModal} size={"full"}>
         <ModalOverlay />
         <ModalContent m={0} bg={"transparent"} position={"relative"} h={"100%"}>
-          <CustomQRReader onClose={onClose} onScan={handleScan} />
+          <CustomQRReader onClose={onCloseModal} onScan={handleScan} />
         </ModalContent>
       </Modal>
     </>

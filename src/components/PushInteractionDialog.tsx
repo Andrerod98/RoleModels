@@ -11,27 +11,27 @@ import React, { useContext, useRef } from "react";
 import { CrossAppState, CrossAppContext } from "../context/AppContext";
 
 export function PushInteractionDialog() {
-  const {
-    app,
-    isPushInteractionOpen,
-    setPushInteractionOpen,
-    selectedContainerPush,
-    setCrossDeviceInteractionOpen,
-    role,
-  } = useContext<CrossAppState>(CrossAppContext);
+  const { roleModels, localMode, setLocalMode } =
+    useContext<CrossAppState>(CrossAppContext);
 
-  const view = app.getSharedObject().getView(selectedContainerPush.view);
-  const from = selectedContainerPush.from;
+  if (localMode.mode !== "IncomingContainer") {
+    return <></>;
+  }
+
+  const { containerID, from } = localMode.properties;
+  //const container = app.getSharedObject().getContainer(containerID);
   const cancelRef = useRef();
+
+  const onClose = () => {
+    setLocalMode({ mode: "" });
+  };
 
   return (
     <>
       <AlertDialog
-        isOpen={isPushInteractionOpen}
+        isOpen={true}
         leastDestructiveRef={cancelRef}
-        onClose={() => {
-          setPushInteractionOpen(false);
-        }}
+        onClose={onClose}
       >
         <AlertDialogOverlay>
           <AlertDialogContent>
@@ -45,19 +45,18 @@ export function PushInteractionDialog() {
             </AlertDialogBody>
 
             <AlertDialogFooter>
-              <Button
-                ref={cancelRef}
-                onClick={() => {
-                  setPushInteractionOpen(false);
-                }}
-              >
+              <Button ref={cancelRef} onClick={onClose}>
                 Cancel
               </Button>
               <Button
                 colorScheme='green'
                 onClick={() => {
-                  setPushInteractionOpen(false);
-                  setCrossDeviceInteractionOpen(true);
+                  onClose();
+                  roleModels.setMode("");
+                  setLocalMode("ContainerTransfer", {
+                    containerID: containerID,
+                    from: from,
+                  });
                 }}
                 ml={3}
               >

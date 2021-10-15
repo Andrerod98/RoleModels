@@ -16,17 +16,13 @@ import {
   Spacer,
   IconButton,
 } from "@chakra-ui/react";
-import React from "react";
-import { CrossDeviceApplication } from "../../../shared-application/CrossDeviceApplication";
+import React, { useContext } from "react";
+import { CrossAppState, CrossAppContext } from "../../../context/AppContext";
 import { Role } from "../../../shared-application/roles/Role";
 
-interface LayoutTableProps {
-  readonly app: CrossDeviceApplication;
-}
-
-export function RolesTable(props: LayoutTableProps) {
-  const sharedObject = props.app.getSharedObject();
-  const roles = Array.from(sharedObject.getRoles());
+export function RolesTable() {
+  const { roleModels } = useContext<CrossAppState>(CrossAppContext);
+  const roles = Array.from(roleModels.getRoles());
 
   return (
     <Box>
@@ -36,9 +32,7 @@ export function RolesTable(props: LayoutTableProps) {
         <Button
           mr={"40px"}
           size={"sm"}
-          onClick={() =>
-            props.app.getSharedObject().addRole("role" + roles.length)
-          }
+          onClick={() => roleModels.addRole("role" + roles.length)}
         >
           <AddIcon />
         </Button>
@@ -72,7 +66,7 @@ export function RolesTable(props: LayoutTableProps) {
                     }
                     defaultValue={role.getName()}
                     onSubmit={(nextValue: string) => {
-                      sharedObject.renameRole(
+                      roleModels.renameRole(
                         role.getId(),
                         role.getName(),
                         nextValue
@@ -93,7 +87,7 @@ export function RolesTable(props: LayoutTableProps) {
                         : "block"
                     }
                     onClick={() => {
-                      sharedObject.removeRole(role.getId());
+                      roleModels.removeRole(role.getId());
                     }}
                     aria-label='Delete Role'
                     icon={<DeleteIcon />}

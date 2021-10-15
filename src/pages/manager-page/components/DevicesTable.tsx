@@ -13,18 +13,12 @@ import {
   MenuList,
   MenuItem,
 } from "@chakra-ui/react";
-import React from "react";
-import { CrossDeviceApplication } from "../../../shared-application/CrossDeviceApplication";
-import { IDevice } from "../../../shared-application/devices/IDevice";
+import React, { useContext } from "react";
+import { CrossAppState, CrossAppContext } from "../../../context/AppContext";
 import { Role } from "../../../shared-application/roles/Role";
 
-interface DevicesTableProps {
-  devices: IDevice[];
-  readonly app: CrossDeviceApplication;
-}
-
-export function DevicesTable(props: DevicesTableProps) {
-  const sharedObject = props.app.getSharedObject();
+export function DevicesTable() {
+  const { roleModels, devices } = useContext<CrossAppState>(CrossAppContext);
   return (
     <Table variant='simple'>
       <TableCaption>Roles - Devices Mapping</TableCaption>
@@ -37,7 +31,7 @@ export function DevicesTable(props: DevicesTableProps) {
       </Thead>
 
       <Tbody key={"table-body"}>
-        {props.devices.map((device, index) => {
+        {devices.map((device, index) => {
           return (
             <Tr key={"table-tr-" + index}>
               <Td fontSize={{ base: "10px", md: "16px", lg: "16px" }}>
@@ -56,15 +50,12 @@ export function DevicesTable(props: DevicesTableProps) {
                     {device.role}
                   </MenuButton>
                   <MenuList key={"menu-list-" + index}>
-                    {Array.from(sharedObject.getRoles()).map(
+                    {Array.from(roleModels.getRoles()).map(
                       (role: Role, index2) => (
                         <MenuItem
                           key={"menu-item-" + index2}
                           onClick={() =>
-                            sharedObject.promoteToRole(
-                              role.getName(),
-                              device.id
-                            )
+                            roleModels.promoteToRole(role.getName(), device.id)
                           }
                         >
                           {role.getName()}

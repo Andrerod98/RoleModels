@@ -5,12 +5,10 @@ import { Box, Spacer, IconButton, Flex, useColorMode } from "@chakra-ui/react";
 import { IoRefresh } from "react-icons/io5";
 import React, { useMemo } from "react";
 import { Preview } from "./Preview";
-import { CrossDeviceApplication } from "../../../../shared-application/CrossDeviceApplication";
-import { ILayoutNode } from "../../../../shared-application/roles/ILayoutNode";
 import { HiViewGridAdd } from "react-icons/hi";
+import { ILayoutNode } from "../../../../shared-application/workspaces/ILayoutNode";
 interface PreviewerProps {
   layout: ILayoutNode;
-  app: CrossDeviceApplication;
 
   isOpenLayoutModal: boolean;
   handleClick: () => void;
@@ -58,7 +56,6 @@ export const Previewer = (props: PreviewerProps) => {
                 width={"100%"}
                 height={"100%"}
                 layout={props.layout}
-                app={props.app}
                 selectedNode={props.selectedNode}
                 isOpenLayoutModal={props.isOpenLayoutModal}
                 setSelected={(newSelected: string) => {

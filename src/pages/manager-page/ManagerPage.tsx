@@ -25,15 +25,13 @@ import {
 } from "@chakra-ui/react";
 import React, { useContext } from "react";
 import { CrossAppContext, CrossAppState } from "../../context/AppContext";
-import { LayoutsTable } from "./components/LayoutsTable";
+import { WorkspacesTable } from "./components/WorkspacesTable";
 import { DevicesTable } from "./components/DevicesTable";
 import { RolesTable } from "./components/RolesTable";
 
 const QRCode = require("qrcode.react");
 
-interface ManagerPageProps {}
-
-export function ManagerPage(props: ManagerPageProps) {
+export function ManagerPage() {
   const { devices, app } = useContext<CrossAppState>(CrossAppContext);
   return (
     <Box>
@@ -83,13 +81,13 @@ export function ManagerPage(props: ManagerPageProps) {
         </TabList>
         <TabPanels>
           <TabPanel>
-            <DevicesTable app={app} devices={devices} />
+            <DevicesTable />
           </TabPanel>
           <TabPanel>
-            <RolesTable app={app} />
+            <RolesTable />
           </TabPanel>
           <TabPanel>
-            <LayoutsTable app={app} />
+            <WorkspacesTable />
           </TabPanel>
         </TabPanels>
       </Tabs>
