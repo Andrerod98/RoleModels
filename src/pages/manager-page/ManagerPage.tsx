@@ -55,17 +55,7 @@ export function ManagerPage() {
             {app.getFullURL()}
           </Text>
         </Link>
-        <Button
-          onClick={() => {
-            window.location.href = "https://" + app.getServerURL() + ":8080/#";
-            window.location.replace(
-              "https://" + app.getServerURL() + ":8080/#"
-            );
-            window.location.reload();
-          }}
-        >
-          Create new project
-        </Button>
+
         <Spacer />
         <Stat key='stat'>
           <StatLabel>Connected Devices</StatLabel>

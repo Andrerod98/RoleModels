@@ -34,7 +34,35 @@ export function ErrorPage(props: ErrorPageProps) {
     }
   });
   return (
-    <Center h={"100vh"}>
+    <Box
+      w={"100vw"}
+      h={"100vh"}
+      bg={"rgba(0,0,0, 0.75)"}
+      position={"absolute"}
+      left={0}
+      top={0}
+    >
+      <Center h={"100%"} w={"100%"}>
+        <Box>
+          <Heading color={"white"} w={"100%"} textAlign={"center"}>
+            {"Connecting..."}
+          </Heading>
+          <Center w={"100%"}>
+            <Spinner size={"xl"} color={"white"} borderWidth={"5px"} my={5} />
+          </Center>
+          <Text
+            fontSize={"20px"}
+            w={"100%"}
+            textAlign={"center"}
+            color={"white"}
+          >
+            {props.message}
+          </Text>
+        </Box>
+      </Center>
+    </Box>
+  );
+  /*<Center h={"100vh"}>
       <Box>
         <Heading>Redirecting...</Heading>
         <Spinner></Spinner>
@@ -61,6 +89,5 @@ export function ErrorPage(props: ErrorPageProps) {
           Download Certificate
         </Button>
       </Box>
-    </Center>
-  );
+        </Center>*/
 }

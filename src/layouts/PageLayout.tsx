@@ -21,19 +21,18 @@ export function PageLayout(props: PageLayoutProps) {
 
   return (
     <>
-      <Box zIndex={1000} w={"100%"}>
-        <Header
-          myRole={roleModels.getDeviceRole()}
-          roles={roles.map((role: IRole) => role.name)}
-          onRoleClick={(role: string) => {
-            roleModels.promoteToRole(role);
-            setSelectedNode("");
-          }}
-          onLoggingOpen={() => {
-            setOpen({ ...isOpen, logging: true });
-          }}
-        />
-      </Box>
+      <Header
+        myRole={roleModels.getDeviceRole()}
+        roles={roles.map((role: IRole) => role.name)}
+        onRoleClick={(role: string) => {
+          roleModels.promoteToRole(role);
+          setSelectedNode("");
+        }}
+        onLoggingOpen={() => {
+          setOpen({ ...isOpen, logging: !isOpen.logging });
+        }}
+      />
+
       {props.children}
 
       <PushInteractionDialog />

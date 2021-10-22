@@ -52,7 +52,12 @@ export const QRReaderModal: FC<CrossDeviceInteractionModalProps> = (
         size={"sm"}
         ml={"10px"}
         my={"5px"}
-        colorScheme={mode.mode === "PULL" ? undefined : "blue"}
+        color={"white"}
+        _hover={{ color: "white", bg: "black" }}
+        _focus={{ color: "white", bg: "black" }}
+        borderRadius={"5px"}
+        borderColor={"gray.600"}
+        bg={mode.mode === "PULL" ? "black" : "transparent"}
         icon={<Icon as={AiOutlineExpand} />}
         onClick={() => {
           roleModels.setMode("PULL");

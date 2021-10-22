@@ -53,7 +53,7 @@ export function RolePage(props: RoleProps) {
     containerID = localMode.properties.containerID;
   }
 
-  const isPUSH = true;
+  const isPUSH = false;
   const generateWidget = (node: ILayoutNode): JSX.Element => {
     switch (node.name) {
       case "div":

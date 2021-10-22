@@ -65,7 +65,7 @@ export const LoggingWindow = () => {
         aria-label={"Search database"}
         icon={<CloseIcon />}
         onClick={() => {
-          setOpen({ ...isOpen, logging: true });
+          setOpen({ ...isOpen, logging: !isOpen.logging });
         }}
       />
       <Divider />

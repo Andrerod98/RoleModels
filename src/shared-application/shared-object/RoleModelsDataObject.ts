@@ -661,7 +661,9 @@ export class RoleModelsDataObject
   public extendWorkspace = () => {
     const myDevice = this.getDevice();
 
-    const newRole = this.addRole(myDevice.id);
+    const newRole = this.addRole(
+      "role" + (Array.from(this.getRoles()).length - 1)
+    );
     this.devicesManager.promoteToRole(newRole.getName(), myDevice.id);
   };
 

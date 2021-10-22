@@ -3647,6 +3647,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/hammerjs@^2.0.40":
+  "integrity" "sha512-VbjwR1fhsn2h2KXAY4oy1fm7dCxaKy0D+deTb8Ilc3Eo3rc5+5eA4rfYmZaHgNJKxVyI0f6WIXzO2zLkVmQPHA=="
+  "resolved" "https://registry.npmjs.org/@types/hammerjs/-/hammerjs-2.0.40.tgz"
+  "version" "2.0.40"
+
 "@types/hast@^2.0.0":
   "integrity" "sha512-viwwrB+6xGzw+G1eWpF9geV3fnsDgXqHG+cqgiHrvQfDUW5hzhCyV7Sy3UJxhfRFBsgky2SSW33qi/YrIkjX5Q=="
   "resolved" "https://registry.npmjs.org/@types/hast/-/hast-2.3.1.tgz"
@@ -8887,6 +8892,11 @@
   dependencies:
     "duplexer" "^0.1.1"
     "pify" "^4.0.1"
+
+"hammerjs@^2.0.8":
+  "integrity" "sha1-BO93hiz/K7edMPdpIJWTAiK/YPE="
+  "resolved" "https://registry.npmjs.org/hammerjs/-/hammerjs-2.0.8.tgz"
+  "version" "2.0.8"
 
 "handle-thing@^2.0.0":
   "integrity" "sha512-9Qn4yBxelxoh2Ow62nP+Ka/kMnOXRi8BXnRaUwezLNhqelnN49xKz4F/dPP8OYLxLxq6JDtZb2i9XznUQbNPTg=="
