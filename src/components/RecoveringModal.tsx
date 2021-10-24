@@ -1,11 +1,12 @@
 import { Box, Heading, Center, Spinner } from "@chakra-ui/react";
 import React, { useContext } from "react";
 import { CrossAppState, CrossAppContext } from "../context/AppContext";
+import { Mode } from "../context/Modes";
 
 export const RecoveringModal = () => {
   const { mode } = useContext<CrossAppState>(CrossAppContext);
 
-  if (mode.mode !== "recovery" && mode.mode !== "setting-up") {
+  if (mode.mode !== Mode.Recovery && mode.mode !== Mode.SettingUp) {
     return <></>;
   }
 
@@ -21,7 +22,7 @@ export const RecoveringModal = () => {
       <Center h={"100%"} w={"100%"}>
         <Box>
           <Heading color={"white"} w={"100%"} textAlign={"center"}>
-            {mode.mode === "recovery"
+            {mode.mode === Mode.Recovery
               ? "Recovering workspace..."
               : "Setting up workspace..."}
           </Heading>

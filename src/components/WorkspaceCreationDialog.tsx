@@ -14,10 +14,10 @@ import { useState } from "react";
 import { CrossAppState, CrossAppContext } from "../context/AppContext";
 
 export const WorkspaceCreationDialog = () => {
-  const { roleModels, localMode, setLocalMode } =
+  const { roleModels, isOpen, setOpen } =
     useContext<CrossAppState>(CrossAppContext);
 
-  if (localMode.mode !== "WorkspaceCreation") {
+  if (!isOpen.saveWorkspaceModal) {
     return <></>;
   }
 
@@ -27,7 +27,7 @@ export const WorkspaceCreationDialog = () => {
   const handleChange = (event) => setValue(event.target.value);
 
   const handleClose = () => {
-    setLocalMode("");
+    setOpen({ ...isOpen, saveWorkspaceModal: false });
   };
   return (
     <AlertDialog
@@ -65,7 +65,7 @@ export const WorkspaceCreationDialog = () => {
                   duration: 9000,
                   isClosable: true,
                 });
-                roleModels.saveConfiguration(value);
+                roleModels.saveWorkspace(value);
                 handleClose();
               }}
               ml={3}

@@ -7,6 +7,7 @@ import {
 import React, { useContext } from "react";
 import { uuid } from "uuidv4";
 import { CrossAppState, CrossAppContext } from "../context/AppContext";
+import { Mode } from "../context/Modes";
 import { ILayoutNode } from "../shared-application/workspaces/ILayoutNode";
 
 import { ContainerTransferActionChooser } from "./ContainerTransferActionChooser";
@@ -17,29 +18,28 @@ export const ContainerTransferActionModal = () => {
     role,
     localMode,
     setLocalMode,
-    setOpen,
-    isOpen,
+
     setSelectedNode,
   } = useContext<CrossAppState>(CrossAppContext);
 
-  if (localMode.mode !== "ContainerTransfer") {
+  if (localMode.mode !== Mode.ContainerTransfer) {
     return <></>;
   }
 
   const { containerID, from } = localMode.properties;
   const container = roleModels.getContainer(containerID);
-  const currentLayout = roleModels.getCurrentConfigurationOfRole(role.getId());
+  const currentLayout = roleModels.getCurrentLayoutOfRole(role.getId());
 
   const handleMigrate = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.stopPropagation();
 
-    roleModels.migrateView(container, from);
+    roleModels.removeContainerFromRole(container, from);
 
     const length = roleModels.getMyContainers().length;
     if (length === 0) {
-      roleModels.getCurrentConfigurationOfRole(role.getId()).update({
+      roleModels.getCurrentLayoutOfRole(role.getId()).replace({
         id: uuid(),
         name: "view",
         viewId: container.getId(),
@@ -49,12 +49,12 @@ export const ContainerTransferActionModal = () => {
       setSelectedNode(container.getId());
     } else {
       setLocalMode({
-        mode: "ContainerPosition",
+        mode: Mode.ContainerPosition,
         properties: { containerID: container.getId() },
       });
     }
 
-    roleModels.setMode("");
+    setLocalMode({ mode: Mode.Default });
   };
 
   const handleMirror = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -63,7 +63,7 @@ export const ContainerTransferActionModal = () => {
 
     const length = roleModels.getMyContainers().length;
     if (length === 0) {
-      currentLayout.update({
+      currentLayout.replace({
         id: uuid(),
         name: "view",
         viewId: container.getId(),
@@ -72,12 +72,12 @@ export const ContainerTransferActionModal = () => {
       setSelectedNode(container.getId());
     } else {
       setLocalMode({
-        mode: "ContainerPosition",
+        mode: Mode.ContainerPosition,
         properties: { containerID: container.getId() },
       });
     }
 
-    roleModels.setMode("");
+    setLocalMode({ mode: Mode.Default });
   };
 
   const handleStitch = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -85,19 +85,24 @@ export const ContainerTransferActionModal = () => {
     //const stitchingCV = app.stitchViews(view.view, view.view);
 
     //stitchingCV.stitchBottom(app.getMyRole().getName(), view.from);
-    roleModels.setMode("");
+    roleModels.setMode(Mode.Default);
   };
 
   const handleQuickInteraction = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
-    setOpen({ ...isOpen, q: true });
-    setLocalMode({ mode: "QuickInteraction" });
+    setLocalMode({
+      mode: Mode.QuickInteraction,
+      properties: { containerID: container.getId(), from },
+    });
+
+    e.stopPropagation();
+    //setOpen({ ...isOpen, q: true });
   };
 
   const handleClose = () => {
-    roleModels.setMode("");
-    setLocalMode({ mode: "" });
+    roleModels.setMode(Mode.Default);
+    setLocalMode({ mode: Mode.Default });
   };
 
   return (

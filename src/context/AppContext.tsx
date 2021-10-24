@@ -3,11 +3,11 @@ import { CrossDeviceApplication } from "../shared-application/CrossDeviceApplica
 import { IDevice } from "../shared-application/devices/IDevice";
 import { IInteraction } from "../shared-application/managers/InteractionsManager";
 import { IRole } from "../shared-application/roles/IRole";
-import { LayoutNode } from "../shared-application/workspaces/LayoutNode";
 import { Role } from "../shared-application/roles/Role";
 import { Container } from "../shared-application/containers/Container";
 import { RoleModelsDataObject } from "../shared-application/shared-object/RoleModelsDataObject";
 import { Workspace } from "../shared-application/workspaces/Workspace";
+import { Mode } from "./Modes";
 
 export const CrossAppContext = createContext(undefined);
 
@@ -20,12 +20,12 @@ export interface CrossAppState {
   interactions: IInteraction[];
   currentWorkspace: Workspace;
   primaryWorkspace: Workspace;
-  mode: { mode: string; properties?: any };
+  mode: { mode: Mode; properties?: any };
   localMode: {
-    mode: string;
+    mode: Mode;
     properties?: any;
   };
-  setLocalMode: any;
+  setLocalMode: (localMode: { mode: Mode; properties?: any }) => void;
   role: Role;
   views: Container[];
   isOpen: {
@@ -33,11 +33,15 @@ export interface CrossAppState {
     logging: boolean;
     saveWorkspaceModal: boolean;
   };
-  setOpen: any;
+  setOpen: (isOpen: {
+    header: boolean;
+    logging: boolean;
+    saveWorkspaceModal: boolean;
+  }) => void;
   isMaxFill: boolean;
-  setMaxFill: any;
+  setMaxFill: (isMaxFill: boolean) => void;
   selectedNode: string;
-  setSelectedNode: any;
+  setSelectedNode: (selectedNode: string) => void;
 }
 
 export const CrossAppProvider = ({
@@ -83,7 +87,7 @@ export const CrossAppProvider = ({
       containers: Array.from(roleModels.getContainers()),
       interactions: Array.from(roleModels.getInteractions()),
 
-      currentWorkspace: roleModels.getCurrentConfiguration().get(),
+      currentWorkspace: roleModels.getCurrentWorkspace().get(),
 
       primaryWorkspace: roleModels.getPrimaryWorkspace(1),
 
@@ -109,9 +113,12 @@ export const CrossAppProvider = ({
       if (nDevices + 1 > 1) roleModels.savePrimaryWorkspace(nDevices + 1);
 
       if (nDevices > 1) {
-        roleModels.setMode("SUGGEST", { saved: workspaces, type: "removed" });
+        roleModels.setMode(Mode.Suggest, {
+          saved: workspaces,
+          type: "removed",
+        });
       } else {
-        roleModels.loadConfiguration(
+        roleModels.loadWorkspace(
           roleModels.getPrimaryWorkspace(1).toWorkspace()
         );
       }
@@ -124,7 +131,7 @@ export const CrossAppProvider = ({
 
       if (nDevices > 1)
         setLocalMode({
-          mode: "SUGGEST",
+          mode: Mode.Suggest,
           properties: { saved: workspaces, type: "added" },
         });
     });

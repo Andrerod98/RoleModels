@@ -14,22 +14,24 @@ import React, { useContext } from "react";
 import { AiOutlineAppstoreAdd } from "react-icons/ai";
 import { MdRestore } from "react-icons/md";
 import { CrossAppState, CrossAppContext } from "../context/AppContext";
+import { Mode } from "../context/Modes";
+import { Workspace } from "../shared-application/workspaces/Workspace";
 
 export const SuggestionModalNew = () => {
   const { mode, roleModels, localMode, setLocalMode, devices } =
     useContext<CrossAppState>(CrossAppContext);
 
-  if (mode.mode !== "SUGGEST" && localMode.mode !== "SUGGEST") {
+  if (mode.mode !== Mode.Suggest && localMode.mode !== Mode.Suggest) {
     return <></>;
   }
   let saved = [];
   let deviceAction = "";
 
-  if (mode.mode === "SUGGEST") {
+  if (mode.mode === Mode.Suggest) {
     saved = mode.properties.saved;
     deviceAction = mode.properties.type;
   }
-  if (localMode.mode === "SUGGEST") {
+  if (localMode.mode === Mode.Suggest) {
     saved = localMode.properties.saved;
     deviceAction = localMode.properties.type;
   }
@@ -39,8 +41,6 @@ export const SuggestionModalNew = () => {
 
   const primaryWorkspace = roleModels.getPrimaryWorkspace(connectedDevices);
 
-  console.log("AQUI");
-  console.log(primaryWorkspace);
   const hasRestore = primaryWorkspace !== undefined;
 
   return (
@@ -63,9 +63,10 @@ export const SuggestionModalNew = () => {
             mx={"10px"}
           >
             <Flex width={"70vw"}>
+              <Spacer />
               <Heading color={"white"} textAlign={"center"}>
-                A device was {deviceAction}. Connected devices:{" "}
-                {connectedDevices}
+                A device was {deviceAction}. {connectedDevices} connected
+                devices.
               </Heading>
               <Spacer />
               <CloseButton
@@ -74,8 +75,8 @@ export const SuggestionModalNew = () => {
                 color={"white"}
                 size={"xl"}
                 onClick={() => {
-                  roleModels.setMode("");
-                  setLocalMode("");
+                  roleModels.setMode(Mode.Default);
+                  setLocalMode({ mode: Mode.Default });
                 }}
               />
             </Flex>
@@ -90,8 +91,8 @@ export const SuggestionModalNew = () => {
               alignContent={"center"}
               flexDirection={"column"}
               onClick={() => {
+                setLocalMode({ mode: Mode.Default });
                 roleModels.restoreLastWorkspace();
-                roleModels.setMode("");
               }}
             >
               <Text fontSize={"30px"}>Restore last</Text>
@@ -109,9 +110,9 @@ export const SuggestionModalNew = () => {
               alignContent={"center"}
               flexDirection={"column"}
               onClick={() => {
+                setLocalMode({ mode: Mode.Default });
+                roleModels.setMode(Mode.Default);
                 roleModels.extendWorkspace();
-                setLocalMode("");
-                roleModels.setMode("");
               }}
             >
               <Text fontSize={"30px"}>Extend</Text>
@@ -144,10 +145,10 @@ export const SuggestionModalNew = () => {
                 fontWeight={"bold"}
                 m={2}
               >
-                There are no saved workspaces
+                There are no saved workspaces with {connectedDevices} roles.
               </Text>
             ) : (
-              saved.map((workspace) => {
+              saved.map((workspace: Workspace) => {
                 return (
                   <Button
                     position={"relative"}
@@ -157,8 +158,8 @@ export const SuggestionModalNew = () => {
                     bg={"white"}
                     borderRadius={"40px"}
                     onClick={() => {
-                      roleModels.loadConfiguration(workspace);
-                      roleModels.setMode("");
+                      setLocalMode({ mode: Mode.Default });
+                      roleModels.loadWorkspace(workspace.toWorkspace());
                     }}
                   >
                     {workspace.name}

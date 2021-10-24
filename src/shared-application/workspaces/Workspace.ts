@@ -47,8 +47,6 @@ export class Workspace {
     this.id = workspace.id;
     this.name = workspace.name;
 
-    console.log(workspace);
-
     for (const key of sharedLayouts) {
       let roleLayout = tempRoleLayouts.get(key);
       const value = workspace.layouts[key];
@@ -73,7 +71,7 @@ export class Workspace {
       layouts[role] = {
         name: layout.getName(),
         type: layout.getType(),
-        layout: layout.toLayout(),
+        layout: layout.getLayout().toLayout(),
       };
     }
 

@@ -52,6 +52,8 @@ import { HandFactory } from "../../shared-components/Hand";
 import { TextFactory } from "../../shared-components/Text";
 import { StockDetailsFactory } from "../../shared-components/StockDetails";
 import { IWorkspace } from "../workspaces/IWorkspace";
+import { Workspace } from "../workspaces/Workspace";
+import { Mode } from "../../context/Modes";
 
 export class RoleModelsDataObject
   extends DataObject
@@ -451,7 +453,7 @@ export class RoleModelsDataObject
     }
   }*/
 
-  public setMode(mode: string, properties?: any) {
+  public setMode(mode: Mode, properties?: any) {
     this.mode.set({
       mode: mode,
       properties: properties,
@@ -562,10 +564,10 @@ export class RoleModelsDataObject
   public getInk = (): IInk => this.ink;
 
   /* ******************************************************** 
-                View Management Functions
+                Containers Management Functions
    ******************************************************** */
   public getMyContainers = (): Container[] => {
-    const viewsIds = this.getCurrentConfigurationOfRole(
+    const viewsIds = this.getCurrentLayoutOfRole(
       this.getMyRole().getId()
     ).toViewsIds();
     return this.containersManager.getContainersByIds(viewsIds);
@@ -576,7 +578,7 @@ export class RoleModelsDataObject
   };
 
   public getContainersFrom = (roleId: string): Container[] => {
-    const viewsIds = this.getCurrentConfigurationOfRole(roleId).toViewsIds();
+    const viewsIds = this.getCurrentLayoutOfRole(roleId).toViewsIds();
     return this.containersManager.getContainersByIds(viewsIds);
   };
 
@@ -603,7 +605,7 @@ export class RoleModelsDataObject
       .getLayoutWithContainer(containerID);
   }
 
-  public migrateView = (view: Container, from: string): void => {
+  public removeContainerFromRole = (view: Container, from: string): void => {
     this.workspacesManager.removeContainerFromRole(from, view.getId());
 
     Logger.getInstance().info(
@@ -611,7 +613,40 @@ export class RoleModelsDataObject
     );
   };
 
-  /* Roles */
+  public updateContainer(container: Container): void {
+    this.containersManager
+      .getContainer(container.getId())
+      .update(container.toContainer());
+  }
+
+  public updateContainers(containers: Container[]) {
+    containers.forEach((c) => {
+      const container = this.containersManager.getContainer(c.getId());
+      if (container) container.update(c.toContainer());
+    });
+  }
+
+  public updateIContainers(containers: IContainer[]) {
+    containers.forEach((c) => {
+      if (this.containersMap.has(c.id)) {
+        this.containersManager.getContainer(c.id).updateObject(c);
+      } else {
+        const sharedContainer = SharedCell.create(this.runtime);
+        sharedContainer.set(c);
+        sharedContainer.on("valueChanged", () => {
+          this.emit("change");
+        });
+
+        this.containersManager.addContainer(sharedContainer);
+      }
+    });
+  }
+
+  public getDeviceRole = (): string => this.devicesManager.getMyDevice().role;
+
+  /* ******************************************************** 
+                Roles Functions
+   ******************************************************** */
   /**
    * Get the role for the current device.
    */
@@ -621,8 +656,6 @@ export class RoleModelsDataObject
 
   public getRoleByName = (roleName: string): Role =>
     this.rolesManager.getRoleByName(roleName);
-
-  public getDeviceRole = (): string => this.devicesManager.getMyDevice().role;
 
   public removeRole(roleName: string) {
     this.rolesManager.removeRole(roleName);
@@ -656,17 +689,6 @@ export class RoleModelsDataObject
     return resultWorkspace;
   };
 
-  public restoreLastWorkspace = () => {};
-
-  public extendWorkspace = () => {
-    const myDevice = this.getDevice();
-
-    const newRole = this.addRole(
-      "role" + (Array.from(this.getRoles()).length - 1)
-    );
-    this.devicesManager.promoteToRole(newRole.getName(), myDevice.id);
-  };
-
   public assignRolesToDevices = (workspace: IWorkspace) => {
     const copy = Object.assign({}, workspace.layouts);
     const roles = Object.keys(workspace.layouts);
@@ -675,8 +697,9 @@ export class RoleModelsDataObject
       for (const roleID of roles) {
         const type = copy[roleID].type;
         const name = copy[roleID].name;
+
         if (type !== "assigned") {
-          if (device.type === type) {
+          if (device.type === type || type == "") {
             this.devicesManager.promoteToRole(name, device.id);
             copy[roleID].type = "assigned";
             break;
@@ -694,17 +717,21 @@ export class RoleModelsDataObject
       roleId = roleID;
     }
 
-    console.log("Adding role " + roleId);
+
     sharedRole.set({
       id: roleId,
       name: roleName,
     } as IRole);
 
     const newRole = this.rolesManager.addRole(sharedRole);
-    this.workspacesManager.getCurrentWorkspace().setLayout(roleId, {
-      id: uuid(),
-      name: "div",
-      flexGrow: false,
+    this.workspacesManager.getCurrentWorkspace().setRoleLayout(roleId, {
+      name: newRole.getName(),
+      type: "",
+      layout: {
+        id: uuid(),
+        name: "div",
+        flexGrow: false,
+      },
     });
 
     Logger.getInstance().info(`The role ${roleName} has been added.`);
@@ -714,33 +741,6 @@ export class RoleModelsDataObject
    * Get the available roles.
    */
   public getRoles = (): IterableIterator<Role> => this.rolesManager.getRoles();
-
-  public updateView(view: Container): void {
-    this.containersManager.getContainer(view.getId()).update(view.toView());
-  }
-
-  public updateViews(views: Container[]) {
-    views.forEach((v) => {
-      const view = this.containersManager.getContainer(v.getId());
-      if (view) view.update(v.toView());
-    });
-  }
-
-  public updateIViews(views: IContainer[]) {
-    views.forEach((v) => {
-      if (this.containersMap.has(v.id)) {
-        this.containersManager.getContainer(v.id).updateObject(v);
-      } else {
-        const sharedView = SharedCell.create(this.runtime);
-        sharedView.set(v);
-        sharedView.on("valueChanged", () => {
-          this.emit("change");
-        });
-
-        this.containersManager.addContainer(sharedView);
-      }
-    });
-  }
 
   /* ******************************************************** 
                 Factory Manager Management Functions
@@ -762,27 +762,19 @@ export class RoleModelsDataObject
   }
 
   /* ******************************************************** 
-                Configurations Functions
+                Workspaces Functions
    ******************************************************** */
 
-  public getConfigurations() {
+  public getWorkspaces() {
     return this.workspacesManager.getWorkspaces();
   }
 
-  public getWorkspacesWithNDevices = (quantity: number): any[] =>
+  public getWorkspacesWithNDevices = (quantity: number): Workspace[] =>
     this.workspacesManager.getWorkspacesWithNDevices(quantity);
 
-  public getCurrentConfiguration() {
+  public getCurrentWorkspace() {
     return this.workspacesManager.getCurrentWorkspace();
   }
-
-  /*public getEmptyWorkspace() {
-    return this.configurationsManager.getEmptyWorkspace();
-  }*/
-
-  /*public getPrimaryConfiguration() {
-    return this.configurationsManager.getPrimaryConfiguration();
-  }*/
 
   public getPrimaryWorkspace(nDevices: number) {
     return this.workspacesManager.getPrimaryWorkspace(nDevices);
@@ -792,33 +784,47 @@ export class RoleModelsDataObject
     this.workspacesManager.saveLastWorkspace(nDevices);
   }
 
-  /*public getPrimaryConfigurationShared() {
-    return this.configurationsManager.getPrimaryConfigurationShared();
-  }*/
-
-  public renameConfiguration(id: string, oldValue: string, newValue: string) {
+  public renameWorkspace(id: string, oldValue: string, newValue: string) {
     this.workspacesManager.renameWorkspace(id, oldValue, newValue);
   }
 
-  public getCurrentConfigurationOfRole(roleId: string) {
+  public getCurrentLayoutOfRole(roleId: string) {
     return this.workspacesManager.getCurrentLayoutOfRole(roleId);
   }
 
-  public saveConfiguration(name: string) {
+  public saveWorkspace(name: string) {
     this.workspacesManager.saveWorkspace(name);
   }
 
-  public resetWorkspace() {
-    this.workspacesManager.resetWorkspace();
+  public resetWorkspace(roleID: string) {
+    this.workspacesManager.resetWorkspace(roleID);
   }
 
-  public loadConfiguration(workspace: IWorkspace) {
+  public loadWorkspace(workspace: IWorkspace) {
     this.workspacesManager.loadWorkspace(workspace);
   }
 
-  public deleteConfigurationWithId(configId: string) {
+  public deleteWorkspaceWithId(configId: string) {
     this.workspacesManager.deleteWorkspace(configId);
   }
+
+  public restoreLastWorkspace = () => {
+    const nDevices = Array.from(this.getDevices()).length;
+    this.loadWorkspace(this.getPrimaryWorkspace(nDevices).toWorkspace());
+  };
+
+  public extendWorkspace = () => {
+    const myDevice = this.getDevice();
+
+    const newRole = this.addRole(
+      "role" + (Array.from(this.getRoles()).length - 1)
+    );
+    this.devicesManager.promoteToRole(newRole.getName(), myDevice.id);
+  };
+
+  /* ******************************************************** 
+                Interactions Functions
+   ******************************************************** */
 
   public getInteractions() {
     return this.interactionsManager.getInteractions();

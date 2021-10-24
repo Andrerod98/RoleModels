@@ -11,6 +11,7 @@ import {
 import React, { useContext, useState } from "react";
 import { uuid } from "uuidv4";
 import { CrossAppState, CrossAppContext } from "../../context/AppContext";
+import { Mode } from "../../context/Modes";
 import { ILayoutNode } from "../../shared-application/workspaces/ILayoutNode";
 import Utils from "../../utils/Utils";
 import { SingleTabCatalogBar } from "./CatalogBar";
@@ -34,7 +35,7 @@ export function RoleTab(props: RoleTabProps) {
   let currentLayout = primaryWorkspace.getFirstLayout().getLayout();
 
   const [codeState, setCodeState] = useState({
-    value: Utils.jsonToString(containers.map((c) => c.toView())),
+    value: Utils.jsonToString(containers.map((c) => c.toContainer())),
     position: { row: 0, column: 0 },
   });
 
@@ -61,7 +62,7 @@ export function RoleTab(props: RoleTabProps) {
     }
 
     //props.role.updateIViews(iviews);
-    roleModels.updateIViews(iviews);
+    roleModels.updateIContainers(iviews);
 
     //setLayoutSnapshot({ ...layout.toLayout() });
   };
@@ -95,7 +96,7 @@ export function RoleTab(props: RoleTabProps) {
       setSelectedNode(newView.id);
     } else {
       setLocalMode({
-        mode: "ContainerPosition",
+        mode: Mode.ContainerPosition,
         properties: { containerID: newView.id },
       });
     }
@@ -194,7 +195,7 @@ export function RoleTab(props: RoleTabProps) {
                       children: [],
                     } as ILayoutNode)
               }
-              isOpenLayoutModal={localMode.mode === "ContainerPosition"}
+              isOpenLayoutModal={localMode.mode === Mode.ContainerPosition}
               handleViewClick={() => {
                 addViewToEditor();
               }}
@@ -202,7 +203,6 @@ export function RoleTab(props: RoleTabProps) {
                 preview();
               }}
               setSelected={(newSelected: string) => {
-                console.log("SELECTED:" + newSelected);
                 setSelectedNode(newSelected);
               }}
               selectedNode={selectedNode}

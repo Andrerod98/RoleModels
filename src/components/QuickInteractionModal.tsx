@@ -9,13 +9,15 @@ import {
 } from "@chakra-ui/react";
 import React, { useContext } from "react";
 import { CrossAppState, CrossAppContext } from "../context/AppContext";
+import { Mode } from "../context/Modes";
 import { ViewComponent } from "./ViewComponent";
 
-export function QuickInteractionModal() {
+export const QuickInteractionModal = () => {
   const { roleModels, localMode, setLocalMode, role } =
     useContext<CrossAppState>(CrossAppContext);
 
-  if (localMode.mode !== "QuickInteraction") {
+
+  if (localMode.mode !== Mode.QuickInteraction) {
     return <></>;
   }
 
@@ -23,25 +25,23 @@ export function QuickInteractionModal() {
   const container = roleModels.getContainer(containerID);
 
   return (
-    <>
-      <Modal
-        isOpen={true}
-        size={"xl"}
-        onClose={() => {
-          setLocalMode({ mode: "" });
-        }}
-      >
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Quick Interaction</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Box h={"600px"}>
-              <ViewComponent view={container} role={role} />
-            </Box>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-    </>
+    <Modal
+      isOpen={true}
+      size={"xl"}
+      onClose={() => {
+        setLocalMode({ mode: Mode.Default });
+      }}
+    >
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>Quick Interaction</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          <Box h={"70vh"}>
+            <ViewComponent view={container} role={role} />
+          </Box>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
   );
-}
+};

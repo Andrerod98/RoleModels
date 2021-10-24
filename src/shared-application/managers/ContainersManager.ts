@@ -58,8 +58,10 @@ export class ContainersManager extends EventEmitter {
     });
 
     this.containers = newCVS;
-    Logger.getInstance().info(`${this.containersSharedMap.size} views loaded.`);
-    console.log(this.containersSharedMap.size + " Views Loaded.");
+    Logger.getInstance().info(
+      `${this.containersSharedMap.size} containers loaded.`
+    );
+    console.log(this.containersSharedMap.size + " containers loaded.");
   }
 
   /* Load a combined view from the shared combined view */

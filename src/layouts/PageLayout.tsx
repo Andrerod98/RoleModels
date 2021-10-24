@@ -1,4 +1,3 @@
-import { Box } from "@chakra-ui/react";
 import React, { useContext } from "react";
 import { LoggingWindow } from "../components/LoggingWindow";
 import { Header } from "../components/header";
@@ -36,8 +35,8 @@ export function PageLayout(props: PageLayoutProps) {
       {props.children}
 
       <PushInteractionDialog />
-      <QuickInteractionModal />
       <ContainerTransferActionModal />
+      <QuickInteractionModal />
       <SuggestionModalNew />
       <RecoveringModal />
       <WorkspaceCreationDialog />

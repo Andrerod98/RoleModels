@@ -15,11 +15,12 @@ import {
   AiOutlineTablet,
 } from "react-icons/ai";
 import { CrossAppState, CrossAppContext } from "../context/AppContext";
+import { Mode } from "../context/Modes";
 
 export const SuggestionModal = () => {
   const { mode, roleModels } = useContext<CrossAppState>(CrossAppContext);
 
-  if (mode.mode !== "suggest") {
+  if (mode.mode !== Mode.Suggest) {
     return <></>;
   }
 
@@ -61,8 +62,8 @@ export const SuggestionModal = () => {
                     h='300px'
                     borderRadius={"20px"}
                     onClick={() => {
-                      roleModels.loadConfiguration(workspace);
-                      roleModels.setMode("");
+                      roleModels.loadWorkspace(workspace);
+                      roleModels.setMode(Mode.Default);
                     }}
                   >
                     <SimpleGrid

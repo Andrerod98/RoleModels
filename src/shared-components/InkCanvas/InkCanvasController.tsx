@@ -34,8 +34,6 @@ export class InkCanvasController extends UIComponentController {
   }
 
   public setInkCanvas(canvasElement: HTMLCanvasElement) {
-    console.log("Creating a new ink canvas");
-
     this.inkCanvas = new InkCanvas(canvasElement, this.getInk());
 
     if (this.model.thickness) this.setStroke(this.model.thickness);

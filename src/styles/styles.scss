@@ -3,6 +3,17 @@
  * Licensed under the MIT License.
  */
 //@import "~bootstrap/scss/bootstrap.scss";
+@keyframes blink {
+  0% {
+    border-color: red;
+  }
+  50% {
+    border-color: green;
+  }
+  100% {
+    border-color: red;
+  }
+}
 
 body {
   background-color: white;

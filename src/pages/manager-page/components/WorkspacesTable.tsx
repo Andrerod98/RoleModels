@@ -21,7 +21,7 @@ import { CrossAppState, CrossAppContext } from "../../../context/AppContext";
 
 export function WorkspacesTable() {
   const { roleModels } = useContext<CrossAppState>(CrossAppContext);
-  const workspaces = [...Array.from(roleModels.getConfigurations())];
+  const workspaces = [...Array.from(roleModels.getWorkspaces())];
 
   return (
     <Box>
@@ -61,7 +61,7 @@ export function WorkspacesTable() {
                   p={3}
                   borderRadius={"20px"}
                   onClick={() => {
-                    roleModels.loadConfiguration(workspace.toWorkspace());
+                    roleModels.loadWorkspace(workspace.toWorkspace());
                   }}
                 >
                   <Grid
@@ -115,7 +115,7 @@ export function WorkspacesTable() {
                     fontWeight={"bold"}
                     onSubmit={(nextValue: string) => {
                       if (nextValue === "") return;
-                      roleModels.renameConfiguration(
+                      roleModels.renameWorkspace(
                         workspace.id,
                         workspace.name,
                         nextValue

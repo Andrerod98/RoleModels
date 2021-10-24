@@ -36,7 +36,8 @@ export const LandingPage: React.FC<TemplateSelectorProps> = (
   props: TemplateSelectorProps
 ) => {
   const [name, setName] = useState("untitled");
-  const handleChange = (event: any) => setName(event.target.value);
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) =>
+    setName(event.target.value);
 
   const [path] = useState("/var/tmp/tinylicious/tinylicious/.git/refs/heads");
   let files = [];
@@ -67,6 +68,22 @@ export const LandingPage: React.FC<TemplateSelectorProps> = (
     <Container maxW={"container.xl"}>
       <VStack spacing={4} align={"stretch"} flex={1}>
         <Heading>Create a Project</Heading>
+        <Button
+          onClick={() => {
+            const element = document.createElement("a");
+            element.setAttribute("href", "../certificates/host.crt");
+            element.setAttribute("download", "host.crt");
+
+            element.style.display = "none";
+            document.body.appendChild(element);
+
+            element.click();
+
+            document.body.removeChild(element);
+          }}
+        >
+          Download Certificate
+        </Button>
         <FormControl id={"project-name"}>
           <FormLabel>Project name</FormLabel>
           <Input type={"text"} onChange={handleChange} />

@@ -9,22 +9,29 @@ import {
 } from "@chakra-ui/react";
 import React, { useContext, useRef } from "react";
 import { CrossAppState, CrossAppContext } from "../context/AppContext";
+import { Mode } from "../context/Modes";
 
 export function PushInteractionDialog() {
-  const { roleModels, localMode, setLocalMode } =
+  const cancelRef = useRef();
+  const { roleModels, mode, role, setLocalMode } =
     useContext<CrossAppState>(CrossAppContext);
 
-  if (localMode.mode !== "IncomingContainer") {
+  if (mode.mode !== Mode.Push) {
     return <></>;
   }
 
-  const { containerID, from } = localMode.properties;
+  const { containerID, from } = mode.properties;
+
+  if (from === role.getId()) {
+    return <></>;
+  }
   //const container = app.getSharedObject().getContainer(containerID);
-  const cancelRef = useRef();
 
   const onClose = () => {
-    setLocalMode({ mode: "" });
+    roleModels.setMode(Mode.Default);
   };
+
+  const roleName = roleModels.getRole(from).getName();
 
   return (
     <>
@@ -40,7 +47,7 @@ export function PushInteractionDialog() {
             </AlertDialogHeader>
 
             <AlertDialogBody>
-              There is a container being pushed coming from the role: {from} do
+              There is a container being pushed coming from the {roleName} do
               you want to accept?
             </AlertDialogBody>
 
@@ -52,10 +59,10 @@ export function PushInteractionDialog() {
                 colorScheme='green'
                 onClick={() => {
                   onClose();
-                  roleModels.setMode("");
-                  setLocalMode("ContainerTransfer", {
-                    containerID: containerID,
-                    from: from,
+                  roleModels.setMode(Mode.Default);
+                  setLocalMode({
+                    mode: Mode.ContainerTransfer,
+                    properties: { containerID, from },
                   });
                 }}
                 ml={3}

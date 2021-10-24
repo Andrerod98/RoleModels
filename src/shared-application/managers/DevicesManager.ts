@@ -157,14 +157,13 @@ export class DevicesManager {
 
   public getDeviceTypeOfRole(role: string): string {
     const devices = Array.from(this.getDevices());
-    console.log(role);
-    console.log(devices);
+
     const filteredDevices = devices.filter((device) => device.role === role);
-    console.log(filteredDevices);
+
     if (filteredDevices.length > 0) {
       return filteredDevices[0].type;
     } else {
-      return "unknown";
+      return "";
     }
   }
 

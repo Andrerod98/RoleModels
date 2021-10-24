@@ -30,46 +30,44 @@ export function ContainerTransferActionChooser({
         left={0}
         right={0}
         top={0}
-        m={20}
+        m={0}
         onClick={onClose}
         direction={["column", "row"]}
-        justifyContent={"space-around"}
+        justifyContent={["center", "space-evenly"]}
+        alignItems={"center"}
       >
         <Button
-          mx={"20px"}
-          my={"auto"}
-          w={["70%", "40%"]}
-          h={["30%", "40%"]}
+          w={["70%", "30%"]}
+          h={["auto", "40%"]}
+          my={["5px", "0"]}
           onClick={onMigrate}
         >
           <Box align={"center"}>
-            <Text fontSize={"40px"}> Migrate</Text>
+            <Text fontSize={["20px", "40px"]}> Migrate</Text>
 
             <CgArrowsExpandDownRight fontSize={"60px"} />
           </Box>
         </Button>
         <Button
-          mx={"20px"}
-          my={"auto"}
-          w={["70%", "40%"]}
-          h={["30%", "40%"]}
+          w={["70%", "30%"]}
+          h={["auto", "40%"]}
+          my={["5px", "0"]}
           onClick={onMirror}
         >
           <Box align={"center"}>
-            <Text fontSize={"40px"}>Mirror</Text>
+            <Text fontSize={["20px", "40px"]}>Mirror</Text>
 
             <CgScreenMirror fontSize={"60px"} />
           </Box>
         </Button>
         <Button
-          mx={"20px"}
-          my={"auto"}
-          w={["70%", "40%"]}
-          h={["30%", "40%"]}
+          w={["70%", "30%"]}
+          h={["auto", "40%"]}
+          my={["5px", "0"]}
           onClick={onQuickInteraction}
         >
           <Box align={"center"}>
-            <Text fontSize={"40px"}>Quick Interaction</Text>
+            <Text fontSize={["20px", "40px"]}>Quick Interaction</Text>
 
             <CgEye fontSize={"60px"} />
           </Box>

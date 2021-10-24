@@ -33,7 +33,7 @@ export function EditableTab(props: any) {
               onSubmit={(nextValue) => {
                 props.onSubmit(nextValue);
               }}
-              onKeyDown={(e: any) => {
+              onKeyDown={(e) => {
                 e.stopPropagation();
               }}
               defaultValue={tabProps.title as string}

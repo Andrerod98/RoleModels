@@ -23,6 +23,7 @@ import {
 } from "react-icons/ri";
 import { uuid } from "uuidv4";
 import { CrossAppState, CrossAppContext } from "../context/AppContext";
+import { Mode } from "../context/Modes";
 import { ILayoutNode } from "../shared-application/workspaces/ILayoutNode";
 interface ContainerPositionModal {
   setSelected: (newSelected: string) => void;
@@ -30,7 +31,6 @@ interface ContainerPositionModal {
 }
 export function ContainerPositionModal(props: ContainerPositionModal) {
   const {
-    roleModels,
     role,
     selectedNode,
     isMaxFill,
@@ -41,7 +41,7 @@ export function ContainerPositionModal(props: ContainerPositionModal) {
     setLocalMode,
   } = useContext<CrossAppState>(CrossAppContext);
 
-  if (localMode.mode !== "ContainerPosition") {
+  if (localMode.mode !== Mode.ContainerPosition) {
     return <></>;
   }
 
@@ -105,7 +105,7 @@ export function ContainerPositionModal(props: ContainerPositionModal) {
         break;
     }
     setSelectedNode(containerID);
-    setLocalMode({ mode: "" });
+    setLocalMode({ mode: Mode.Default });
   };
 
   return (

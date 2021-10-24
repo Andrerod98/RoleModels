@@ -1,5 +1,4 @@
 import { SharedCell } from "@fluidframework/cell";
-import { ILayoutNode } from "./ILayoutNode";
 import { IWorkspace } from "./IWorkspace";
 import { IRoleLayout } from "./RoleLayout";
 import { Workspace } from "./Workspace";
@@ -25,7 +24,11 @@ export class SharedWorkspace {
 
     for (const [role, layout] of entries) {
       layout.getLayout().on("change", (l) => {
-        this.setLayout(role, l);
+        this.setRoleLayout(role, {
+          name: layout.getName(),
+          type: layout.getType(),
+          layout: l,
+        });
       });
     }
   }
@@ -34,11 +37,10 @@ export class SharedWorkspace {
     this.sharedWorkspace.set(value);
   }
 
-  public setLayout(roleID: string, value: ILayoutNode) {
+  public setRoleLayout(roleID: string, value: IRoleLayout) {
     const iworkspace = this.workspace.toWorkspace();
     iworkspace.layouts[roleID] = {
-      ...iworkspace.layouts[roleID],
-      layout: value,
+      ...value,
     } as IRoleLayout;
     this.sharedWorkspace.set(iworkspace);
   }

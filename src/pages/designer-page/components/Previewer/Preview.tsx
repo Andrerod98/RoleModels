@@ -23,6 +23,7 @@ import {
 import { CrossAppState, CrossAppContext } from "../../../../context/AppContext";
 import { ViewComponent } from "../../../../components/ViewComponent";
 import { ILayoutNode } from "../../../../shared-application/workspaces/ILayoutNode";
+import { Mode } from "../../../../context/Modes";
 
 interface PreviewProps {
   layout: ILayoutNode;
@@ -39,8 +40,7 @@ export const Preview = (props: PreviewProps) => {
     roleModels,
     setMaxFill,
     isMaxFill,
-    role,
-    selectedNode,
+
     setSelectedNode,
     primaryWorkspace,
     localMode,
@@ -48,7 +48,7 @@ export const Preview = (props: PreviewProps) => {
   } = useContext<CrossAppState>(CrossAppContext);
   let currentLayout = primaryWorkspace.getFirstLayout().getLayout();
 
-  const isOpenLayoutModal = localMode.mode === "ContainerPosition";
+  const isOpenLayoutModal = localMode.mode === Mode.ContainerPosition;
   let containerID = "";
   if (isOpenLayoutModal) {
     containerID = localMode.properties.containerID;
@@ -155,7 +155,7 @@ export const Preview = (props: PreviewProps) => {
           //primaryWorkspace.splitTop(containerID, false, isMaxFill);
           currentLayout.splitTop(containerID, false, isMaxFill);
           setSelectedNode(containerID);
-          setLocalMode({ mode: "" });
+          setLocalMode({ mode: Mode.Default });
         }}
         icon={<Icon as={isMaxFill ? RiLayoutBottomLine : BiDockTop} />}
       />
@@ -174,7 +174,7 @@ export const Preview = (props: PreviewProps) => {
           //primaryWorkspace.splitBottom(containerID, false, isMaxFill);
           currentLayout.splitBottom(containerID, false, isMaxFill);
           setSelectedNode(containerID);
-          setLocalMode({ mode: "" });
+          setLocalMode({ mode: Mode.Default });
         }}
         icon={<Icon as={isMaxFill ? RiLayoutTopLine : BiDockBottom} />}
       />
@@ -193,7 +193,7 @@ export const Preview = (props: PreviewProps) => {
           //primaryWorkspace.splitLeft(containerID, false, isMaxFill);
           currentLayout.splitLeft(containerID, false, isMaxFill);
           setSelectedNode(containerID);
-          setLocalMode({ mode: "" });
+          setLocalMode({ mode: Mode.Default });
         }}
         icon={<Icon as={isMaxFill ? RiLayoutRightLine : BiDockLeft} />}
       />
@@ -212,7 +212,7 @@ export const Preview = (props: PreviewProps) => {
           //primaryWorkspace.splitRight(containerID, false, isMaxFill);
           currentLayout.splitRight(containerID, false, isMaxFill);
           setSelectedNode(containerID);
-          setLocalMode({ mode: "" });
+          setLocalMode({ mode: Mode.Default });
         }}
         icon={<Icon as={isMaxFill ? RiLayoutLeftLine : BiDockRight} />}
       />

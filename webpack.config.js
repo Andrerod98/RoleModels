@@ -6,7 +6,7 @@ const fs = require('fs');
 module.exports = (env) => {
   return {
     devServer: {
-      host: '127.0.0.1',
+      host: '192.168.1.72',
       //port: 80,
       headers: {
         'Access-Control-Allow-Origin': '*'

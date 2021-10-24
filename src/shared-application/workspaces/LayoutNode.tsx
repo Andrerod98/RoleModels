@@ -102,9 +102,7 @@ export class LayoutNode extends EventEmitter {
 
   removeChild(childId: string) {
     const index = this.children.findIndex((c) => c.getId() === childId);
-    console.log("Removing child");
-    console.log(index);
-    console.log(this.children);
+
     if (index == -1) {
       this.children.forEach((child) => {
         child.removeChild(childId);
@@ -152,8 +150,15 @@ export class LayoutNode extends EventEmitter {
     if (model.children) {
       model.children.forEach((child) => this.addChild(child));
     }
+  }
 
+  public sync() {
     this.getRoot().emit("change", this.getRoot().toLayout());
+  }
+
+  public replace(model: ILayoutNode) {
+    this.update(model);
+    this.sync();
   }
 
   public groupWith(name: string, newView: ILayoutNode, isFirst: boolean) {
@@ -205,6 +210,8 @@ export class LayoutNode extends EventEmitter {
     } else {
       this.groupWith("flex", newView, false);
     }
+
+    this.sync();
   }
 
   public splitLeft(viewId: string, isExtreme: boolean, flexGrow: boolean) {
@@ -238,6 +245,7 @@ export class LayoutNode extends EventEmitter {
     } else {
       this.groupWith("flex", newView, true);
     }
+    this.sync();
   }
 
   public splitTop(viewId: string, isExtreme: boolean, flexGrow: boolean) {
@@ -271,6 +279,7 @@ export class LayoutNode extends EventEmitter {
     } else {
       this.groupWith("div", newView, true);
     }
+    this.sync();
   }
 
   public splitBottom(viewId: string, isExtreme: boolean, flexGrow: boolean) {
@@ -304,6 +313,7 @@ export class LayoutNode extends EventEmitter {
     } else {
       this.groupWith("div", newView, false);
     }
+    this.sync();
   }
 
   public toLayout(): ILayoutNode {

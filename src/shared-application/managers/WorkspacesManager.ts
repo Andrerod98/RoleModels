@@ -8,6 +8,7 @@ import { IWorkspace } from "../workspaces/IWorkspace";
 import { SharedWorkspaces } from "../workspaces/SharedWorkspaces";
 import { SharedWorkspace } from "../workspaces/SharedWorkspace";
 import { Workspace } from "../workspaces/Workspace";
+import { Mode } from "../../context/Modes";
 
 enum ConfigurationsManagerEvents {
   ChangeState = "changeState",
@@ -41,7 +42,7 @@ export class WorkspacesManager extends EventEmitter {
     super();
 
     this.lastWorkspaces = new SharedWorkspaces(
-      primaryWorkspacesSharedMap,
+      this.primaryWorkspacesSharedMap,
       this.emitChange
     );
     this.allWorkspaces = new SharedWorkspaces(
@@ -78,7 +79,8 @@ export class WorkspacesManager extends EventEmitter {
     if (nDevices > 1) {
       const id = "" + nDevices;
       const value = this.currentWorkspace.get();
-      this.lastWorkspaces.set(id, value);
+
+      this.lastWorkspaces.set(id, { ...value });
     }
   }
 
@@ -115,16 +117,16 @@ export class WorkspacesManager extends EventEmitter {
   }
 
   public loadWorkspace(workspace: IWorkspace): void {
-    this.app.setMode("setting-up");
+    this.app.setMode(Mode.SettingUp);
 
     const newWorkspace = this.app.setRoles(workspace);
 
     this.current.set({ ...newWorkspace });
 
     setTimeout(() => {
-      this.app.setMode("");
+      this.app.setMode(Mode.Default);
       this.app.assignRolesToDevices(newWorkspace);
-    }, 5000);
+    }, 2000);
   }
 
   public deleteWorkspace(workspaceID: string): void {
@@ -133,25 +135,26 @@ export class WorkspacesManager extends EventEmitter {
 
   public saveWorkspace(name: string) {
     const id = uuid();
-    const value = Object.assign({}, this.currentWorkspace.get());
+    const value = { ...this.current.get().toWorkspace() };
     this.current.set({
-      ...value,
+      layouts: value.layouts,
       id: id,
       name: name,
     });
 
     const layouts = {};
-    for (const key of Object.keys(value.layouts)) {
-      const roleId = this.app.getRole(key).getId();
-      const roleName = this.app.getRole(key).getName();
+    const rolesIDs = Object.keys(value.layouts);
+    for (const key of rolesIDs) {
+      const role = this.app.getRole(key);
+      const roleId = role.getId();
+      const roleName = role.getName();
       layouts[roleId] = {
         layout: value.layouts[key].layout,
         type: this.app.getDeviceTypeOfRole(roleId),
         name: roleName,
       };
     }
-
-    this.workspacesSharedMap.set(id, {
+    this.allWorkspaces.set(id, {
       id,
       name: name,
       layouts: layouts,
@@ -162,32 +165,23 @@ export class WorkspacesManager extends EventEmitter {
     return this.allWorkspaces.getWorkspacesWithNDevices(quantity);
   }
 
-  public resetWorkspace() {
+  public resetWorkspace(roleID: string) {
     const layouts = {};
 
     const entries = this.current.get().getRoleLayouts().entries();
-    console.log("Reseting");
-    console.log(this.primary.get());
-    console.log(this.current.get());
-    let i = 0;
-    for (const [key, value] of entries) {
-      if (i === 0) {
-        layouts[key] = { ...this.primary.get().getFirstLayout().toLayout() };
-      } else {
-        layouts[key] = {
-          ...value,
-          layout: {
-            id: uuid(),
-            name: "div",
-          },
-        };
-      }
 
-      i++;
+    for (const [key, value] of entries) {
+      layouts[key] = {
+        ...value,
+        layout: {
+          id: uuid(),
+          name: "div",
+        },
+      };
     }
 
-    console.log("Layouts");
-    console.log(layouts);
+    layouts[roleID] = { ...this.primary.get().getFirstLayout().toLayout() };
+
     this.current.set({
       ...this.current.get().toWorkspace(),
       layouts: { ...layouts },

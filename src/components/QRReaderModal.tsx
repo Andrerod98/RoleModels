@@ -9,6 +9,7 @@ import {
 import React, { FC, useContext } from "react";
 import { AiOutlineExpand } from "react-icons/ai";
 import { CrossAppState, CrossAppContext } from "../context/AppContext";
+import { Mode } from "../context/Modes";
 import { QRCodeController } from "../shared-components/QRCode";
 
 import { CustomQRReader } from "./CustomQRReader";
@@ -23,14 +24,14 @@ export const QRReaderModal: FC<CrossDeviceInteractionModalProps> = (
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const onCloseModal = () => {
-    roleModels.setMode("");
+    roleModels.setMode(Mode.Default);
     onClose();
   };
 
   const handleScan = (containerID: string, qr: string, from: string) => {
     if (containerID != "") {
       setLocalMode({
-        mode: "ContainerTransfer",
+        mode: Mode.ContainerTransfer,
         properties: { containerID: containerID, from: from },
       });
       onCloseModal();
@@ -54,13 +55,13 @@ export const QRReaderModal: FC<CrossDeviceInteractionModalProps> = (
         my={"5px"}
         color={"white"}
         _hover={{ color: "white", bg: "black" }}
-        _focus={{ color: "white", bg: "black" }}
+        _focus={{ color: "white" }}
         borderRadius={"5px"}
         borderColor={"gray.600"}
-        bg={mode.mode === "PULL" ? "black" : "transparent"}
+        bg={mode.mode === Mode.Pull ? "black" : "transparent"}
         icon={<Icon as={AiOutlineExpand} />}
         onClick={() => {
-          roleModels.setMode("PULL");
+          roleModels.setMode(Mode.Pull);
           onOpen();
         }}
       />

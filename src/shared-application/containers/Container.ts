@@ -7,8 +7,8 @@ import { Logger } from "../Logger";
 import { FactoriesManager } from "../managers/FactoriesManager";
 import { IContainer } from "./IContainer";
 
-enum ViewEvents {
-  Changed = "viewChanged",
+enum ContainerEvents {
+  Changed = "containerChanged",
   ComponentEvent = "componentEvent",
 }
 
@@ -16,7 +16,7 @@ export class Container {
   protected root: UIComponentController;
   private id: string;
   constructor(
-    protected readonly sharedView: SharedCell,
+    protected readonly sharedContainer: SharedCell,
     private readonly factoriesManager: FactoriesManager
   ) {
     this.loadObject();
@@ -24,30 +24,30 @@ export class Container {
   }
 
   private setEventListener() {
-    this.sharedView.on("valueChanged", () => {
+    this.sharedContainer.on("valueChanged", () => {
       this.loadObject();
     });
 
-    this.sharedView.on("viewChanged", (root: IUIComponent) => {
+    this.sharedContainer.on("containerChanged", (root: IUIComponent) => {
       this.setRoot(root);
-      this.updateObject(this.toView());
+      this.updateObject(this.toContainer());
     });
   }
 
   private loadObject() {
-    const view = this.sharedView.get() as IContainer;
-    this.id = view.id;
-    this.setRoot(view.root);
+    const container = this.sharedContainer.get() as IContainer;
+    this.id = container.id;
+    this.setRoot(container.root);
   }
 
   /* GETTERS */
 
   public getSharedObject(): SharedCell {
-    return this.sharedView;
+    return this.sharedContainer;
   }
 
   public getObject(): IContainer {
-    return this.sharedView.get();
+    return this.sharedContainer.get();
   }
 
   public getId() {
@@ -79,11 +79,11 @@ export class Container {
 
   public deleteEventListeners() {
     this.root.deleteEventListeners();
-    this.sharedView.removeAllListeners();
+    this.sharedContainer.removeAllListeners();
   }
 
   public updateObject(object: IContainer) {
-    this.sharedView.set(object);
+    this.sharedContainer.set(object);
   }
 
   public update(object: IContainer) {
@@ -93,22 +93,22 @@ export class Container {
     this.emitChange();
   }
 
-  public toView(): IContainer {
+  public toContainer(): IContainer {
     return {
       id: this.id,
       root: this.root.getSnapshot(),
     };
   }
 
-  static from(sharedView: SharedCell, factoriesManager: FactoriesManager) {
-    const view = new Container(sharedView, factoriesManager);
+  static from(sharedContainer: SharedCell, factoriesManager: FactoriesManager) {
+    const container = new Container(sharedContainer, factoriesManager);
 
-    return view;
+    return container;
   }
 
   /* Callback functions */
   private emitChange(data?: any) {
-    this.sharedView.emit(ViewEvents.Changed, data);
+    this.sharedContainer.emit(ContainerEvents.Changed, data);
   }
 
   private emitComponentEvent(
@@ -116,8 +116,8 @@ export class Container {
     componentId: string,
     args: any[]
   ) {
-    this.sharedView.emit(
-      ViewEvents.ComponentEvent,
+    this.sharedContainer.emit(
+      ContainerEvents.ComponentEvent,
       eventName,
       componentId,
       args
