@@ -14,14 +14,14 @@ prompt              = no
 countryName            = PT # Change here to your country
 stateOrProvinceName    = Portugal # Change here to your city
 organizationName       = Andre # Change here to your organization
-commonName             = 192.168.1.72 # Change here to your ip adress
+commonName             = 192.168.1.71 # Change here to your ip adress
 
 [ x509_ext ]
 subjectKeyIdentifier      = hash
 authorityKeyIdentifier    = keyid:always,issuer
 basicConstraints        = critical, CA:TRUE
 keyUsage            = critical, digitalSignature, keyEncipherment, cRLSign, keyCertSign
-subjectAltName = IP:192.168.1.72 # Change here to your ip adress
+subjectAltName = IP:192.168.1.71 # Change here to your ip adress
 extendedKeyUsage = serverAuth
 
 extendedKeyUsage    = TLS Web Server Authentication
@@ -30,5 +30,5 @@ extendedKeyUsage    = TLS Web Server Authentication
 subjectKeyIdentifier        = hash
 basicConstraints        = CA:FALSE
 keyUsage            = digitalSignature, keyEncipherment
-subjectAltName = IP:192.168.1.72 # Change here to your ip adress
+subjectAltName = IP:192.168.1.71 # Change here to your ip adress
 nsComment           = "OpenSSL Generated Certificate"

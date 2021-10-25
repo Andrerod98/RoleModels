@@ -8,21 +8,20 @@ import { CrossAppState, CrossAppContext } from "../context/AppContext";
 import { IoPushOutline } from "react-icons/io5";
 import { ContainerPositionModal } from "./ContainerPositionModal";
 import { Mode } from "../context/Modes";
-import { useGesture } from "@use-gesture/react";
+import { useDrag, useGesture } from "@use-gesture/react";
 const QRCode = require("qrcode.react");
 
 interface ViewComponentProps {
   view: Container;
   role: Role;
+  
   onDoubleClick?: () => void;
 }
 
 export const ViewComponent: FC<ViewComponentProps> = (
   props: ViewComponentProps
 ) => {
-  let qrUrl = "view/" + props.view.getId() + "#from=" + props.role.getId();
-  // const toast = useToast();\
-
+ 
   const {
     selectedNode,
     setSelectedNode,
@@ -33,52 +32,8 @@ export const ViewComponent: FC<ViewComponentProps> = (
     setLocalMode,
   } = useContext<CrossAppState>(CrossAppContext);
 
-  {
-    /*const ref = React.useRef(null);
-
-  useGesture(
-    {
-      // onHover: ({ active, event }) => console.log('hover', event, active),
-      // onMove: ({ event }) => console.log('move', event),
-      onDrag: ({
-        swipe: [swipeX, swipeY],
-        velocity: [vx],
-        last,
-        tap,
-        first,
-        elapsedTime,
-        distance: [dx, dy],
-      }) => {
-        if (elapsedTime > 1000 && dx + dy < 3)
-          console.log("THIS IS A LONG PRESS");
-
-        if (last) {
-          if (swipeX === 1) {
-            console.log("swipe right");
-          } else if (swipeX === -1) {
-            console.log("swipe left");
-          }
-        }
-      },
-      onPinch: ({
-        origin: [ox, oy],
-        first,
-        movement: [ms],
-        offset: [s, a],
-        memo,
-      }) => {
-        alert("PINCH");
-        return memo;
-      },
-    },
-    {
-      target: ref,
-
-      delay: 3000,
-      pinch: { scaleBounds: { min: 0.5, max: 2 }, rubberband: true },
-    }
-  );*/
-  }
+  const qrUrl = "view/" + props.view.getId() + "#from=" + props.role.getId();
+ 
 
   const isPullMode = mode.mode === Mode.Pull;
   const isContainerPositionMode = localMode.mode === Mode.ContainerPosition;

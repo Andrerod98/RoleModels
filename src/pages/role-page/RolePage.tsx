@@ -29,6 +29,7 @@ import { Mode } from "../../context/Modes";
 import Hammer from "hammerjs";
 import { uuid } from "uuidv4";
 import "../../styles/styles.scss";
+import { useDrag } from "@use-gesture/react";
 
 interface RoleProps {}
 
@@ -49,7 +50,118 @@ export function RolePage(props: RoleProps) {
 
   let currentLayout = undefined;
 
-  const ref = useRef();
+  const bind = useDrag(
+    ({
+      args: [originalIndex],
+      first,
+      last,
+      tap,
+      distance: [dx, dy],
+      swipe: [swipeX],
+      cancel,
+      down,
+      canceled,
+    }) => {
+      if ("deposit" === originalIndex) {
+        if (mode.mode === Mode.CopyPaste) {
+          const { containerID, from } = mode.properties;
+          const container = roleModels.getContainer(containerID);
+          const currentLayout = roleModels.getCurrentLayoutOfRole(role.getId());
+          if (last && tap && !canceled) {
+            toast({
+              title: "Container was mirrored.",
+
+              status: "success",
+              position: "top",
+              duration: 9000,
+              isClosable: true,
+            });
+            const length = roleModels.getMyContainers().length;
+            if (length === 0) {
+              currentLayout.replace({
+                id: uuid(),
+                name: "view",
+                viewId: container.getId(),
+                flexGrow: true,
+              } as ILayoutNode);
+              setSelectedNode(container.getId());
+              setLocalMode({ mode: Mode.Default });
+            } else {
+              setLocalMode({
+                mode: Mode.ContainerPosition,
+                properties: { containerID: container.getId() },
+              });
+            }
+
+            roleModels.setMode(Mode.Default);
+            cancel();
+          } else if (first && down && !canceled && dx + dy < 3) {
+            toast({
+              title: "Container was migrated.",
+
+              status: "success",
+              position: "top",
+              duration: 9000,
+              isClosable: true,
+            });
+            roleModels.removeContainerFromRole(container, from);
+
+            const length = roleModels.getMyContainers().length;
+            if (length === 0) {
+              roleModels.getCurrentLayoutOfRole(role.getId()).replace({
+                id: uuid(),
+                name: "view",
+                viewId: container.getId(),
+                flexGrow: true,
+              } as ILayoutNode);
+
+              setSelectedNode(container.getId());
+              setLocalMode({ mode: Mode.Default });
+            } else {
+              setLocalMode({
+                mode: Mode.ContainerPosition,
+                properties: { containerID: container.getId() },
+              });
+            }
+
+            roleModels.setMode(Mode.Default);
+            cancel();
+          } else if (last && !canceled && swipeX === 1) {
+            setLocalMode({
+              mode: Mode.QuickInteraction,
+              properties: { containerID: container.getId(), from },
+            });
+            roleModels.setMode(Mode.Default);
+            cancel();
+          }
+        }
+      }
+      console.log(originalIndex);
+
+      if (localMode.mode === Mode.CopyPaste && first && dx + dy < 3) {
+        toast({
+          title: "Container was copied.",
+          description:
+            "The container has been copied you can paste in another device.",
+          status: "success",
+          position: "top",
+          duration: 9000,
+          isClosable: true,
+        });
+        roleModels.setMode(Mode.CopyPaste, {
+          containerID: originalIndex,
+          from: role.getId(),
+        });
+      }
+    },
+    {
+      delay: 900,
+      preventDefault: true,
+      filterTaps: true,
+      threshold: 0,
+    }
+  );
+
   const toast = useToast();
   if (currentWorkspace.getRoleLayout(role.getId())) {
     currentLayout = currentWorkspace.getRoleLayout(role.getId()).getLayout();
@@ -61,9 +173,7 @@ export function RolePage(props: RoleProps) {
     containerID = localMode.properties.containerID;
   }
 
-  let hammertime = undefined;
-
-  useEffect(() => {
+  /* useEffect(() => {
     if (mode.mode === Mode.CopyPaste && localMode.mode !== Mode.CopyPaste) {
       const { containerID, from } = mode.properties;
       const container = roleModels.getContainer(containerID);
@@ -144,7 +254,7 @@ export function RolePage(props: RoleProps) {
     return () => {
       if (hammertime) hammertime.destroy();
     };
-  }, [mode.mode, localMode.mode]);
+  }, [mode.mode, localMode.mode]);*/
 
   const generateWidget = (node: ILayoutNode): JSX.Element => {
     switch (node.name) {
@@ -199,6 +309,9 @@ export function RolePage(props: RoleProps) {
             minW={"40px"}
             overflow={"hidden"}
             position={"relative"}
+            userSelect={"none"}
+            style={{ touchAction: "none" }}
+            {...bind(view.getId())}
             key={roleModels.getDeviceRole() + "-box-view-" + node.viewId}
             onClick={() => {
               setSelectedNode(node.viewId);
@@ -208,21 +321,7 @@ export function RolePage(props: RoleProps) {
               key={roleModels.getDeviceRole() + "-view-" + node.viewId}
               view={view}
               role={role}
-              onDoubleClick={() => {
-                toast({
-                  title: "Container was copied.",
-                  description:
-                    "The container has been copied you can paste in another device.",
-                  status: "success",
-                  position: "top",
-                  duration: 9000,
-                  isClosable: true,
-                });
-                roleModels.setMode(Mode.CopyPaste, {
-                  containerID: view.getId(),
-                  from: role.getId(),
-                });
-              }}
+              onDoubleClick={() => {}}
             />
 
             <Box
@@ -266,6 +365,8 @@ export function RolePage(props: RoleProps) {
         left={"0"}
         right={"0"}
         top={"0"}
+        width={"25px"}
+        height={"25px"}
         zIndex={"2000"}
         onClick={() => {
           //primaryWorkspace.splitTop(containerID, false, isMaxFill);
@@ -285,6 +386,8 @@ export function RolePage(props: RoleProps) {
         left={"0"}
         right={"0"}
         bottom={"0"}
+        width={"25px"}
+        height={"25px"}
         zIndex={"2000"}
         onClick={() => {
           //primaryWorkspace.splitBottom(containerID, false, isMaxFill);
@@ -304,6 +407,8 @@ export function RolePage(props: RoleProps) {
         left={"0"}
         top={"0"}
         bottom={"0"}
+        width={"25px"}
+        height={"25px"}
         zIndex={"2000"}
         onClick={() => {
           //primaryWorkspace.splitLeft(containerID, false, isMaxFill);
@@ -323,6 +428,8 @@ export function RolePage(props: RoleProps) {
         right={"0"}
         top={"0"}
         bottom={"0"}
+        width={"25px"}
+        height={"25px"}
         zIndex={"2000"}
         onClick={() => {
           //primaryWorkspace.splitRight(containerID, false, isMaxFill);
@@ -369,7 +476,7 @@ export function RolePage(props: RoleProps) {
         position={"absolute"}
         top={"0"}
         left={"0"}
-        ref={ref}
+        {...bind("deposit")}
         display={
           mode.mode === Mode.CopyPaste && localMode.mode !== Mode.CopyPaste
             ? "block"

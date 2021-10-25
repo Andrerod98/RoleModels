@@ -17,19 +17,27 @@ export class SharedWorkspace {
   private setEventListeners() {
     this.sharedWorkspace.on("valueChanged", () => {
       this.workspace.update(this.sharedWorkspace.get());
+      this.setLayoutsEventListeners();
       this.emitChange();
     });
 
+    this.setLayoutsEventListeners();
+  }
+
+  private setLayoutsEventListeners() {
     const entries = this.workspace.getRoleLayouts().entries();
 
-    for (const [role, layout] of entries) {
-      layout.getLayout().on("change", (l) => {
-        this.setRoleLayout(role, {
-          name: layout.getName(),
-          type: layout.getType(),
-          layout: l,
-        });
+    const handleChange = (role, layout, l) => {
+      this.setRoleLayout(role, {
+        name: layout.getName(),
+        type: layout.getType(),
+        layout: l,
       });
+    };
+
+    for (const [role, layout] of entries) {
+      layout.getLayout().off("change", (l) => handleChange(role, layout, l));
+      layout.getLayout().on("change", (l) => handleChange(role, layout, l));
     }
   }
 

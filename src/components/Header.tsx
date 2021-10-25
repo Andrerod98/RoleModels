@@ -233,87 +233,75 @@ export const Header = (props: HeaderProps) => {
         }
         justifyContent={"center"}
       >
-        {mode.mode === Mode.CopyPaste ? (
-          <Text color={"white"}>
-            A container was copied on another device. 
-            Mirror - Double tap Migrate - Long press Quick Interaction - Swipe up
-          </Text>
-        ) : (
-          <>
-            <IconButton
-              aria-label={"Focus"}
-              icon={<Icon as={BiSave} />}
-              ml={"10px"}
-              my={"5px"}
-              size={"sm"}
-              borderRadius={"5px"}
-              onClick={() => {
-                setOpen({ ...isOpen, saveWorkspaceModal: true });
-              }}
-            />
-            <IconButton
-              aria-label={"Focus"}
-              icon={<Icon as={GrPowerReset} />}
-              ml={"10px"}
-              my={"5px"}
-              size={"sm"}
-              borderRadius={"5px"}
-              onClick={() => {
-                roleModels.resetWorkspace(role.getId());
-              }}
-            />
-            <Center>
-              <Divider
-                orientation='vertical'
-                bg={"white"}
-                h={"60%"}
-                ml={"10px"}
-              />
-            </Center>
-            <IconButton
-              aria-label={"Focus"}
-              icon={<Icon as={MdContentCopy} />}
-              ml={"10px"}
-              my={"5px"}
-              size={"sm"}
-              color={"white"}
-              borderRadius={"5px"}
-              borderColor={"gray.600"}
-              _hover={{ color: "white", bg: "black" }}
-              _focus={{ color: "white" }}
-              bg={localMode.mode === Mode.CopyPaste ? "black" : "transparent"}
-              onClick={() => {
-                if (mode.mode === Mode.CopyPaste) {
-                  setLocalMode({ mode: Mode.Default });
-                  roleModels.setMode(Mode.Default);
-                } else {
-                  setLocalMode({ mode: Mode.CopyPaste });
-                }
-              }}
-            />
-            <IconButton
-              aria-label={"Focus"}
-              icon={<Icon as={IoPushOutline} />}
-              ml={"10px"}
-              my={"5px"}
-              size={"sm"}
-              color={"white"}
-              borderRadius={"5px"}
-              _hover={{ color: "white", bg: "black" }}
-              _focus={{ color: "white" }}
-              borderColor={"gray.600"}
-              bg={localMode.mode === Mode.Push ? "black" : "transparent"}
-              onClick={() => {
-                if (localMode.mode === Mode.Push) {
-                  setLocalMode({ mode: Mode.Default, properties: {} });
-                } else {
-                  setLocalMode({ mode: Mode.Push, properties: {} });
-                }
-              }}
-            />
-            <QRReaderModal />
-          </>
-        )}
+        <IconButton
+          aria-label={"Focus"}
+          icon={<Icon as={BiSave} />}
+          ml={"10px"}
+          my={"5px"}
+          size={"sm"}
+          borderRadius={"5px"}
+          onClick={() => {
+            setOpen({ ...isOpen, saveWorkspaceModal: true });
+          }}
+        />
+        <IconButton
+          aria-label={"Focus"}
+          icon={<Icon as={GrPowerReset} />}
+          ml={"10px"}
+          my={"5px"}
+          size={"sm"}
+          borderRadius={"5px"}
+          onClick={() => {
+            roleModels.resetWorkspace(role.getId());
+          }}
+        />
+        <Center>
+          <Divider orientation='vertical' bg={"white"} h={"60%"} ml={"10px"} />
+        </Center>
+        <IconButton
+          aria-label={"Focus"}
+          icon={<Icon as={MdContentCopy} />}
+          ml={"10px"}
+          my={"5px"}
+          size={"sm"}
+          color={"white"}
+          borderRadius={"5px"}
+          borderColor={"gray.600"}
+          _hover={{ color: "white", bg: "black" }}
+          _focus={{ color: "white" }}
+          bg={localMode.mode === Mode.CopyPaste ? "black" : "transparent"}
+          onClick={() => {
+            if (mode.mode === Mode.CopyPaste) {
+              setLocalMode({ mode: Mode.Default });
+              roleModels.setMode(Mode.Default);
+            } else if (localMode.mode === Mode.CopyPaste) {
+              setLocalMode({ mode: Mode.Default });
+            } else {
+              setLocalMode({ mode: Mode.CopyPaste });
+            }
+          }}
+        />
+        <IconButton
+          aria-label={"Focus"}
+          icon={<Icon as={IoPushOutline} />}
+          ml={"10px"}
+          my={"5px"}
+          size={"sm"}
+          color={"white"}
+          borderRadius={"5px"}
+          _hover={{ color: "white", bg: "black" }}
+          _focus={{ color: "white" }}
+          borderColor={"gray.600"}
+          bg={localMode.mode === Mode.Push ? "black" : "transparent"}
+          onClick={() => {
+            if (localMode.mode === Mode.Push) {
+              setLocalMode({ mode: Mode.Default, properties: {} });
+            } else {
+              setLocalMode({ mode: Mode.Push, properties: {} });
+            }
+          }}
+        />
+        <QRReaderModal />
       </Flex>
     </Box>
   );

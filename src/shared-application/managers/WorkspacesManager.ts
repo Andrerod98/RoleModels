@@ -98,17 +98,23 @@ export class WorkspacesManager extends EventEmitter {
     this.emitChange();
   }
 
-  public removeContainerFromRole(roleId: string, viewId: string) {
-    const containerId = this.current
+  public removeContainerFromRole(roleId: string, containerID: string) {
+    this.current
       .get()
       .getRoleLayout(roleId)
       .getLayout()
-      .getChildByViewId(viewId)
-      .getId();
+      .getChildByViewId(containerID)
+      .removeAllListeners();
 
-    let test = this.current.get().getRoleLayout(roleId).getLayout();
-    test.removeChild(containerId);
-    //this.current..updateCurrent(roleId, test.toLayout());
+    const nodeID = this.current
+      .get()
+      .getRoleLayout(roleId)
+      .getLayout()
+      .getChildByViewId(containerID)
+      .getId();
+    this.current.get().getRoleLayout(roleId).getLayout().removeChild(nodeID);
+
+    this.current.get().getRoleLayout(roleId).getLayout().sync();
   }
 
   /* Returns all the workspaces */

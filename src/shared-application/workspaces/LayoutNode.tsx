@@ -109,29 +109,12 @@ export class LayoutNode extends EventEmitter {
       });
     } else {
       this.children.splice(index, 1);
-
       if (this.children.length === 0) {
         if (this.parent) {
           this.parent.removeChild(this.getId());
         }
-      } else {
-        this.getRoot().emit("change", this.getRoot().toLayout());
       }
     }
-
-    /*if (this.id === childId) {
-      if (this.parent) {
-        this.parent.removeChild(childId);
-      } else {
-        this.update({
-          id: this.getId(),
-          viewId: "",
-          name: "div",
-          children: [],
-        });
-      }
-      return;
-    }*/
   }
 
   public setParent(node: LayoutNode) {

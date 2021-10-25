@@ -47,14 +47,13 @@ export const ContainerTransferActionModal = () => {
       } as ILayoutNode);
 
       setSelectedNode(container.getId());
+      setLocalMode({ mode: Mode.Default });
     } else {
       setLocalMode({
         mode: Mode.ContainerPosition,
         properties: { containerID: container.getId() },
       });
     }
-
-    setLocalMode({ mode: Mode.Default });
   };
 
   const handleMirror = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -70,14 +69,13 @@ export const ContainerTransferActionModal = () => {
         flexGrow: true,
       } as ILayoutNode);
       setSelectedNode(container.getId());
+      setLocalMode({ mode: Mode.Default });
     } else {
       setLocalMode({
         mode: Mode.ContainerPosition,
         properties: { containerID: container.getId() },
       });
     }
-
-    setLocalMode({ mode: Mode.Default });
   };
 
   const handleStitch = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {

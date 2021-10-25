@@ -7,7 +7,7 @@ import {
   Switch,
   Text,
 } from "@chakra-ui/react";
-import React, { useContext } from "react";
+import React, { useContext, useRef } from "react";
 import {
   BiDockBottom,
   BiDockLeft,
@@ -24,6 +24,7 @@ import { CrossAppState, CrossAppContext } from "../../../../context/AppContext";
 import { ViewComponent } from "../../../../components/ViewComponent";
 import { ILayoutNode } from "../../../../shared-application/workspaces/ILayoutNode";
 import { Mode } from "../../../../context/Modes";
+import { useDrag } from "@use-gesture/react";
 
 interface PreviewProps {
   layout: ILayoutNode;
@@ -40,12 +41,14 @@ export const Preview = (props: PreviewProps) => {
     roleModels,
     setMaxFill,
     isMaxFill,
-
+    selectedNode,
+    mode,
     setSelectedNode,
     primaryWorkspace,
     localMode,
     setLocalMode,
   } = useContext<CrossAppState>(CrossAppContext);
+
   let currentLayout = primaryWorkspace.getFirstLayout().getLayout();
 
   const isOpenLayoutModal = localMode.mode === Mode.ContainerPosition;

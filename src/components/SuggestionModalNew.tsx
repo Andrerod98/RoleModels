@@ -60,11 +60,15 @@ export const SuggestionModalNew = () => {
             justifyContent={"center"}
             flex={"0 1 30vw"}
             my={"20px"}
-            mx={"10px"}
+            w={"70vw"}
           >
-            <Flex width={"70vw"}>
+            <Flex width={"70vw"} mb={"20px"}>
               <Spacer />
-              <Heading color={"white"} textAlign={"center"}>
+              <Heading
+                color={"white"}
+                textAlign={"center"}
+                fontSize={["20px", "30px"]}
+              >
                 A device was {deviceAction}. {connectedDevices} connected
                 devices.
               </Heading>
@@ -82,40 +86,40 @@ export const SuggestionModalNew = () => {
             </Flex>
             <Button
               position={"relative"}
-              w={"35vw"}
               h={"200px"}
-              m={2}
               bg={"white"}
               display={hasRestore ? "flex" : "none"}
               borderRadius={"40px"}
               alignContent={"center"}
               flexDirection={"column"}
+              m={2}
+              flex={"1 1 35%"}
               onClick={() => {
                 setLocalMode({ mode: Mode.Default });
                 roleModels.restoreLastWorkspace();
               }}
             >
-              <Text fontSize={"30px"}>Restore last</Text>
+              <Text fontSize={["20px", "30px"]}>Restore last</Text>
 
               <MdRestore fontSize={"80px"} />
             </Button>
             <Button
               position={"relative"}
-              w={"35vw"}
-              m={2}
               h={"200px"}
               bg={"white"}
+              m={2}
               borderRadius={"40px"}
               display={hasExtend ? "flex" : "none"}
               alignContent={"center"}
               flexDirection={"column"}
+              flex={"1 1 35%"}
               onClick={() => {
                 setLocalMode({ mode: Mode.Default });
                 roleModels.setMode(Mode.Default);
                 roleModels.extendWorkspace();
               }}
             >
-              <Text fontSize={"30px"}>Extend</Text>
+              <Text fontSize={["20px", "30px"]}>Extend</Text>
 
               <AiOutlineAppstoreAdd fontSize={"80px"} />
             </Button>
@@ -130,7 +134,7 @@ export const SuggestionModalNew = () => {
               color={"white"}
               w={"100%"}
               textAlign={"center"}
-              fontSize={"30px"}
+              fontSize={["20px", "30px"]}
               fontWeight={"bold"}
               m={2}
             >
@@ -141,31 +145,33 @@ export const SuggestionModalNew = () => {
                 color={"white"}
                 w={"100%"}
                 textAlign={"center"}
-                fontSize={"18px"}
+                fontSize={["12px", "18px"]}
                 fontWeight={"bold"}
                 m={2}
               >
                 There are no saved workspaces with {connectedDevices} roles.
               </Text>
             ) : (
-              saved.map((workspace: Workspace) => {
-                return (
-                  <Button
-                    position={"relative"}
-                    w={"70vw"}
-                    m={2}
-                    h={"50px"}
-                    bg={"white"}
-                    borderRadius={"40px"}
-                    onClick={() => {
-                      setLocalMode({ mode: Mode.Default });
-                      roleModels.loadWorkspace(workspace.toWorkspace());
-                    }}
-                  >
-                    {workspace.name}
-                  </Button>
-                );
-              })
+              <Box overflowY={"scroll"} h={"120px"}>
+                {saved.map((workspace: Workspace) => {
+                  return (
+                    <Button
+                      position={"relative"}
+                      w={"70vw"}
+                      m={2}
+                      h={"50px"}
+                      bg={"white"}
+                      borderRadius={"40px"}
+                      onClick={() => {
+                        setLocalMode({ mode: Mode.Default });
+                        roleModels.loadWorkspace(workspace.toWorkspace());
+                      }}
+                    >
+                      {workspace.name}
+                    </Button>
+                  );
+                })}
+              </Box>
             )}
           </Flex>
         </Box>
