@@ -14,14 +14,13 @@ const QRCode = require("qrcode.react");
 interface ViewComponentProps {
   view: Container;
   role: Role;
-  
+
   onDoubleClick?: () => void;
 }
 
 export const ViewComponent: FC<ViewComponentProps> = (
   props: ViewComponentProps
 ) => {
- 
   const {
     selectedNode,
     setSelectedNode,
@@ -33,7 +32,6 @@ export const ViewComponent: FC<ViewComponentProps> = (
   } = useContext<CrossAppState>(CrossAppContext);
 
   const qrUrl = "view/" + props.view.getId() + "#from=" + props.role.getId();
- 
 
   const isPullMode = mode.mode === Mode.Pull;
   const isContainerPositionMode = localMode.mode === Mode.ContainerPosition;
@@ -120,18 +118,15 @@ export const ViewComponent: FC<ViewComponentProps> = (
           ></Box>
         </Box>
       ) : isCopyPasteMode ? (
-        <Box w={"100%"} h={"100%"} position={"relative"}>
+        <Box
+          w={"100%"}
+          h={"100%"}
+          position={"relative"}
+          style={{ touchAction: "none", msTouchAction: "none" }}
+        >
           {useMemo(() => {
             return props.view.getRoot().generateWidget();
           }, [JSON.stringify(props.view.getRoot().getSnapshot())])}
-          <Box
-            w={"100%"}
-            h={"100%"}
-            position={"absolute"}
-            left={0}
-            top={0}
-            _hover={{ bg: "rgba(17, 99, 245,0.4)" }}
-          ></Box>
         </Box>
       ) : (
         useMemo(() => {

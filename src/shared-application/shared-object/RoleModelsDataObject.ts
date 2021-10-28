@@ -54,6 +54,12 @@ import { StockDetailsFactory } from "../../shared-components/StockDetails";
 import { IWorkspace } from "../workspaces/IWorkspace";
 import { Workspace } from "../workspaces/Workspace";
 import { Mode } from "../../context/Modes";
+import { DrawingToolsFactory } from "../../shared-components/DrawingTools";
+import { BrushChart2Factory } from "../../shared-components/BrushChart2";
+import { StockTableFactory } from "../../shared-components/StockTable";
+import { NewsTableFactory } from "../../shared-components/NewsTable";
+import { RemoteControlFactory } from "../../shared-components/RemoteControl";
+import { SlidesListFactory } from "../../shared-components/SlidesList";
 
 export class RoleModelsDataObject
   extends DataObject
@@ -357,6 +363,30 @@ export class RoleModelsDataObject
 
     this.factoriesManager.registerFactory(
       new StockDetailsFactory(this.factoriesManager)
+    );
+
+    this.factoriesManager.registerFactory(
+      new DrawingToolsFactory(this.factoriesManager)
+    );
+
+    this.factoriesManager.registerFactory(
+      new BrushChart2Factory(this.factoriesManager)
+    );
+
+    this.factoriesManager.registerFactory(
+      new StockTableFactory(this.factoriesManager)
+    );
+
+    this.factoriesManager.registerFactory(
+      new NewsTableFactory(this.factoriesManager)
+    );
+
+    this.factoriesManager.registerFactory(
+      new RemoteControlFactory(this.factoriesManager)
+    );
+
+    this.factoriesManager.registerFactory(
+      new SlidesListFactory(this.factoriesManager)
     );
   }
 
@@ -716,7 +746,6 @@ export class RoleModelsDataObject
     if (roleID) {
       roleId = roleID;
     }
-
 
     sharedRole.set({
       id: roleId,

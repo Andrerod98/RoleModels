@@ -13,20 +13,28 @@ import { ILayoutNode } from "../shared-application/workspaces/ILayoutNode";
 import { ContainerTransferActionChooser } from "./ContainerTransferActionChooser";
 
 export const ContainerTransferActionModal = () => {
-  const {
-    roleModels,
-    role,
-    localMode,
-    setLocalMode,
+  const { roleModels, role, localMode, setLocalMode, mode, setSelectedNode } =
+    useContext<CrossAppState>(CrossAppContext);
 
-    setSelectedNode,
-  } = useContext<CrossAppState>(CrossAppContext);
+  let containerID = "";
+  let from = "";
 
-  if (localMode.mode !== Mode.ContainerTransfer) {
+  if (
+    (localMode.mode !== Mode.ContainerTransfer &&
+      mode.mode !== Mode.CopyPaste) ||
+    localMode.mode === Mode.CopyPaste
+  ) {
     return <></>;
+  } else {
+    if (localMode.mode === Mode.ContainerTransfer) {
+      containerID = localMode.properties.containerID;
+      from = localMode.properties.from;
+    } else {
+      containerID = mode.properties.containerID;
+      from = mode.properties.from;
+    }
   }
 
-  const { containerID, from } = localMode.properties;
   const container = roleModels.getContainer(containerID);
   const currentLayout = roleModels.getCurrentLayoutOfRole(role.getId());
 
@@ -47,8 +55,10 @@ export const ContainerTransferActionModal = () => {
       } as ILayoutNode);
 
       setSelectedNode(container.getId());
+      roleModels.setMode(Mode.Default);
       setLocalMode({ mode: Mode.Default });
     } else {
+      roleModels.setMode(Mode.Default);
       setLocalMode({
         mode: Mode.ContainerPosition,
         properties: { containerID: container.getId() },
@@ -69,8 +79,10 @@ export const ContainerTransferActionModal = () => {
         flexGrow: true,
       } as ILayoutNode);
       setSelectedNode(container.getId());
+      roleModels.setMode(Mode.Default);
       setLocalMode({ mode: Mode.Default });
     } else {
+      roleModels.setMode(Mode.Default);
       setLocalMode({
         mode: Mode.ContainerPosition,
         properties: { containerID: container.getId() },
@@ -89,6 +101,7 @@ export const ContainerTransferActionModal = () => {
   const handleQuickInteraction = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
+    roleModels.setMode(Mode.Default);
     setLocalMode({
       mode: Mode.QuickInteraction,
       properties: { containerID: container.getId(), from },

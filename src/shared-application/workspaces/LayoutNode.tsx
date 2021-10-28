@@ -150,6 +150,7 @@ export class LayoutNode extends EventEmitter {
         id: uuid(),
         name: name,
         viewId: "",
+        flexGrow: this.flexGrow,
         children: [newView, this.toLayout()],
       } as ILayoutNode);
     } else {
@@ -157,6 +158,7 @@ export class LayoutNode extends EventEmitter {
         id: uuid(),
         name: name,
         viewId: "",
+        flexGrow: this.flexGrow,
         children: [this.toLayout(), newView],
       } as ILayoutNode);
     }

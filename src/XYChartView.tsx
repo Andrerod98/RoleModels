@@ -10,20 +10,23 @@ import {
   GlyphSeries,
   LineSeries,
 } from "@visx/xychart";
-import { XYChartController, XYChartModel } from ".";
 
 type Stock = (string | number)[];
-import AppleStockData from "../../mocks/apple/stock.json";
-import AmazonStockData from "../../mocks/amazon/stock.json";
-import MicrosoftStockData from "../../mocks/microsoft/stock.json";
+import AppleStockData from "./mocks/apple/stock.json";
+import AmazonStockData from "./mocks/amazon/stock.json";
+import MicrosoftStockData from "./mocks/microsoft/stock.json";
 
-export function XYChartView({ controller }: { controller: XYChartController }) {
-  const component = controller.get() as XYChartModel;
-
-  // accessors
-
+export function XYChartView(props: {
+  type: string;
+  stock: string;
+  xVariable: string;
+  yVariable: string;
+  xDomain: [string, string];
+  yDomain: [string, string];
+  color: string[];
+}) {
   const xAccessor = (d: Stock) => {
-    switch (component.xVariable) {
+    switch (props.xVariable) {
       case "Date":
         return new Date(d[0]);
       case "Open":
@@ -55,7 +58,7 @@ export function XYChartView({ controller }: { controller: XYChartController }) {
     }
   };
   const yAccesor = (d: Stock) => {
-    switch (component.yVariable) {
+    switch (props.yVariable) {
       case "Date":
         return new Date(d[0]);
       case "Open":
@@ -92,10 +95,10 @@ export function XYChartView({ controller }: { controller: XYChartController }) {
     const xRaw = xAccessor(s);
     let x, minX, maxX;
     let y, minY, maxY;
-    if (!component.xDomain || !component.yDomain) return true;
+    if (!props.xDomain || !props.yDomain) return true;
 
-    const [minXRaw, maxXRaw] = component.xDomain;
-    const [minYRaw, maxYRaw] = component.yDomain;
+    const [minXRaw, maxXRaw] = props.xDomain;
+    const [minYRaw, maxYRaw] = props.yDomain;
     if (minXRaw === "" || maxXRaw === "" || minYRaw === "" || maxYRaw === "")
       return true;
 
@@ -148,21 +151,21 @@ export function XYChartView({ controller }: { controller: XYChartController }) {
   const numTicks = 10;
   const curve = Curve.curveBasis;
 
-  const colorAccessor1 = (d: Stock, index: number) => component.color[0];
-  const colorAccessor2 = (d: Stock, index: number) => component.color[1];
-  const colorAccessor3 = (d: Stock, index: number) => component.color[2];
+  const colorAccessor1 = (d: Stock, index: number) => props.color[0];
+  const colorAccessor2 = (d: Stock, index: number) => props.color[1];
+  const colorAccessor3 = (d: Stock, index: number) => props.color[2];
 
   return (
     <div ref={divRef} style={{ width: "100%", height: "100%" }}>
       <XYChart
         height={size.height}
-        xScale={{ type: component.xVariable === "Date" ? "time" : "linear" }}
-        yScale={{ type: component.yVariable === "Date" ? "time" : "linear" }}
+        xScale={{ type: props.xVariable === "Date" ? "time" : "linear" }}
+        yScale={{ type: props.yVariable === "Date" ? "time" : "linear" }}
         margin={{ top: 5, bottom: 35, right: 10, left: 65 }}
       >
         <AnimatedAxis
           orientation='left'
-          label={component.yVariable}
+          label={props.yVariable}
           labelProps={{ fill: "white", fontSize: "12px", fontWeight: "bold" }}
           labelOffset={40}
           stroke={"white"}
@@ -175,7 +178,7 @@ export function XYChartView({ controller }: { controller: XYChartController }) {
         />
         <AnimatedAxis
           orientation='bottom'
-          label={component.xVariable}
+          label={props.xVariable}
           labelProps={{ fill: "white", fontSize: "12px", fontWeight: "bold" }}
           tickLabelProps={() => ({
             fill: "white",
@@ -184,17 +187,17 @@ export function XYChartView({ controller }: { controller: XYChartController }) {
         />
         <AnimatedGrid columns={true} numTicks={numTicks} stroke={"white"} />
 
-        {component.type === "barSeries" && (
+        {props.type === "barSeries" && (
           <BarSeries
             dataKey='New York'
-            data={dataMapping[component.stock]}
+            data={dataMapping[props.stock]}
             xAccessor={xAccessor}
             yAccessor={yAccesor}
             colorAccessor={colorAccessor1}
           />
         )}
-        {component.type === "areaSeries" &&
-          (component.stock === "all" ? (
+        {props.type === "areaSeries" &&
+          (props.stock === "all" ? (
             <>
               {" "}
               <AreaSeries
@@ -228,14 +231,14 @@ export function XYChartView({ controller }: { controller: XYChartController }) {
               data={data1}
               xAccessor={xAccessor}
               yAccessor={yAccesor}
-              fill={component.color[0]}
-              lineProps={{ fill: component.color[0] }}
+              fill={props.color[0]}
+              lineProps={{ fill: props.color[0] }}
               fillOpacity={0.4}
               curve={curve}
             />
           ))}
-        {component.type === "glyphSeries" &&
-          (component.stock === "all" ? (
+        {props.type === "glyphSeries" &&
+          (props.stock === "all" ? (
             <>
               <GlyphSeries
                 dataKey='San Francisco'
@@ -265,15 +268,15 @@ export function XYChartView({ controller }: { controller: XYChartController }) {
           ) : (
             <GlyphSeries
               dataKey='San Francisco'
-              data={dataMapping[component.stock]}
+              data={dataMapping[props.stock]}
               size={1}
               colorAccessor={colorAccessor1}
               xAccessor={xAccessor}
               yAccessor={yAccesor}
             />
           ))}
-        {component.type === "areaStack" &&
-          (component.stock === "all" ? (
+        {props.type === "areaStack" &&
+          (props.stock === "all" ? (
             <AreaStack curve={curve} offset={"expand"} renderLine={true}>
               <AreaSeries
                 dataKey='Austin'
@@ -301,18 +304,18 @@ export function XYChartView({ controller }: { controller: XYChartController }) {
             <AreaStack curve={curve} offset={"expand"} renderLine={true}>
               <AreaSeries
                 dataKey='Austin'
-                data={dataMapping[component.stock]}
+                data={dataMapping[props.stock]}
                 xAccessor={xAccessor}
                 yAccessor={yAccesor}
-                color={component.color[0]}
-                fill={component.color[0]}
-                lineProps={{ fill: component.color[0] }}
+                color={props.color[0]}
+                fill={props.color[0]}
+                lineProps={{ fill: props.color[0] }}
                 fillOpacity={0.4}
               />
             </AreaStack>
           ))}
-        {component.type === "lineSeries" &&
-          (component.stock === "all" ? (
+        {props.type === "lineSeries" &&
+          (props.stock === "all" ? (
             <>
               <LineSeries
                 dataKey='Austin'
@@ -340,10 +343,10 @@ export function XYChartView({ controller }: { controller: XYChartController }) {
           ) : (
             <LineSeries
               dataKey='San Francisco'
-              data={dataMapping[component.stock]}
+              data={dataMapping[props.stock]}
               xAccessor={xAccessor}
               yAccessor={yAccesor}
-              stroke={component.color[0]}
+              stroke={props.color[0]}
               curve={curve}
             />
           ))}

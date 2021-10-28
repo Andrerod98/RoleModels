@@ -9,7 +9,7 @@ export function BoardView({ controller }: { controller: BoardController }) {
   const component = controller.get() as BoardModel;
 
   return (
-    <Flex p={"20px"} width={"50%"} height={"90%"}>
+    <Flex {...component}>
       <Box>
         <CardsLayout type={"deck"}>
           {component.deckCards.map((c) => (

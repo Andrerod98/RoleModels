@@ -9,6 +9,7 @@ import { ErrorPage } from "./pages/error-page/ErrorPage";
 import Utils from "./utils/Utils";
 import { LandingPage } from "./pages/landing-page/LandingPage";
 import { TestComponent } from "./TestComponent";
+import { TestComponent2 } from "./TestComponent2";
 
 const HASH = window.location.hash.substring(1);
 const HASH_PARTS = Utils.getURLHashParts(HASH);
@@ -126,4 +127,5 @@ ReactDOM.render(
 
   document.getElementById("content")
 );
+
 */

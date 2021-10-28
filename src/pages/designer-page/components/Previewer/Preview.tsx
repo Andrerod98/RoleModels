@@ -71,8 +71,11 @@ export const Preview = (props: PreviewProps) => {
           <Flex
             maxW={"100%"}
             maxH={"100%"}
-            w={"100%"}
-            h={"100%"}
+            minH={"40px"}
+            minW={"40px"}
+            h={node.flexGrow ? "100%" : undefined}
+            w={node.flexGrow ? "100%" : undefined}
+            flex={(node.flexGrow ? "1 1" : "0 0") + " auto"}
             overflow={"hidden"}
             key={roleModels.getMyRole().getName() + "-div-" + node.id}
             direction={"column"}
@@ -87,8 +90,11 @@ export const Preview = (props: PreviewProps) => {
           <Flex
             maxW={"100%"}
             maxH={"100%"}
-            w={"100%"}
-            h={"100%"}
+            minH={"40px"}
+            minW={"40px"}
+            h={node.flexGrow ? "100%" : undefined}
+            w={node.flexGrow ? "100%" : undefined}
+            flex={(node.flexGrow ? "1 1" : "0 0") + " auto"}
             overflow={"hidden"}
             key={roleModels.getMyRole().getName() + "-flex-" + node.id}
             direction={"row"}

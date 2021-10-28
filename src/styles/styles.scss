@@ -3,16 +3,20 @@
  * Licensed under the MIT License.
  */
 //@import "~bootstrap/scss/bootstrap.scss";
-@keyframes blink {
-  0% {
-    border-color: red;
-  }
-  50% {
-    border-color: green;
-  }
-  100% {
-    border-color: red;
-  }
+* {
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: -moz-none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+p {
+  -webkit-user-select: text;
+  -khtml-user-select: text;
+  -moz-user-select: text;
+  -o-user-select: text;
+  user-select: text;
 }
 
 body {

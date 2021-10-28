@@ -256,11 +256,17 @@ export const Header = (props: HeaderProps) => {
           }}
         />
         <Center>
-          <Divider orientation='vertical' bg={"white"} h={"60%"} ml={"10px"} />
+          <Divider
+            orientation='vertical'
+            bg={"white"}
+            h={"60%"}
+            ml={"10px"}
+            userSelect={"none"}
+          />
         </Center>
         <IconButton
           aria-label={"Focus"}
-          icon={<Icon as={MdContentCopy} />}
+          icon={<Icon as={IoPushOutline} />}
           ml={"10px"}
           my={"5px"}
           size={"sm"}
@@ -281,26 +287,7 @@ export const Header = (props: HeaderProps) => {
             }
           }}
         />
-        <IconButton
-          aria-label={"Focus"}
-          icon={<Icon as={IoPushOutline} />}
-          ml={"10px"}
-          my={"5px"}
-          size={"sm"}
-          color={"white"}
-          borderRadius={"5px"}
-          _hover={{ color: "white", bg: "black" }}
-          _focus={{ color: "white" }}
-          borderColor={"gray.600"}
-          bg={localMode.mode === Mode.Push ? "black" : "transparent"}
-          onClick={() => {
-            if (localMode.mode === Mode.Push) {
-              setLocalMode({ mode: Mode.Default, properties: {} });
-            } else {
-              setLocalMode({ mode: Mode.Push, properties: {} });
-            }
-          }}
-        />
+
         <QRReaderModal />
       </Flex>
     </Box>

@@ -1,10 +1,14 @@
 import React from "react";
 import { BoxUI } from ".";
 import { Box } from "@chakra-ui/react";
-import { BoxController } from "./BoxController";
+import { DrawingToolsController } from "./BoxController";
 import { UIComponentController } from "../UIComponent";
 
-export function BoxView({ controller }: { controller: BoxController }) {
+export function BoxView({
+  controller,
+}: {
+  controller: DrawingToolsController;
+}) {
   const component = controller.get() as BoxUI;
 
   return (

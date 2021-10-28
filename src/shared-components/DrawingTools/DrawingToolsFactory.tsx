@@ -1,17 +1,17 @@
 import React from "react";
-import { BiRectangle } from "react-icons/bi";
-import { BoxUI, DrawingToolsController } from ".";
+import { MdOutlineDraw } from "react-icons/md";
+import { DrawingToolsModel, DrawingToolsController } from ".";
 import { UIComponentController, UIComponentFactory } from "../UIComponent";
 
-export class BoxFactory extends UIComponentFactory {
+export class DrawingToolsFactory extends UIComponentFactory {
   public get name() {
-    return "box";
+    return "drawing-tools";
   }
 
   public get example() {
     return {
-      id: "box-id",
-      name: "box",
+      id: "drawing-tools-id",
+      name: "drawing-tools",
       h: "100%",
       w: "100%",
       children: [],
@@ -19,11 +19,11 @@ export class BoxFactory extends UIComponentFactory {
   }
 
   public get icon() {
-    return <BiRectangle />;
+    return <MdOutlineDraw />;
   }
 
   public generateComponent(
-    component: BoxUI,
+    component: DrawingToolsModel,
     parent?: UIComponentController
   ): DrawingToolsController {
     return new DrawingToolsController(component, this.factoriesManager, parent);

@@ -50,19 +50,7 @@ export function RolePage(props: RoleProps) {
 
   let currentLayout = undefined;
 
-  const bind = useDrag(
-    ({
-      args: [originalIndex],
-      first,
-      last,
-      tap,
-      distance: [dx, dy],
-      swipe: [swipeX],
-      cancel,
-      down,
-      canceled,
-    }) => {
-      if ("deposit" === originalIndex) {
+  /*if ("deposit" === originalIndex) {
         if (mode.mode === Mode.CopyPaste) {
           const { containerID, from } = mode.properties;
           const container = roleModels.getContainer(containerID);
@@ -152,17 +140,8 @@ export function RolePage(props: RoleProps) {
           containerID: originalIndex,
           from: role.getId(),
         });
-      }
-    },
-    {
-      delay: 900,
-      preventDefault: true,
-      filterTaps: true,
-      threshold: 0,
-    }
-  );
+      }*/
 
-  const toast = useToast();
   if (currentWorkspace.getRoleLayout(role.getId())) {
     currentLayout = currentWorkspace.getRoleLayout(role.getId()).getLayout();
   }
@@ -263,8 +242,11 @@ export function RolePage(props: RoleProps) {
           <Flex
             maxW={"100%"}
             maxH={"100%"}
-            w={"100%"}
-            h={"100%"}
+            minH={"40px"}
+            minW={"40px"}
+            h={node.flexGrow ? "100%" : undefined}
+            w={node.flexGrow ? "100%" : undefined}
+            flex={(node.flexGrow ? "1 1" : "0 0") + " auto"}
             overflow={"hidden"}
             key={roleModels.getDeviceRole() + "-div-" + node.id}
             direction={"column"}
@@ -279,8 +261,11 @@ export function RolePage(props: RoleProps) {
           <Flex
             maxW={"100%"}
             maxH={"100%"}
-            w={"100%"}
-            h={"100%"}
+            minH={"40px"}
+            minW={"40px"}
+            h={node.flexGrow ? "100%" : undefined}
+            w={node.flexGrow ? "100%" : undefined}
+            flex={(node.flexGrow ? "1 1" : "0 0") + " auto"}
             overflow={"hidden"}
             key={roleModels.getDeviceRole() + "-flex-" + node.id}
             direction={"row"}
@@ -309,13 +294,38 @@ export function RolePage(props: RoleProps) {
             minW={"40px"}
             overflow={"hidden"}
             position={"relative"}
-            userSelect={"none"}
-            style={{ touchAction: "none" }}
-            {...bind(view.getId())}
-            key={roleModels.getDeviceRole() + "-box-view-" + node.viewId}
-            onClick={() => {
-              setSelectedNode(node.viewId);
+            onMouseDown={() => {
+              if (localMode.mode === Mode.CopyPaste) {
+                setSelectedNode(view.getId());
+                roleModels.setMode(Mode.CopyPaste, {
+                  containerID: view.getId(),
+                  from: role.getId(),
+                });
+              }
             }}
+            onMouseUp={() => {
+              if (localMode.mode === Mode.CopyPaste) {
+                setSelectedNode("");
+                roleModels.setMode(Mode.Default);
+              }
+            }}
+            onTouchStart={() => {
+              if (localMode.mode === Mode.CopyPaste) {
+                setSelectedNode(view.getId());
+                roleModels.setMode(Mode.CopyPaste, {
+                  containerID: view.getId(),
+                  from: role.getId(),
+                });
+              }
+            }}
+            onTouchEnd={() => {
+              if (localMode.mode === Mode.CopyPaste) {
+                setSelectedNode("");
+                roleModels.setMode(Mode.Default);
+              }
+            }}
+            userSelect={"none"}
+            key={roleModels.getDeviceRole() + "-box-view-" + node.viewId}
           >
             <ViewComponent
               key={roleModels.getDeviceRole() + "-view-" + node.viewId}
@@ -334,6 +344,7 @@ export function RolePage(props: RoleProps) {
               display={isContainerPosition ? "block" : "none"}
               w={"100%"}
               h={"100%"}
+              userSelect={"none"}
               position={"absolute"}
               top={0}
               left={0}
@@ -476,7 +487,6 @@ export function RolePage(props: RoleProps) {
         position={"absolute"}
         top={"0"}
         left={"0"}
-        {...bind("deposit")}
         display={
           mode.mode === Mode.CopyPaste && localMode.mode !== Mode.CopyPaste
             ? "block"
@@ -484,7 +494,7 @@ export function RolePage(props: RoleProps) {
         }
         bg={"blackAlpha.800"}
       >
-        <Flex
+        {/* <Flex
           w={"100%"}
           h={"100%"}
           alignItems={"center"}
