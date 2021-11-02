@@ -21,7 +21,7 @@ import {
   BiMicrophone,
   BiTargetLock,
 } from "react-icons/bi";
-import { BsBrush, BsFullscreen, BsPower } from "react-icons/bs";
+import { BsFullscreen, BsPower } from "react-icons/bs";
 import { HiFastForward, HiPlay, HiRewind } from "react-icons/hi";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 import { MdRadioButtonChecked } from "react-icons/md";

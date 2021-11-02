@@ -1,17 +1,6 @@
 import React, { useState } from "react";
 import { SlidesListModel } from ".";
-import {
-  Box,
-  Flex,
-  Table,
-  Tbody,
-  Image,
-  Td,
-  Th,
-  Thead,
-  Text,
-  Tr,
-} from "@chakra-ui/react";
+import { Box, Flex, Image, Text } from "@chakra-ui/react";
 import { SlidesListController } from "./SlidesListController";
 
 export function SlidesListView({
@@ -36,7 +25,13 @@ export function SlidesListView({
 
   const [selected, setSelected] = useState(slides[0]);
   return (
-    <Flex flexDirection={"column"} p={"10px"} h={"100%"} overflowY={"scroll"}>
+    <Flex
+      flexDirection={"column"}
+      p={"10px"}
+      h={"100%"}
+      overflowY={"scroll"}
+      {...component}
+    >
       {slides.map((slide, index) => (
         <Flex>
           <Text fontWeight={"bold"}>{index + 1}</Text>

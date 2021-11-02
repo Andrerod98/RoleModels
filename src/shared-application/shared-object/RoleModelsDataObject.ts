@@ -60,6 +60,7 @@ import { StockTableFactory } from "../../shared-components/StockTable";
 import { NewsTableFactory } from "../../shared-components/NewsTable";
 import { RemoteControlFactory } from "../../shared-components/RemoteControl";
 import { SlidesListFactory } from "../../shared-components/SlidesList";
+import { SlideControlsFactory } from "../../shared-components/SlideControls";
 
 export class RoleModelsDataObject
   extends DataObject
@@ -388,6 +389,10 @@ export class RoleModelsDataObject
     this.factoriesManager.registerFactory(
       new SlidesListFactory(this.factoriesManager)
     );
+
+    this.factoriesManager.registerFactory(
+      new SlideControlsFactory(this.factoriesManager)
+    );
   }
 
   public async createAllEventListeners() {
@@ -641,6 +646,20 @@ export class RoleModelsDataObject
     Logger.getInstance().info(
       `The view with id ${view.getId()} from ${from} has been migrated.`
     );
+  };
+
+  public removeContainer = (containerID: string): void => {
+    this.containersManager.removeContainer(containerID);
+    this.workspacesManager.removeContainerFromAllRoles(containerID);
+    this.workspacesManager.removeContainerFromAllRoles(containerID, true);
+    this.emit("change", "remove container");
+  };
+
+  public removeAllContainers = (): void => {
+    this.containersManager.removeAllContainers();
+
+    this.workspacesManager.clearContainers();
+    this.emit("change", "remove container");
   };
 
   public updateContainer(container: Container): void {

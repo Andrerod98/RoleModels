@@ -1,44 +1,47 @@
 import React, { useRef, useState, useMemo, useEffect } from "react";
 import { scaleTime, scaleLinear } from "@visx/scale";
-import appleStock, { AppleStock } from "@visx/mock-data/lib/mocks/appleStock";
 import { Brush } from "@visx/brush";
 import { Bounds } from "@visx/brush/lib/types";
-import BaseBrush, {
-  BaseBrushState,
-  UpdateBrush,
-} from "@visx/brush/lib/BaseBrush";
+import BaseBrush from "@visx/brush/lib/BaseBrush";
 import { PatternLines } from "@visx/pattern";
 import { LinearGradient } from "@visx/gradient";
 import { max, extent } from "d3-array";
-
+import AppleStockData from "../../mocks/apple/stock.json";
+import AmazonStockData from "../../mocks/amazon/stock.json";
+import MicrosoftStockData from "../../mocks/microsoft/stock.json";
 import AreaChart from "./AreaChart";
 
 // Initialize some variables
-const stock = appleStock.slice(1000);
+
 const brushMargin = { top: 10, bottom: 30, left: 30, right: 30 };
 const chartSeparation = 30;
 const PATTERN_ID = "brush_pattern";
 const GRADIENT_ID = "brush_gradient";
 export const accentColor = "white";
 export const background = "#000000";
-export const background2 = "#0FFFEE";
+
 const selectedBrushStyle = {
   fill: `url(#${PATTERN_ID})`,
   stroke: "white",
 };
 
 // accessors
-const getDate = (d: AppleStock) => new Date(d.date);
-const getStockValue = (d: AppleStock) => d.close;
+export type Stock = (string | number)[];
+
+const getDate = (d: Stock) => new Date(d[0]);
+const getStockValue = (d: Stock) => d[1];
 
 export type BrushProps = {
   margin?: { top: number; right: number; bottom: number; left: number };
   compact?: boolean;
+  stockSymbol: string;
+  background2: string;
 };
 
 function BrushChart({
   compact = false,
-
+  stockSymbol = "microsoft",
+  background2 = "#0FFFEE",
   margin = {
     top: 20,
     left: 30,
@@ -46,6 +49,18 @@ function BrushChart({
     right: 30,
   },
 }: BrushProps) {
+  const data1 = AppleStockData.dataset.data;
+  const data2 = AmazonStockData.dataset.data;
+  const data3 = MicrosoftStockData.dataset.data;
+
+  const dataMapping = {
+    apple: data1,
+    amazon: data2,
+    microsoft: data3,
+  };
+
+  const stock = dataMapping[stockSymbol];
+
   const [size, setSize] = useState({ width: 0, height: 0 });
   const brushRef = useRef<BaseBrush | null>(null);
   const [filteredStock, setFilteredStock] = useState(stock);
@@ -134,7 +149,7 @@ function BrushChart({
     [brushDateScale]
   );
 
-  // event handlers
+  /* event handlers
   const handleClearClick = () => {
     if (brushRef?.current) {
       setFilteredStock(stock);
@@ -162,7 +177,7 @@ function BrushChart({
       brushRef.current.updateBrush(updater);
     }
   };
-
+*/
   return (
     <svg ref={divRef} style={{ width: "100%", height: "100%" }}>
       <LinearGradient

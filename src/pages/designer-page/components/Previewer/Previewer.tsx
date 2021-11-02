@@ -7,12 +7,16 @@ import React, { useMemo } from "react";
 import { Preview } from "./Preview";
 import { HiViewGridAdd } from "react-icons/hi";
 import { ILayoutNode } from "../../../../shared-application/workspaces/ILayoutNode";
+import { MdDelete } from "react-icons/md";
+import { CgExtensionRemove } from "react-icons/cg";
 interface PreviewerProps {
   layout: ILayoutNode;
 
   isOpenLayoutModal: boolean;
   handleClick: () => void;
   handleViewClick: () => void;
+  handleRemoveAll: () => void;
+  handleRemove: () => void;
   selectedNode: string;
   setSelected: (newSelected: string) => void;
 }
@@ -38,6 +42,22 @@ export const Previewer = (props: PreviewerProps) => {
             onClick={props.handleClick}
             mb={2}
             icon={<IoRefresh />}
+          />
+          <IconButton
+            aria-label={"Search database"}
+            size={"sm"}
+            ml={2}
+            onClick={props.handleRemove}
+            mb={2}
+            icon={<CgExtensionRemove />}
+          />
+          <IconButton
+            aria-label={"Search database"}
+            size={"sm"}
+            ml={2}
+            onClick={props.handleRemoveAll}
+            mb={2}
+            icon={<MdDelete />}
           />
           <Spacer></Spacer>
         </Flex>

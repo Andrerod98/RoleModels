@@ -78,7 +78,9 @@ export class WorkspacesManager extends EventEmitter {
   public saveLastWorkspace(nDevices: number) {
     if (nDevices > 1) {
       const id = "" + nDevices;
-      const value = this.currentWorkspace.get();
+      const value = this.current.get().toWorkspace();
+
+      console.log(value);
 
       this.lastWorkspaces.set(id, { ...value });
     }
@@ -96,6 +98,24 @@ export class WorkspacesManager extends EventEmitter {
     });
 
     this.emitChange();
+  }
+
+  public clearContainers() {
+    this.primary.resetLayouts();
+    this.current.resetLayouts();
+  }
+
+  public removeContainerFromAllRoles(containerID: string, isPrimary = false) {
+    const roles = isPrimary
+      ? this.primary.get().getRoleLayouts().values()
+      : this.current.get().getRoleLayouts().values();
+
+    for (const role of roles) {
+      role.getLayout().getChildByViewId(containerID).removeAllListeners();
+      const nodeID = role.getLayout().getChildByViewId(containerID).getId();
+      role.getLayout().removeChild(nodeID);
+      role.getLayout().sync();
+    }
   }
 
   public removeContainerFromRole(roleId: string, containerID: string) {
@@ -186,7 +206,10 @@ export class WorkspacesManager extends EventEmitter {
       };
     }
 
-    layouts[roleID] = { ...this.primary.get().getFirstLayout().toLayout() };
+    layouts[roleID].layout = this.primary
+      .get()
+      .getFirstLayout()
+      .toLayout().layout;
 
     this.current.set({
       ...this.current.get().toWorkspace(),

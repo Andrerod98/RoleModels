@@ -1,5 +1,5 @@
 import { Box, Button, Text, Center } from "@chakra-ui/react";
-import React, { useContext, useEffect, useMemo, useRef } from "react";
+import React, { useContext, useMemo } from "react";
 import { FC } from "react";
 // import { UIComponentFactory } from "../components/UIComponentFactory";
 import { Role } from "../shared-application/roles/Role";
@@ -8,7 +8,6 @@ import { CrossAppState, CrossAppContext } from "../context/AppContext";
 import { IoPushOutline } from "react-icons/io5";
 import { ContainerPositionModal } from "./ContainerPositionModal";
 import { Mode } from "../context/Modes";
-import { useDrag, useGesture } from "@use-gesture/react";
 const QRCode = require("qrcode.react");
 
 interface ViewComponentProps {
@@ -35,6 +34,8 @@ export const ViewComponent: FC<ViewComponentProps> = (
 
   const isPullMode = mode.mode === Mode.Pull;
   const isContainerPositionMode = localMode.mode === Mode.ContainerPosition;
+  const isContainerRemovalMode = localMode.mode === Mode.ContainerRemove;
+
   const isPushMode = localMode.mode === Mode.Push;
   const isCopyPasteMode = localMode.mode === Mode.CopyPaste;
 
@@ -94,7 +95,7 @@ export const ViewComponent: FC<ViewComponentProps> = (
             </Box>
           </Button>
         </Center>
-      ) : isPushMode ? (
+      ) : isPushMode || isContainerRemovalMode ? (
         <Box w={"100%"} h={"100%"} position={"relative"}>
           {useMemo(() => {
             return props.view.getRoot().generateWidget();
@@ -107,13 +108,21 @@ export const ViewComponent: FC<ViewComponentProps> = (
             top={0}
             _hover={{ bg: "rgba(17, 99, 245,0.4)" }}
             onClick={() => {
-              setLocalMode({
-                mode: Mode.Push,
-                properties: {
-                  containerID: props.view.getId(),
-                  from: props.role.getId(),
-                },
-              });
+              if (isPushMode) {
+                setLocalMode({
+                  mode: Mode.Push,
+                  properties: {
+                    containerID: props.view.getId(),
+                    from: props.role.getId(),
+                  },
+                });
+              } else {
+                roleModels.removeContainer(props.view.getId());
+
+                setLocalMode({
+                  mode: Mode.Default,
+                });
+              }
             }}
           ></Box>
         </Box>

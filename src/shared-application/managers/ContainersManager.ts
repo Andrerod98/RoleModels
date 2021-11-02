@@ -64,6 +64,11 @@ export class ContainersManager extends EventEmitter {
     console.log(this.containersSharedMap.size + " containers loaded.");
   }
 
+  public removeAllContainers() {
+    this.containersSharedMap.clear();
+    this.containers.clear();
+  }
+
   /* Load a combined view from the shared combined view */
   public loadContainer(sharedContainer: SharedCell): Container {
     const viewValue = sharedContainer.get();

@@ -4,7 +4,7 @@ import { AreaClosed } from "@visx/shape";
 import { AxisLeft, AxisBottom, AxisScale } from "@visx/axis";
 import { LinearGradient } from "@visx/gradient";
 import { curveMonotoneX } from "@visx/curve";
-import { AppleStock } from "@visx/mock-data/lib/mocks/appleStock";
+import { Stock } from "./BrushChart";
 
 // Initialize some variables
 const axisColor = "#fff";
@@ -24,8 +24,8 @@ const axisLeftTickLabelProps = {
 };
 
 // accessors
-const getDate = (d: AppleStock) => new Date(d.date);
-const getStockValue = (d: AppleStock) => d.close;
+const getDate = (d: Stock) => new Date(d[0]);
+const getStockValue = (d: Stock) => d[1];
 
 export default function AreaChart({
   data,
@@ -41,7 +41,7 @@ export default function AreaChart({
   left,
   children,
 }: {
-  data: AppleStock[];
+  data: Stock[];
   gradientColor: string;
   xScale: AxisScale<number>;
   yScale: AxisScale<number>;
@@ -64,10 +64,10 @@ export default function AreaChart({
         to={gradientColor}
         toOpacity={0.2}
       />
-      <AreaClosed<AppleStock>
+      <AreaClosed<Stock>
         data={data}
         x={(d) => xScale(getDate(d)) || 0}
-        y={(d) => yScale(getStockValue(d)) || 0}
+        y={(d) => yScale(getStockValue(d) as any) || 0}
         yScale={yScale}
         strokeWidth={1}
         stroke='url(#gradient)'

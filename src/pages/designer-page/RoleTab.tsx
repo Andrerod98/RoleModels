@@ -8,7 +8,7 @@ import {
   Flex,
   Heading,
 } from "@chakra-ui/react";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { uuid } from "uuidv4";
 import { CrossAppState, CrossAppContext } from "../../context/AppContext";
 import { Mode } from "../../context/Modes";
@@ -39,6 +39,12 @@ export function RoleTab(props: RoleTabProps) {
     position: { row: 0, column: 0 },
   });
 
+  useEffect(() => {
+    setCodeState({
+      ...codeState,
+      value: Utils.jsonToString(containers.map((c) => c.toContainer())),
+    });
+  }, [containers]);
   const [alert, setAlert] = useState(false);
 
   /* const [layoutSnapshot, setLayoutSnapshot] = useState(
@@ -196,6 +202,28 @@ export function RoleTab(props: RoleTabProps) {
                     } as ILayoutNode)
               }
               isOpenLayoutModal={localMode.mode === Mode.ContainerPosition}
+              handleRemoveAll={() => {
+                roleModels.removeAllContainers();
+                setCodeState({
+                  ...codeState,
+                  value: Utils.jsonToString(
+                    Array.from(roleModels.getContainers()).map((c) =>
+                      c.toContainer()
+                    )
+                  ),
+                });
+              }}
+              handleRemove={() => {
+                if (localMode.mode === Mode.ContainerRemove) {
+                  setLocalMode({
+                    mode: Mode.Default,
+                  });
+                } else {
+                  setLocalMode({
+                    mode: Mode.ContainerRemove,
+                  });
+                }
+              }}
               handleViewClick={() => {
                 addViewToEditor();
               }}

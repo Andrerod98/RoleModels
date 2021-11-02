@@ -11,7 +11,6 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
-  Text,
   Spacer,
   useColorMode,
 } from "@chakra-ui/react";
@@ -21,11 +20,10 @@ import { FaPencilRuler } from "react-icons/fa";
 import { CrossAppState, CrossAppContext } from "../context/AppContext";
 import { QRReaderModal } from "./QRReaderModal";
 import { IoPushOutline } from "react-icons/io5";
-import { MdContentCopy } from "react-icons/md";
-import { BiSave } from "react-icons/bi";
 import { GrPowerReset } from "react-icons/gr";
 import { AiOutlineHome } from "react-icons/ai";
 import { Mode } from "../context/Modes";
+import { BiSave } from "react-icons/bi";
 
 interface HeaderProps {
   roles: string[];

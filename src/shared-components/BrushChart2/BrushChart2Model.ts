@@ -1,4 +1,6 @@
-import { BoxProps } from "@chakra-ui/react";
 import { IUIComponent } from "../UIComponent/UIComponentModel";
 
-export type BrushChart2Model = IUIComponent & BoxProps;
+export interface BrushChart2Model extends IUIComponent {
+  stock: "microsoft" | "apple" | "amazon" | "all";
+  color: string;
+}

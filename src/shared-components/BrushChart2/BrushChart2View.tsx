@@ -237,7 +237,7 @@ export function BrushChart2View({
         justifyContent={"center"}
         alignItems={"center"}
       >
-        <BrushChart></BrushChart>
+        <BrushChart stockSymbol={component.stock} background2={component.color}></BrushChart>
       </Flex>
     </Box>
   );

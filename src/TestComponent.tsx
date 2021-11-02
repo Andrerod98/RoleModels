@@ -9,7 +9,6 @@ import {
   Tbody,
   Td,
   Text,
-  Tfoot,
   Th,
   Thead,
   Tr,
@@ -22,16 +21,13 @@ import {
   BsPencil,
   BsPen,
   BsEraser,
-  BsPaintBucket,
   BsTextareaT,
   BsBoundingBox,
-  BsEyedropper,
   BsCircle,
   BsTrash,
   BsZoomIn,
   BsZoomOut,
 } from "react-icons/bs";
-import { IoColorWandOutline } from "react-icons/io5";
 import BrushChart from "./BrushChart";
 import { XYChartView } from "./XYChartView";
 

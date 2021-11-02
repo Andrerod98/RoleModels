@@ -1,4 +1,5 @@
 import { SharedCell } from "@fluidframework/cell";
+import { uuid } from "uuidv4";
 import { IWorkspace } from "./IWorkspace";
 import { IRoleLayout } from "./RoleLayout";
 import { Workspace } from "./Workspace";
@@ -17,6 +18,8 @@ export class SharedWorkspace {
   private setEventListeners() {
     this.sharedWorkspace.on("valueChanged", () => {
       this.workspace.update(this.sharedWorkspace.get());
+      console.log("CHANGED");
+      console.log(this.get().toWorkspace());
       this.setLayoutsEventListeners();
       this.emitChange();
     });
@@ -44,6 +47,18 @@ export class SharedWorkspace {
   public set(value: IWorkspace) {
     this.sharedWorkspace.set(value);
   }
+
+
+  public resetLayouts(){
+    const iworkspace = this.workspace.toWorkspace();
+    const keys = Object.keys(iworkspace.layouts);
+    for(const key of keys){
+      iworkspace.layouts[key].layout = { id: uuid(), name: "div" };
+    }
+
+    this.sharedWorkspace.set(iworkspace);
+  }
+
 
   public setRoleLayout(roleID: string, value: IRoleLayout) {
     const iworkspace = this.workspace.toWorkspace();

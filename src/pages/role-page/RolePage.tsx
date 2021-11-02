@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef } from "react";
+import React, { useContext } from "react";
 
 import {
   Box,
@@ -8,7 +8,6 @@ import {
   IconButton,
   Switch,
   Text,
-  useToast,
 } from "@chakra-ui/react";
 import { ViewComponent } from "../../components/ViewComponent";
 import { CrossAppState, CrossAppContext } from "../../context/AppContext";
@@ -26,10 +25,8 @@ import {
 } from "react-icons/ri";
 import { ILayoutNode } from "../../shared-application/workspaces/ILayoutNode";
 import { Mode } from "../../context/Modes";
-import Hammer from "hammerjs";
-import { uuid } from "uuidv4";
+
 import "../../styles/styles.scss";
-import { useDrag } from "@use-gesture/react";
 
 interface RoleProps {}
 
@@ -341,7 +338,11 @@ export function RolePage(props: RoleProps) {
                   ? "rgba(17, 99, 245,0.4)"
                   : "transparent"
               }
-              display={isContainerPosition ? "block" : "none"}
+              display={
+                isContainerPosition || localMode.mode === Mode.CopyPaste
+                  ? "block"
+                  : "none"
+              }
               w={"100%"}
               h={"100%"}
               userSelect={"none"}

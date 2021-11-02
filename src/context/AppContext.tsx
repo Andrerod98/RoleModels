@@ -118,9 +118,11 @@ export const CrossAppProvider = ({
           type: "removed",
         });
       } else {
-        roleModels.loadWorkspace(
-          roleModels.getPrimaryWorkspace(1).toWorkspace()
-        );
+        //const timer = setTimeout(() => {
+          roleModels.loadWorkspace(
+            roleModels.getPrimaryWorkspace(1).toWorkspace()
+          );
+        //}, 1000);
       }
     });
 

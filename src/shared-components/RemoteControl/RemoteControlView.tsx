@@ -27,6 +27,7 @@ export function RemoteControlView({
 
   return (
     <Flex
+      {...component}
       flexDirection={"column"}
       alignItems={"center"}
       justifyContent={"center"}

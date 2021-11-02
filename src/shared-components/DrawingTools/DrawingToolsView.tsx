@@ -28,7 +28,7 @@ export function DrawingToolsView({
 
   const [selected, setSelected] = useState("brush");
   return (
-    <Flex w={"100%"} h={"100vh"} bg={"#323232"} p={2} flexDirection={"column"}>
+    <Flex {...component} w={"100%"} h={"100vh"} bg={"#323232"} p={2} flexDirection={"column"}>
       <Text color={"white"} fontWeight={"bold"} w={"100%"} textAlign={"center"}>
         Tools
       </Text>

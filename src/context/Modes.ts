@@ -3,6 +3,7 @@ export enum Mode {
   Pull = "PULL",
   ContainerTransfer = "ContainerTransfer",
   ContainerPosition = "ContainerPosition",
+  ContainerRemove = "ContainerRemove",
   QuickInteraction = "QuickInteraction",
   Suggest = "Suggest",
   CopyPaste = "CopyPaste",
